@@ -1,18 +1,34 @@
-import { sql } from "drizzle-orm";
-import { pgTable, text, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, integer, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+  id: serial("id").primaryKey(),
+  username: text("username").notNull(),
+  platform: text("platform").notNull(), // 'instagram' or 'facebook'
+  avatarUrl: text("avatar_url"),
+  isConnected: boolean("is_connected").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
+export const unfollowers = pgTable("unfollowers", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  username: text("username").notNull(), // The person who unfollowed
+  detectedAt: timestamp("detected_at").defaultNow(),
 });
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
+export const insertUserSchema = createInsertSchema(users).omit({ 
+  id: true, 
+  createdAt: true 
+});
+
+export const insertUnfollowerSchema = createInsertSchema(unfollowers).omit({ 
+  id: true, 
+  detectedAt: true 
+});
+
 export type User = typeof users.$inferSelect;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type Unfollower = typeof unfollowers.$inferSelect;
+export type InsertUnfollower = z.infer<typeof insertUnfollowerSchema>;
