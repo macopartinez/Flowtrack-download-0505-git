@@ -4,23 +4,23 @@ import { Instagram, Facebook, BarChart3, ShieldCheck, Zap } from "lucide-react";
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-mesh font-body overflow-hidden">
+    <div className="min-h-screen bg-[#050505] font-body overflow-hidden text-white">
       {/* Navbar */}
-      <nav className="fixed w-full top-0 z-50 glass border-b border-gray-100/50">
+      <nav className="fixed w-full top-0 z-50 bg-black/50 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-primary/20">
               F
             </div>
-            <span className="font-display font-bold text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">Flowtrack</span>
+            <span className="font-display font-bold text-2xl tracking-tight text-white">Flowtrack</span>
           </div>
-          <div className="hidden md:flex items-center gap-10 text-sm font-semibold text-gray-500">
-            <a href="#features" className="hover:text-primary transition-all hover:scale-105">Features</a>
-            <a href="#how-it-works" className="hover:text-primary transition-all hover:scale-105">How it works</a>
-            <a href="#pricing" className="hover:text-primary transition-all hover:scale-105">Pricing</a>
+          <div className="hidden md:flex items-center gap-10 text-sm font-semibold text-gray-400">
+            <a href="#features" className="hover:text-white transition-all">Features</a>
+            <a href="#how-it-works" className="hover:text-white transition-all">How it works</a>
+            <a href="#pricing" className="hover:text-white transition-all">Pricing</a>
           </div>
           <div className="flex items-center gap-6">
-            <button className="text-sm font-bold text-gray-600 hover:text-primary transition-colors">Login</button>
+            <button className="text-sm font-bold text-gray-400 hover:text-white transition-colors">Login</button>
             <ConnectDialog />
           </div>
         </div>
@@ -34,26 +34,26 @@ export default function Landing() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/80 backdrop-blur-sm border border-primary/10 shadow-sm mb-10">
-              <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
-              <span className="text-sm font-bold text-gray-700 tracking-wide uppercase">Real-time Unfollower Tracking</span>
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 shadow-sm mb-10">
+              <span className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></span>
+              <span className="text-sm font-bold text-gray-400 tracking-wide uppercase">AI-Powered Unfollower Intelligence</span>
             </div>
             
-            <h1 className="text-6xl md:text-8xl font-display font-black leading-[1] mb-8 text-slate-900 tracking-tighter">
-              Know who unfollows <br />
-              <span className="text-gradient">in absolute real-time.</span>
+            <h1 className="text-6xl md:text-8xl font-display font-black leading-[1] mb-8 text-white tracking-tighter">
+              The ultimate tracking tool <br />
+              <span className="text-gradient">for serious creators.</span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-slate-500 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
-              The only tool that gives you instant clarity on your audience shifts. 
-              Beautiful analytics, instant notifications, and growth protection for your social presence.
+            <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
+              Don't just track numbers. Understand the human behind the click. 
+              The world's most advanced unfollower analytics platform.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <div className="scale-110">
                 <ConnectDialog />
               </div>
-              <button className="px-10 py-4 rounded-2xl text-lg font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 shadow-sm transition-all active:scale-95">
+              <button className="px-10 py-4 rounded-2xl text-lg font-bold text-white bg-white/5 border border-white/10 hover:bg-white/10 transition-all active:scale-95">
                 Watch Demo
               </button>
             </div>

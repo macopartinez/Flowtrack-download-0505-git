@@ -46,15 +46,15 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex font-body">
+    <div className="min-h-screen bg-black flex font-body text-white">
       {/* Sidebar */}
-      <aside className="w-72 bg-white border-r border-slate-100 hidden md:flex flex-col fixed h-full z-10 shadow-sm">
+      <aside className="w-72 bg-[#0A0A0A] border-r border-white/5 hidden md:flex flex-col fixed h-full z-10 shadow-2xl">
         <div className="p-10">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-white font-black text-2xl shadow-xl shadow-primary/30">
               F
             </div>
-            <span className="font-display font-black text-2xl tracking-tighter text-slate-900">Flowtrack</span>
+            <span className="font-display font-black text-2xl tracking-tighter text-white">Flowtrack</span>
           </div>
         </div>
 
@@ -65,9 +65,9 @@ export default function Dashboard() {
           <NavItem icon={Settings} label="Settings" />
         </nav>
 
-        <div className="p-6 border-t border-slate-100">
-          <div className="bg-slate-50 p-5 rounded-3xl mb-6 flex items-center gap-4 border border-slate-100">
-            <div className="w-12 h-12 rounded-full bg-white p-1 border border-slate-200 overflow-hidden shadow-sm">
+        <div className="p-6 border-t border-white/5">
+          <div className="bg-white/5 p-5 rounded-3xl mb-6 flex items-center gap-4 border border-white/5">
+            <div className="w-12 h-12 rounded-full bg-white/10 p-1 border border-white/10 overflow-hidden shadow-sm">
               <img 
                 src={user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`} 
                 alt="Avatar" 
@@ -75,14 +75,14 @@ export default function Dashboard() {
               />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="font-bold truncate text-sm text-slate-900">{user.username}</div>
-              <div className="text-xs text-slate-500 capitalize flex items-center gap-1.5 font-medium">
+              <div className="font-bold truncate text-sm text-white">{user.username}</div>
+              <div className="text-xs text-gray-400 capitalize flex items-center gap-1.5 font-medium">
                 {user.platform === 'instagram' ? <Instagram className="w-3.5 h-3.5 text-pink-500" /> : <Facebook className="w-3.5 h-3.5 text-blue-600" />}
                 {user.platform}
               </div>
             </div>
           </div>
-          <Button variant="ghost" className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 rounded-2xl h-12 font-bold">
+          <Button variant="ghost" className="w-full justify-start text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-2xl h-12 font-bold">
             <LogOut className="w-5 h-5 mr-3" /> Logout
           </Button>
         </div>
@@ -92,11 +92,11 @@ export default function Dashboard() {
       <main className="flex-1 md:ml-72 p-6 md:p-12 lg:p-16">
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-16">
           <div>
-            <h1 className="text-4xl font-display font-black text-slate-900 tracking-tight">Overview</h1>
-            <p className="text-slate-500 mt-2 font-medium">Monitoring your social growth and audience health.</p>
+            <h1 className="text-4xl font-display font-black text-white tracking-tight">Overview</h1>
+            <p className="text-gray-400 mt-2 font-medium">Monitoring your social growth and audience health.</p>
           </div>
           <div className="flex gap-4 w-full sm:w-auto">
-            <Button variant="outline" className="rounded-2xl h-12 px-6 font-bold border-slate-200 hover:border-slate-300 w-full sm:w-auto">
+            <Button variant="outline" className="rounded-2xl h-12 px-6 font-bold border-white/10 hover:border-white/20 bg-white/5 text-white w-full sm:w-auto">
               Download CSV
             </Button>
             <Button className="rounded-2xl h-12 px-6 font-bold shadow-lg shadow-primary/25 w-full sm:w-auto">
