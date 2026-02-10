@@ -6,53 +6,55 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-mesh font-body overflow-hidden">
       {/* Navbar */}
-      <nav className="fixed w-full top-0 z-50 glass border-b-0">
+      <nav className="fixed w-full top-0 z-50 glass border-b border-gray-100/50">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-xl">
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-primary/20">
               F
             </div>
-            <span className="font-display font-bold text-xl tracking-tight">Flowtrack</span>
+            <span className="font-display font-bold text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">Flowtrack</span>
           </div>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
-            <a href="#features" className="hover:text-primary transition-colors">Features</a>
-            <a href="#how-it-works" className="hover:text-primary transition-colors">How it works</a>
-            <a href="#pricing" className="hover:text-primary transition-colors">Pricing</a>
+          <div className="hidden md:flex items-center gap-10 text-sm font-semibold text-gray-500">
+            <a href="#features" className="hover:text-primary transition-all hover:scale-105">Features</a>
+            <a href="#how-it-works" className="hover:text-primary transition-all hover:scale-105">How it works</a>
+            <a href="#pricing" className="hover:text-primary transition-all hover:scale-105">Pricing</a>
           </div>
-          <div className="flex items-center gap-4">
-            <button className="text-sm font-semibold hover:text-primary transition-colors">Login</button>
+          <div className="flex items-center gap-6">
+            <button className="text-sm font-bold text-gray-600 hover:text-primary transition-colors">Login</button>
             <ConnectDialog />
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-40 pb-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="relative pt-48 pb-32 px-6">
+        <div className="max-w-5xl mx-auto text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-200 shadow-sm mb-8">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-              <span className="text-sm font-medium text-gray-600">Live Real-time Tracking</span>
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/80 backdrop-blur-sm border border-primary/10 shadow-sm mb-10">
+              <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
+              <span className="text-sm font-bold text-gray-700 tracking-wide uppercase">Real-time Unfollower Tracking</span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-display font-bold leading-[1.1] mb-6 text-foreground tracking-tight">
-              Stop losing followers <br />
-              <span className="text-gradient">without knowing why.</span>
+            <h1 className="text-6xl md:text-8xl font-display font-black leading-[1] mb-8 text-slate-900 tracking-tighter">
+              Know who unfollows <br />
+              <span className="text-gradient">in absolute real-time.</span>
             </h1>
             
-            <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-              Track your Instagram and Facebook unsubscriptions in real-time. 
-              Get detailed analytics, spot trends, and protect your audience growth.
+            <p className="text-xl md:text-2xl text-slate-500 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
+              The only tool that gives you instant clarity on your audience shifts. 
+              Beautiful analytics, instant notifications, and growth protection for your social presence.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <ConnectDialog />
-              <button className="px-8 py-6 rounded-full text-lg font-semibold text-gray-600 hover:bg-gray-100 transition-colors">
-                View Demo
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+              <div className="scale-110">
+                <ConnectDialog />
+              </div>
+              <button className="px-10 py-4 rounded-2xl text-lg font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 shadow-sm transition-all active:scale-95">
+                Watch Demo
               </button>
             </div>
           </motion.div>

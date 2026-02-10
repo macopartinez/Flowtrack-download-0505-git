@@ -8,8 +8,8 @@
   --font-display: 'Outfit', sans-serif;
   --font-body: 'Plus Jakarta Sans', sans-serif;
 
-  /* Clean, premium light theme */
-  --background: 0 0% 100%;
+  /* Clean, premium light theme with Figma-inspired colors */
+  --background: 210 40% 98%;
   --foreground: 222 47% 11%;
 
   --card: 0 0% 100%;
@@ -17,16 +17,16 @@
   --popover: 0 0% 100%;
   --popover-foreground: 222 47% 11%;
 
-  --primary: 262 83% 58%; /* Vibrant Violet */
+  --primary: 250 84% 54%; /* Premium Indigo/Violet */
   --primary-foreground: 210 40% 98%;
 
   --secondary: 210 40% 96.1%;
   --secondary-foreground: 222 47% 11.2%;
 
-  --muted: 210 40% 96.1%;
+  --muted: 214 32% 91%;
   --muted-foreground: 215.4 16.3% 46.9%;
 
-  --accent: 262 83% 58%;
+  --accent: 250 84% 54%;
   --accent-foreground: 222 47% 11.2%;
 
   --destructive: 0 84.2% 60.2%;
@@ -34,9 +34,9 @@
 
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
-  --ring: 262 83% 58%;
+  --ring: 250 84% 54%;
 
-  --radius: 1rem;
+  --radius: 1.25rem;
 }
 
 @layer base {
