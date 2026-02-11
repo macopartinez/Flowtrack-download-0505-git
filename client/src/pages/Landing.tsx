@@ -11,7 +11,7 @@ export default function Landing() {
       <nav className="fixed w-full top-0 z-50 bg-transparent">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="font-display font-bold text-2xl tracking-tight text-white">Flowtrack</span>
+            <span className="font-display font-bold tracking-tight text-white text-[36px] bg-[#00000000]">FLOWTRACK</span>
           </div>
           <div className="hidden md:flex items-center gap-10 text-sm font-semibold text-gray-400">
             <a href="#features" className="hover:text-white transition-all">Features</a>
@@ -24,7 +24,6 @@ export default function Landing() {
           </div>
         </div>
       </nav>
-
       {/* Hero Section */}
       <section className="relative pt-48 pb-32 px-6">
         <div className="max-w-5xl mx-auto text-center">
@@ -92,7 +91,6 @@ export default function Landing() {
           </div>
         </motion.div>
       </section>
-
       {/* Features Grid */}
       <section id="features" className="py-24 bg-white/50">
         <div className="max-w-7xl mx-auto px-6">
@@ -140,7 +138,6 @@ export default function Landing() {
           </div>
         </div>
       </section>
-
       {/* Footer */}
       <footer className="py-12 border-t border-gray-100 bg-white">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
