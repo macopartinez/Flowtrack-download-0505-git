@@ -35,11 +35,6 @@ export default function Landing() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 shadow-sm mb-10">
-              <span className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></span>
-              <span className="text-sm font-bold text-gray-400 tracking-wide uppercase">AI-Powered Unfollower Intelligence</span>
-            </div>
-            
             <h1 className="text-6xl md:text-8xl font-display font-black leading-[1] mb-8 text-white tracking-tighter">
               The ultimate tracking tool <br />
               <span className="text-gradient">for serious creators.</span>
