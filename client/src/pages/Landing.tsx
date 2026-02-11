@@ -11,9 +11,6 @@ export default function Landing() {
       <nav className="fixed w-full top-0 z-50 bg-transparent">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-primary/20">
-              F
-            </div>
             <span className="font-display font-bold text-2xl tracking-tight text-white">Flowtrack</span>
           </div>
           <div className="hidden md:flex items-center gap-10 text-sm font-semibold text-gray-400">
