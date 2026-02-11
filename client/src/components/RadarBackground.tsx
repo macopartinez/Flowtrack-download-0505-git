@@ -84,7 +84,7 @@ export function RadarBackground() {
       }
 
       draw() {
-        if (this.opacity <= 0 || this.radius <= 0) return;
+        if (!ctx || this.opacity <= 0 || this.radius <= 0) return;
         ctx.save();
         if (performanceMode !== 'low') {
           ctx.shadowBlur = config.shadowBlur;
