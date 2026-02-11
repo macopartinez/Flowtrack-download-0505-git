@@ -1,5 +1,6 @@
 import { ConnectDialog } from "@/components/ConnectDialog";
 import { RadarBackground } from "@/components/RadarBackground";
+import { GlassText } from "@/components/GlassText";
 import { motion } from "framer-motion";
 import { Instagram, Facebook, BarChart3, ShieldCheck, Zap } from "lucide-react";
 
@@ -11,7 +12,7 @@ export default function Landing() {
       <nav className="fixed w-full top-0 z-50 bg-transparent">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="font-display font-bold tracking-tight text-white text-[36px] bg-[#00000000]">FLOWTRACK</span>
+            <GlassText text="FLOWTRACK" fontSize={36} />
           </div>
           <div className="hidden md:flex items-center gap-10 text-sm font-semibold text-gray-400">
             <a href="#features" className="hover:text-white transition-all">Features</a>
