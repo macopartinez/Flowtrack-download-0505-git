@@ -1,5 +1,6 @@
 import { ConnectDialog } from "@/components/ConnectDialog";
 import { RadarBackground } from "@/components/RadarBackground";
+import { BackgroundFlowtrack } from "@/components/BackgroundFlowtrack";
 import { GlassText } from "@/components/GlassText";
 import { motion } from "framer-motion";
 import { Instagram, Facebook, BarChart3, ShieldCheck, Zap } from "lucide-react";
@@ -8,6 +9,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-transparent font-body overflow-hidden text-white relative">
       <RadarBackground />
+      <BackgroundFlowtrack />
       {/* Navbar */}
       <nav className="fixed w-full top-0 z-50 bg-transparent">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">

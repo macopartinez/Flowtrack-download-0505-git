@@ -30,6 +30,16 @@ Key pages:
 - `/` — Landing page with marketing content and account connection dialog
 - `/dashboard/:userId` — Analytics dashboard showing unfollower stats and charts
 
+### Visual Effects System
+The landing page uses a layered animation system with wave-reactive text:
+
+- **RadarBackground** (`client/src/components/RadarBackground.tsx`): Canvas-based radar wave animation (green waves from top-left corner on #0a0a0a dark background). Exports wave position data via `waveData.ts`.
+- **BackgroundFlowtrack** (`client/src/components/BackgroundFlowtrack.tsx`): Large centered "FLOWTRACK" text rendered on canvas. Only outlines/contours are visible, and they glow electric green when radar waves pass through them.
+- **GlassText** (`client/src/components/GlassText.tsx`): Navbar "FLOWTRACK" logo using Lalezar font with CSS `backdrop-filter` glass effect (blur, low brightness, low saturation). Gets frosted with electric green color when waves pass.
+- **Wave Data** (`client/src/lib/waveData.ts`): Shared module that stores wave positions. `RadarBackground` writes to it each frame, both text components read from it via `getWaveIntensityAtPoint()` to calculate wave intersection intensity.
+- **Fonts**: Lalezar (Google Font) for FLOWTRACK branding, Outfit for display headings, Plus Jakarta Sans for body text.
+- **Theme**: Dark mode only (#0a0a0a background, green electric accents rgba(0,255,100), purple primary for UI elements).
+
 ### Backend
 - **Framework**: Express 5 on Node.js
 - **Runtime**: tsx for TypeScript execution in development

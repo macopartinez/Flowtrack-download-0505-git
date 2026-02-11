@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { setWaveData } from '@/lib/waveData';
 
 export function RadarBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -21,13 +22,13 @@ export function RadarBackground() {
 
     const centerX = 10;
     const centerY = 10;
-    const waves: Wave[] = [];
+    const waves: WaveObj[] = [];
 
     const getWaveConfig = () => {
       const screenWidth = window.innerWidth;
       const isMobile = screenWidth < 768;
       return {
-        maxRadius: Math.max(window.innerWidth, window.innerHeight),
+        maxRadius: Math.max(window.innerWidth, window.innerHeight) * 1.5,
         waveSpeed: isMobile ? 60 : 80,
         waveSpacing: isMobile ? 120 : 180,
         maxWaveWidth: isMobile ? 15 : 22.5,
@@ -43,7 +44,7 @@ export function RadarBackground() {
       config = getWaveConfig();
     });
 
-    class Wave {
+    class WaveObj {
       radius: number;
       opacity: number;
       beat: number;
@@ -84,7 +85,7 @@ export function RadarBackground() {
 
     const createWave = () => {
       if (waves.length === 0 || waves[waves.length - 1].radius >= config.waveSpacing) {
-        waves.push(new Wave(waveCounter));
+        waves.push(new WaveObj(waveCounter));
         waveCounter++;
       }
     };
@@ -103,6 +104,9 @@ export function RadarBackground() {
           waves.splice(i, 1);
         }
       }
+
+      setWaveData(waves.map(w => ({ radius: w.radius, opacity: w.opacity })));
+
       ctx.save();
       ctx.shadowBlur = config.shadowBlur;
       ctx.shadowColor = 'rgba(0, 255, 100, 0.8)';
