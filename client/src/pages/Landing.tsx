@@ -1,10 +1,12 @@
 import { ConnectDialog } from "@/components/ConnectDialog";
+import { RadarBackground } from "@/components/RadarBackground";
 import { motion } from "framer-motion";
 import { Instagram, Facebook, BarChart3, ShieldCheck, Zap } from "lucide-react";
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-[#050505] font-body overflow-hidden text-white">
+    <div className="min-h-screen bg-transparent font-body overflow-hidden text-white relative">
+      <RadarBackground />
       {/* Navbar */}
       <nav className="fixed w-full top-0 z-50 bg-black/50 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">

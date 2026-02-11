@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
+import { RadarBackground } from "@/components/RadarBackground";
 
 // Mock data for the chart since schema doesn't support history yet
 const chartData = [
@@ -46,9 +47,10 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex font-body text-white">
+    <div className="min-h-screen bg-transparent flex font-body text-white relative">
+      <RadarBackground />
       {/* Sidebar */}
-      <aside className="w-72 bg-[#0A0A0A] border-r border-white/5 hidden md:flex flex-col fixed h-full z-10 shadow-2xl">
+      <aside className="w-72 bg-black/80 backdrop-blur-xl border-r border-white/5 hidden md:flex flex-col fixed h-full z-10 shadow-2xl">
         <div className="p-10">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-white font-black text-2xl shadow-xl shadow-primary/30">
