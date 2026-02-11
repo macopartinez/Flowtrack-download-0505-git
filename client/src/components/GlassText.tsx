@@ -96,8 +96,25 @@ export function GlassText({ text, className = '', fontSize = 36 }: GlassTextProp
               left: 0,
               width: `${size.width}px`,
               height: `${size.height}px`,
-              backdropFilter: 'blur(16px) brightness(0.2) saturate(0.2) contrast(1.5)',
-              WebkitBackdropFilter: 'blur(16px) brightness(0.2) saturate(0.2) contrast(1.5)',
+              background: 'rgba(255, 255, 255, 0.85)',
+              maskImage: `url(${maskUrl})`,
+              WebkitMaskImage: `url(${maskUrl})`,
+              maskSize: '100% 100%',
+              WebkitMaskSize: '100% 100%',
+              maskRepeat: 'no-repeat',
+              WebkitMaskRepeat: 'no-repeat',
+              pointerEvents: 'none',
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: `${size.width}px`,
+              height: `${size.height}px`,
+              backdropFilter: 'blur(8px) brightness(1.2)',
+              WebkitBackdropFilter: 'blur(8px) brightness(1.2)',
               maskImage: `url(${maskUrl})`,
               WebkitMaskImage: `url(${maskUrl})`,
               maskSize: '100% 100%',
@@ -115,7 +132,7 @@ export function GlassText({ text, className = '', fontSize = 36 }: GlassTextProp
               left: 0,
               width: `${size.width}px`,
               height: `${size.height}px`,
-              background: 'rgba(0, 255, 100, 0.35)',
+              background: 'rgba(0, 255, 100, 0.8)',
               maskImage: `url(${maskUrl})`,
               WebkitMaskImage: `url(${maskUrl})`,
               maskSize: '100% 100%',
@@ -131,17 +148,17 @@ export function GlassText({ text, className = '', fontSize = 36 }: GlassTextProp
             ref={glowRef}
             style={{
               position: 'absolute',
-              top: '-4px',
-              left: '-4px',
-              width: `${size.width + 8}px`,
-              height: `${size.height + 8}px`,
-              boxShadow: '0 0 30px rgba(0, 255, 100, 0.4), inset 0 0 20px rgba(0, 255, 100, 0.1)',
+              top: '-6px',
+              left: '-6px',
+              width: `${size.width + 12}px`,
+              height: `${size.height + 12}px`,
+              boxShadow: '0 0 20px rgba(0, 255, 100, 0.5), 0 0 40px rgba(0, 255, 100, 0.25)',
               maskImage: `url(${maskUrl})`,
               WebkitMaskImage: `url(${maskUrl})`,
               maskSize: `${size.width}px ${size.height}px`,
               WebkitMaskSize: `${size.width}px ${size.height}px`,
-              maskPosition: '4px 4px',
-              WebkitMaskPosition: '4px 4px',
+              maskPosition: '6px 6px',
+              WebkitMaskPosition: '6px 6px',
               maskRepeat: 'no-repeat',
               WebkitMaskRepeat: 'no-repeat',
               pointerEvents: 'none',
@@ -149,31 +166,6 @@ export function GlassText({ text, className = '', fontSize = 36 }: GlassTextProp
               transition: 'opacity 0.05s linear',
             }}
           />
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: `${size.width}px`,
-              height: `${size.height}px`,
-              pointerEvents: 'none',
-            }}
-          >
-            <svg width={size.width} height={size.height} style={{ display: 'block' }}>
-              <text
-                x="0"
-                y={fontSize * 0.85}
-                fontFamily="'Lalezar', cursive"
-                fontSize={fontSize}
-                letterSpacing="2px"
-                fill="none"
-                stroke="rgba(255,255,255,0.06)"
-                strokeWidth="0.8"
-              >
-                {text}
-              </text>
-            </svg>
-          </div>
         </>
       )}
     </div>
