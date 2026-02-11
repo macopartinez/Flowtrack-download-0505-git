@@ -28,7 +28,7 @@ export default function Landing() {
         </div>
       </nav>
       {/* Hero Section */}
-      <section className="relative pt-48 pb-32 px-6">
+      <section className="relative pt-64 pb-32 px-6">
         <div className="max-w-5xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
