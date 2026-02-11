@@ -8,7 +8,7 @@ export default function Landing() {
     <div className="min-h-screen bg-transparent font-body overflow-hidden text-white relative">
       <RadarBackground />
       {/* Navbar */}
-      <nav className="fixed w-full top-0 z-50 bg-[#0a0a0a]/50 backdrop-blur-xl border-b border-white/5">
+      <nav className="fixed w-full top-0 z-50 bg-[#0a0a0a]/50 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-primary/20">
