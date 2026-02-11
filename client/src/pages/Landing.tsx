@@ -56,23 +56,6 @@ export default function Landing() {
           </motion.div>
         </div>
 
-        {/* Floating Elements (Decorative) */}
-        <motion.div 
-          animate={{ y: [0, -20, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-40 left-10 md:left-40 hidden md:block"
-        >
-          <div className="glass-card p-4 rounded-2xl flex items-center gap-3 w-48">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-yellow-400 to-purple-600 flex items-center justify-center text-white">
-              <Instagram className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-xs text-gray-500">New Unfollower</div>
-              <div className="text-sm font-bold">@sarah_designs</div>
-            </div>
-          </div>
-        </motion.div>
-
         <motion.div 
           animate={{ y: [0, 20, 0] }}
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
