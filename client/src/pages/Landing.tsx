@@ -22,8 +22,8 @@ export default function Landing() {
             <a href="#pricing" className="hover:text-white transition-all">Pricing</a>
           </div>
           <div className="flex items-center gap-6">
-            <button className="text-sm font-bold text-gray-400 hover:text-white transition-colors">Login</button>
             <ConnectDialog />
+            <button className="text-sm font-bold text-gray-400 hover:text-white transition-colors">Login</button>
           </div>
         </div>
       </nav>
