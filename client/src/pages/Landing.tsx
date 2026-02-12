@@ -37,7 +37,7 @@ export default function Landing() {
           >
             <h1 className="text-6xl md:text-8xl font-display font-black leading-[1] mb-8 text-white tracking-tighter">
               The ultimate tracking tool <br />
-              <span className="text-gradient">for serious creators.</span>
+              <span className="text-gradient">for a better relationship.</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
