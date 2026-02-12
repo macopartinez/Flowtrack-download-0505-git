@@ -61,8 +61,8 @@
 }
 
 .text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-[#02c950] via-green-400 to-[#02c950];
-  filter: drop-shadow(0 0 8px rgba(2, 201, 80, 0.5));
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-white via-white/90 to-white;
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 24px rgba(255, 200, 200, 0.4));
 }
 
 /* Glassmorphism */
