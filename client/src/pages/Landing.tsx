@@ -16,14 +16,14 @@ export default function Landing() {
           <div className="flex items-center gap-2">
             <GlassText text="FLOWTRACK" fontSize={36} />
           </div>
-          <div className="hidden md:flex items-center gap-10 text-sm font-semibold text-white/70">
-            <a href="#features" className="hover:text-white transition-all">Features</a>
-            <a href="#how-it-works" className="hover:text-white transition-all">How it works</a>
-            <a href="#pricing" className="hover:text-white transition-all">Pricing</a>
+          <div className="hidden md:flex items-center gap-10 text-sm font-semibold text-white">
+            <a href="#features" className="hover:text-white/80 transition-all">Features</a>
+            <a href="#how-it-works" className="hover:text-white/80 transition-all">How it works</a>
+            <a href="#pricing" className="hover:text-white/80 transition-all">Pricing</a>
           </div>
           <div className="flex items-center gap-6">
             <ConnectDialog />
-            <button className="text-sm font-bold text-white/70 hover:text-white transition-colors">Login</button>
+            <button className="text-sm font-bold text-white hover:text-white/80 transition-colors">Login</button>
           </div>
         </div>
       </nav>
