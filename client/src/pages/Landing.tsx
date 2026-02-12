@@ -35,10 +35,7 @@ export default function Landing() {
               <span className="text-gradient">for a better relationship.</span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
-              Don't just track numbers. Understand the human behind the click. 
-              The world's most advanced unfollower analytics platform.
-            </p>
+            <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">Don't just track numbers. Start seeing faces, know exactly who stays and who fades</p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <div className="scale-110">
