@@ -67,7 +67,7 @@ export default function Landing() {
                 {
                   step: "01",
                   title: "Connect",
-                  desc: "Link your Instagram, Facebook or Email account securely in just one click.",
+                  desc: "Connect your Instagram or Facebook account and add your email to link them securely.",
                   icon: Eye
                 },
                 {
