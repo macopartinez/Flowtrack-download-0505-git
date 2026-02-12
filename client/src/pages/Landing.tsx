@@ -3,14 +3,14 @@ import { RadarBackground } from "@/components/RadarBackground";
 import { BackgroundFlowtrack } from "@/components/BackgroundFlowtrack";
 import { GlassText } from "@/components/GlassText";
 import { motion } from "framer-motion";
-import { Instagram, Facebook, BarChart3, ShieldCheck, Zap } from "lucide-react";
+import { BarChart3, ShieldCheck, Zap, Eye } from "lucide-react";
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-transparent font-body overflow-hidden text-white relative">
+    <div className="h-screen overflow-y-auto snap-y snap-mandatory bg-transparent font-body text-white relative" data-testid="scroll-container">
       <RadarBackground />
       <BackgroundFlowtrack />
-      {/* Navbar */}
+
       <nav className="fixed w-full top-0 z-50 bg-transparent">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -18,26 +18,27 @@ export default function Landing() {
           </div>
           <div className="flex items-center gap-6">
             <ConnectDialog />
-            <button className="text-sm font-bold text-white hover:text-white/80 transition-colors">Login</button>
+            <button className="text-sm font-bold text-white hover:text-white/80 transition-colors" data-testid="button-login">Login</button>
           </div>
         </div>
       </nav>
-      {/* Hero Section */}
-      <section className="relative pt-64 pb-32 px-6">
+
+      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-hero">
         <div className="max-w-5xl mx-auto text-center">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <h1 className="text-6xl md:text-8xl font-display font-black leading-[1] mb-8 text-white tracking-tighter">
               The ultimate tracking tool <br />
               <span className="text-gradient">for a better relationship.</span>
             </h1>
-            
-            <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">Don't just track numbers. Start seeing faces, know exactly who stays and who fades</p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
+              Don't just track numbers. Start seeing faces, know exactly who stays and who fades
+            </p>
+            <div className="flex items-center justify-center">
               <div className="scale-110">
                 <ConnectDialog />
               </div>
@@ -45,65 +46,147 @@ export default function Landing() {
           </motion.div>
         </div>
       </section>
-      {/* Features Grid */}
-      <section id="features" className="py-24 bg-white/50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Everything you need to grow</h2>
-            <p className="text-muted-foreground">Powerful tools to help you understand your audience better.</p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: BarChart3,
-                title: "Deep Analytics",
-                desc: "Understand exactly when and why people unfollow you with detailed timeline charts.",
-                color: "text-blue-500"
-              },
-              {
-                icon: Zap,
-                title: "Real-time Alerts",
-                desc: "Get notified instantly when someone unfollows your account so you can react fast.",
-                color: "text-yellow-500"
-              },
-              {
-                icon: ShieldCheck,
-                title: "Account Safety",
-                desc: "We use official APIs and bank-grade encryption to keep your account 100% secure.",
-                color: "text-green-500"
-              }
-            ].map((feature, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="p-8 rounded-3xl bg-white border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
-              >
-                <div className={`w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center mb-6 ${feature.color}`}>
-                  <feature.icon className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                <p className="text-gray-500 leading-relaxed">{feature.desc}</p>
-              </motion.div>
-            ))}
-          </div>
+      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-features">
+        <div className="max-w-6xl mx-auto w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-6xl font-display font-black mb-6 text-white tracking-tighter">
+                Everything you need <br /><span className="text-gradient">to grow</span>
+              </h2>
+              <p className="text-lg text-gray-400 max-w-2xl mx-auto">Powerful tools to help you understand your audience better.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: BarChart3,
+                  title: "Deep Analytics",
+                  desc: "Understand exactly when and why people unfollow you with detailed timeline charts.",
+                  color: "text-blue-400"
+                },
+                {
+                  icon: Zap,
+                  title: "Real-time Alerts",
+                  desc: "Get notified instantly when someone unfollows your account so you can react fast.",
+                  color: "text-yellow-400"
+                },
+                {
+                  icon: ShieldCheck,
+                  title: "Account Safety",
+                  desc: "We use official APIs and bank-grade encryption to keep your account 100% secure.",
+                  color: "text-green-400"
+                }
+              ].map((feature, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.15, duration: 0.6 }}
+                  className="p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 transition-all duration-300"
+                  data-testid={`card-feature-${i}`}
+                >
+                  <div className={`w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-6 ${feature.color}`}>
+                    <feature.icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3 text-white">{feature.title}</h3>
+                  <p className="text-gray-400 leading-relaxed">{feature.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
-      {/* Footer */}
-      <footer className="py-12 border-t border-gray-100 bg-white">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2">
-             <div className="w-6 h-6 rounded bg-primary flex items-center justify-center text-white font-bold text-xs">F</div>
-             <span className="font-bold">Flowtrack</span>
-          </div>
-          <div className="text-sm text-gray-500">
-            © 2024 Flowtrack Analytics. All rights reserved.
-          </div>
+
+      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-how-it-works">
+        <div className="max-w-5xl mx-auto w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-6xl font-display font-black mb-6 text-white tracking-tighter">
+                How it <span className="text-gradient">works</span>
+              </h2>
+              <p className="text-lg text-gray-400 max-w-2xl mx-auto">Three simple steps to start tracking your audience.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  step: "01",
+                  title: "Connect",
+                  desc: "Link your Instagram or Facebook account securely in just one click.",
+                  icon: Eye
+                },
+                {
+                  step: "02",
+                  title: "Track",
+                  desc: "Our system monitors your followers in real-time, detecting every change instantly.",
+                  icon: BarChart3
+                },
+                {
+                  step: "03",
+                  title: "Analyze",
+                  desc: "Access detailed analytics and insights to understand your audience behavior.",
+                  icon: Zap
+                }
+              ].map((item, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.2, duration: 0.6 }}
+                  className="text-center"
+                  data-testid={`step-${i}`}
+                >
+                  <div className="w-16 h-16 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 flex items-center justify-center mx-auto mb-6">
+                    <item.icon className="w-7 h-7 text-green-400" />
+                  </div>
+                  <div className="text-sm font-bold text-green-400 mb-2 tracking-widest">{item.step}</div>
+                  <h3 className="text-2xl font-bold mb-3 text-white">{item.title}</h3>
+                  <p className="text-gray-400 leading-relaxed max-w-xs mx-auto">{item.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </div>
-      </footer>
+      </section>
+
+      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-cta">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <h2 className="text-4xl md:text-7xl font-display font-black mb-8 text-white tracking-tighter">
+              Ready to see <br /><span className="text-gradient">who's watching?</span>
+            </h2>
+            <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+              Join thousands of creators who already use Flowtrack to understand their audience and grow smarter.
+            </p>
+            <div className="flex items-center justify-center mb-16">
+              <div className="scale-125">
+                <ConnectDialog />
+              </div>
+            </div>
+            <div className="text-sm text-gray-500">
+              &copy; 2024 Flowtrack Analytics. All rights reserved.
+            </div>
+          </motion.div>
+        </div>
+      </section>
     </div>
   );
 }
