@@ -55,22 +55,6 @@ export default function Landing() {
             </div>
           </motion.div>
         </div>
-
-        <motion.div 
-          animate={{ y: [0, 20, 0] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute bottom-20 right-10 md:right-40 hidden md:block"
-        >
-          <div className="glass-card p-4 rounded-2xl flex items-center gap-3 w-48">
-            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white">
-              <Facebook className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-xs text-gray-500">Growth Rate</div>
-              <div className="text-sm font-bold text-green-500">+12.4% ↗</div>
-            </div>
-          </div>
-        </motion.div>
       </section>
       {/* Features Grid */}
       <section id="features" className="py-24 bg-white/50">
