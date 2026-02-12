@@ -47,63 +47,6 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-features">
-        <div className="max-w-6xl mx-auto w-full">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-6xl font-display font-black mb-6 text-white tracking-tighter">
-                Everything you need <br /><span className="text-gradient">to grow</span>
-              </h2>
-              <p className="text-lg text-gray-400 max-w-2xl mx-auto">Powerful tools to help you understand your audience better.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                {
-                  icon: BarChart3,
-                  title: "Deep Analytics",
-                  desc: "Understand exactly when and why people unfollow you with detailed timeline charts.",
-                  color: "text-blue-400"
-                },
-                {
-                  icon: Zap,
-                  title: "Real-time Alerts",
-                  desc: "Get notified instantly when someone unfollows your account so you can react fast.",
-                  color: "text-yellow-400"
-                },
-                {
-                  icon: ShieldCheck,
-                  title: "Account Safety",
-                  desc: "We use official APIs and bank-grade encryption to keep your account 100% secure.",
-                  color: "text-green-400"
-                }
-              ].map((feature, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.15, duration: 0.6 }}
-                  className="p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 transition-all duration-300"
-                  data-testid={`card-feature-${i}`}
-                >
-                  <div className={`w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-6 ${feature.color}`}>
-                    <feature.icon className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-3 text-white">{feature.title}</h3>
-                  <p className="text-gray-400 leading-relaxed">{feature.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
       <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-how-it-works">
         <div className="max-w-5xl mx-auto w-full">
           <motion.div
@@ -155,6 +98,63 @@ export default function Landing() {
                   <div className="text-sm font-bold text-green-400 mb-2 tracking-widest">{item.step}</div>
                   <h3 className="text-2xl font-bold mb-3 text-white">{item.title}</h3>
                   <p className="text-gray-400 leading-relaxed max-w-xs mx-auto">{item.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-features">
+        <div className="max-w-6xl mx-auto w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-6xl font-display font-black mb-6 text-white tracking-tighter">
+                Everything you need <br /><span className="text-gradient">to grow</span>
+              </h2>
+              <p className="text-lg text-gray-400 max-w-2xl mx-auto">Powerful tools to help you understand your audience better.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: BarChart3,
+                  title: "Deep Analytics",
+                  desc: "Understand exactly when and why people unfollow you with detailed timeline charts.",
+                  color: "text-blue-400"
+                },
+                {
+                  icon: Zap,
+                  title: "Real-time Alerts",
+                  desc: "Get notified instantly when someone unfollows your account so you can react fast.",
+                  color: "text-yellow-400"
+                },
+                {
+                  icon: ShieldCheck,
+                  title: "Account Safety",
+                  desc: "We use official APIs and bank-grade encryption to keep your account 100% secure.",
+                  color: "text-green-400"
+                }
+              ].map((feature, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.15, duration: 0.6 }}
+                  className="p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 transition-all duration-300"
+                  data-testid={`card-feature-${i}`}
+                >
+                  <div className={`w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-6 ${feature.color}`}>
+                    <feature.icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3 text-white">{feature.title}</h3>
+                  <p className="text-gray-400 leading-relaxed">{feature.desc}</p>
                 </motion.div>
               ))}
             </div>
