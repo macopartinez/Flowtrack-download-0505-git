@@ -31,13 +31,13 @@ export default function Landing() {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <h1 className="text-6xl md:text-8xl font-display font-black leading-[1] mb-8 text-white tracking-tighter">
-              The ultimate tracking tool <br />
-              <span className="text-gradient">for a better relationship.</span>
+              L'outil de tracking ultime <br />
+              <span className="text-gradient">pour de meilleures relations.</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
-              Don't just track numbers. Understand the human behind the click. 
-              The world's most advanced unfollower analytics platform.
+              Pour ceux qui ne se contentent pas d'un chiffre global. <br />
+              Osez prouver votre intérêt.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
