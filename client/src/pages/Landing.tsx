@@ -11,7 +11,7 @@ function PhoneNotification() {
 
   useEffect(() => {
     const CYCLE = 11000;
-    const NOTIF_DELAY = 6000;
+    const NOTIF_DELAY = 5800; // Ajusté pour apparaître juste après les ondes
 
     function injectNotification() {
       const screen = screenRef.current;
@@ -20,8 +20,6 @@ function PhoneNotification() {
       const existing = screen.querySelector('.phone-notif');
       if (existing) {
         existing.remove();
-        // Force reflow to allow immediate re-animation if needed
-        void (existing as HTMLElement).offsetWidth;
       }
 
       const notif = document.createElement('div');
@@ -37,10 +35,10 @@ function PhoneNotification() {
       screen.appendChild(notif);
     }
 
-    // Initial trigger
+    // Premier déclenchement
     const timeout = setTimeout(injectNotification, NOTIF_DELAY);
 
-    // Precise interval to keep it permanent and rhythmic
+    // Intervalle pour chaque cycle suivant
     const interval = setInterval(injectNotification, CYCLE);
 
     return () => {
