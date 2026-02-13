@@ -222,11 +222,16 @@ export default function Landing() {
                         {[0, 1, 2].map((i) => (
                           <motion.div
                             key={i}
-                            initial={{ width: 60, height: 60, opacity: 0 }}
+                            initial={{ width: 0, height: 0, opacity: 0 }}
                             whileInView={{ width: 450, height: 450, opacity: [0, 0.8, 0] }}
-                            transition={{ delay: 3 + (i * 0.4), duration: 2 }}
-                            className="absolute bottom-[35%] right-[10%] border-4 border-[#39ff14]/80 rounded-full z-[105] pointer-events-none shadow-[0_0_10px_rgba(57,255,20,0.5)]"
-                            style={{ x: "50%", y: "-50%", transform: "translate(-50%, 50%)" }}
+                            transition={{ delay: 3 + (i * 0.4), duration: 2, ease: "easeOut" }}
+                            className="absolute border-4 border-[#39ff14]/80 rounded-full z-[105] pointer-events-none shadow-[0_0_15px_rgba(57,255,20,0.6)]"
+                            style={{ 
+                              bottom: "35%", 
+                              right: "10%",
+                              transform: "translate(50%, 50%)",
+                              transformOrigin: "center"
+                            }}
                           />
                         ))}
                       </div>
