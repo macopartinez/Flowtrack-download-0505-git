@@ -162,7 +162,7 @@ export default function Landing() {
 
                       {/* Téléphone */}
                       <div className="phone relative w-[240px] h-[500px] bg-[#1a1a1a] rounded-[40px] p-2 border-[6px] border-[#2d2d2d] z-[100] shadow-2xl overflow-hidden">
-                        <div className="phone-screen w-full h-full bg-gradient-to-b from-[#2d9f5e] to-[#1e7a42] rounded-[32px] relative overflow-hidden">
+                        <div className="phone-screen w-full h-full bg-gradient-to-b from-[#2d9f5e] to-[#1e7a42] rounded-[32px] relative overflow-visible">
                           <div className="phone-notch absolute top-0 left-1/2 -translate-x-1/2 w-28 h-6 bg-black rounded-b-2xl z-[2]" />
                           <div className="clock absolute top-16 left-1/2 -translate-x-1/2 text-5xl font-light text-black/90">12:05</div>
                           
@@ -183,7 +183,7 @@ export default function Landing() {
                               type: "tween",
                               ease: "easeInOut"
                             }}
-                            className="absolute bottom-8 left-4 right-4 bg-[#2d9f5e]/85 backdrop-blur-xl border border-white/20 rounded-[20px] p-4 z-[103] shadow-lg pointer-events-none"
+                            className="absolute bottom-8 left-4 right-4 bg-[#ffffff]/90 backdrop-blur-xl border border-white/20 rounded-[20px] p-4 z-[999] shadow-[0_10px_30px_rgba(0,0,0,0.5)] pointer-events-none"
                           >
                             <div className="notification-header mb-1">
                               <div className="notification-app text-[14px] font-semibold text-black leading-none">Flowtrack</div>
