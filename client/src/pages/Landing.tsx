@@ -201,34 +201,35 @@ export default function Landing() {
                         
                         {/* Profile 3 (Disappears) */}
                         <motion.div 
-                          initial={{ opacity: 1, scale: 1 }}
+                          key={`profile-disappear-${i}`}
+                          initial={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                           whileInView={{ 
                             opacity: [1, 1, 0.6, 0.3, 0], 
                             scale: [1, 0.95, 0.7, 0.4, 0.05],
                             filter: ["blur(0px)", "blur(0px)", "blur(2px)", "blur(5px)", "blur(10px)"]
                           }}
-                          transition={{ delay: 3, duration: 2, times: [0, 0.15, 0.4, 0.7, 1] }}
+                          transition={{ delay: 3, duration: 2, times: [0, 0.15, 0.4, 0.7, 1], repeat: Infinity, repeatDelay: 5 }}
                           className="absolute bottom-[35%] right-[10%] w-[60px] h-[60px] rounded-full bg-[#4a4a4a] border-2 border-white/20 flex items-center justify-center text-[24px] text-white z-[110] shadow-xl"
                         >🧑</motion.div>
                         
                         {/* Profile 4 */}
                         <motion.div 
                           animate={{ y: [0, -10, 0] }} 
-                          transition={{ duration: 3, repeat: Infinity, delay: 1.5 }}
+                          transition={{ duration: 3, repeat: Infinity }}
                           className="absolute bottom-[20%] left-[15%] w-[60px] h-[60px] rounded-full bg-[#4a4a4a] border-2 border-white/20 flex items-center justify-center text-[24px] text-white z-[110] shadow-xl"
                         >👨</motion.div>
 
                         {/* Radar Waves from disappearing profile (Profile 3) */}
-                        {[0, 1, 2].map((i) => (
+                        {[0, 1, 2].map((waveIndex) => (
                           <motion.div
-                            key={i}
+                            key={`wave-${i}-${waveIndex}`}
                             initial={{ width: 0, height: 0, opacity: 0 }}
                             whileInView={{ width: 450, height: 450, opacity: [0, 0.8, 0] }}
-                            transition={{ delay: 3 + (i * 0.4), duration: 2, ease: "easeOut" }}
+                            transition={{ delay: 3 + (waveIndex * 0.4), duration: 2, ease: "easeOut", repeat: Infinity, repeatDelay: 5 }}
                             className="absolute border-4 border-[#39ff14]/80 rounded-full z-[105] pointer-events-none shadow-[0_0_15px_rgba(57,255,20,0.6)]"
                             style={{ 
-                              bottom: "calc(35% + 30px)", // Adds half the profile height (60px/2)
-                              right: "calc(10% + 30px)",  // Adds half the profile width (60px/2)
+                              bottom: "calc(35% + 30px)", 
+                              right: "calc(10% + 30px)",
                               transform: "translate(50%, 50%)",
                               transformOrigin: "center"
                             }}
