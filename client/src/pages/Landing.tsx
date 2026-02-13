@@ -115,19 +115,19 @@ export default function Landing() {
         <div className="h-full overflow-y-auto snap-y snap-mandatory relative z-10 scrollbar-hide">
           {[
             {
-              icon: BarChart3,
-              title: "Deep Analytics",
-              desc: "Understand exactly when and why people unfollow you with detailed timeline charts.",
-              color: "text-blue-400",
-              tag: "INSIGHTS",
-              animation: true
-            },
-            {
               icon: Zap,
               title: "Real-time Alerts",
               desc: "Get notified instantly when someone unfollows your account so you can react fast.",
               color: "text-yellow-400",
-              tag: "SPEED"
+              tag: "SPEED",
+              animation: true
+            },
+            {
+              icon: BarChart3,
+              title: "Deep Analytics",
+              desc: "Understand exactly when and why people unfollow you with detailed timeline charts.",
+              color: "text-blue-400",
+              tag: "INSIGHTS"
             },
             {
               icon: ShieldCheck,
