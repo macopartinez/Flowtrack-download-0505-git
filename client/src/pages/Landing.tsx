@@ -227,8 +227,8 @@ export default function Landing() {
                             transition={{ delay: 3 + (i * 0.4), duration: 2, ease: "easeOut" }}
                             className="absolute border-4 border-[#39ff14]/80 rounded-full z-[105] pointer-events-none shadow-[0_0_15px_rgba(57,255,20,0.6)]"
                             style={{ 
-                              bottom: "35%", 
-                              right: "10%",
+                              bottom: "calc(35% + 30px)", // Adds half the profile height (60px/2)
+                              right: "calc(10% + 30px)",  // Adds half the profile width (60px/2)
                               transform: "translate(50%, 50%)",
                               transformOrigin: "center"
                             }}
