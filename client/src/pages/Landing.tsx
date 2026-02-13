@@ -18,7 +18,11 @@ function PhoneNotification() {
       if (!screen) return;
 
       const existing = screen.querySelector('.phone-notif');
-      if (existing) existing.remove();
+      if (existing) {
+        existing.remove();
+        // Force reflow to allow immediate re-animation if needed
+        void (existing as HTMLElement).offsetWidth;
+      }
 
       const notif = document.createElement('div');
       notif.className = 'phone-notif';
@@ -33,16 +37,14 @@ function PhoneNotification() {
       screen.appendChild(notif);
     }
 
-    const firstTimeout = setTimeout(() => {
-      injectNotification();
-    }, NOTIF_DELAY);
+    // Initial trigger
+    const timeout = setTimeout(injectNotification, NOTIF_DELAY);
 
-    const interval = setInterval(() => {
-      setTimeout(injectNotification, NOTIF_DELAY);
-    }, CYCLE);
+    // Precise interval to keep it permanent and rhythmic
+    const interval = setInterval(injectNotification, CYCLE);
 
     return () => {
-      clearTimeout(firstTimeout);
+      clearTimeout(timeout);
       clearInterval(interval);
     };
   }, []);
