@@ -169,25 +169,24 @@ export default function Landing() {
                           {/* iOS Style Notification */}
                           <motion.div
                             key={`notification-${i}`}
-                            initial={{ y: 150, opacity: 0 }}
+                            initial={{ y: 200, opacity: 0 }}
                             whileInView={{ 
-                              y: [150, 0, 0, 0, 150],
-                              opacity: [0, 1, 1, 1, 0] 
+                              y: [200, 0],
+                              opacity: [0, 1] 
                             }}
                             transition={{ 
                               delay: 4.5, 
-                              duration: 4, 
-                              times: [0, 0.1, 0.5, 0.9, 1],
+                              duration: 0.6, 
+                              ease: [0.34, 1.56, 0.64, 1],
                               repeat: Infinity, 
-                              repeatDelay: 4,
-                              ease: "easeInOut"
+                              repeatDelay: 6.4,
                             }}
-                            className="absolute bottom-12 left-3 right-3 bg-white border border-gray-200 rounded-2xl p-3 z-[999] shadow-2xl pointer-events-none"
+                            className="absolute bottom-8 left-4 right-4 bg-[#2d9f5e]/85 backdrop-blur-xl border border-white/20 rounded-[20px] p-4 z-[103] shadow-lg pointer-events-none"
                           >
-                            <div className="notification-header mb-1">
+                            <div className="notification-header mb-1 flex items-center">
                               <div className="notification-app text-[14px] font-semibold text-black leading-none">Flowtrack</div>
                             </div>
-                            <div className="notification-body text-[14px] text-black leading-tight">
+                            <div className="notification-body text-[14px] text-black leading-tight font-normal">
                               <strong>Thomas_95</strong> unfollow you on instagram
                             </div>
                           </motion.div>
