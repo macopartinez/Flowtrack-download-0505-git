@@ -226,7 +226,7 @@ export default function Landing() {
                             whileInView={{ width: 450, height: 450, opacity: [0, 0.8, 0] }}
                             transition={{ delay: 3 + (i * 0.4), duration: 2 }}
                             className="absolute bottom-[35%] right-[10%] border-4 border-[#39ff14]/80 rounded-full z-[105] pointer-events-none shadow-[0_0_10px_rgba(57,255,20,0.5)]"
-                            style={{ x: "-50%", y: "50%", transform: "translate(-50%, -50%)" }}
+                            style={{ x: "50%", y: "-50%", transform: "translate(-50%, 50%)" }}
                           />
                         ))}
                       </div>
