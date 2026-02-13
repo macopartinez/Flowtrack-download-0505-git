@@ -11,7 +11,7 @@ function PhoneNotification() {
 
   useEffect(() => {
     const CYCLE = 7000;
-    const FIRST_NOTIF = 4500; // Réduit pour apparaître plus tôt, juste après les ondes
+    const FIRST_NOTIF = 5500;
 
     let intervalId: ReturnType<typeof setInterval> | null = null;
 
@@ -35,10 +35,8 @@ function PhoneNotification() {
       screen.appendChild(notif);
     }
 
-    // On déclenche la première notification plus tôt
     const timeout = setTimeout(() => {
       injectNotification();
-      // On cale l'intervalle sur le même cycle de 7s
       intervalId = setInterval(injectNotification, CYCLE);
     }, FIRST_NOTIF);
 
