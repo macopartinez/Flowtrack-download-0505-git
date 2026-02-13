@@ -208,7 +208,14 @@ export default function Landing() {
                             scale: [1, 0.95, 0.7, 0.4, 0.05],
                             filter: ["blur(0px)", "blur(0px)", "blur(2px)", "blur(5px)", "blur(10px)"]
                           }}
-                          transition={{ delay: 3, duration: 2, times: [0, 0.15, 0.4, 0.7, 1], repeat: Infinity, repeatDelay: 5 }}
+                          transition={{ 
+                            delay: 3, 
+                            duration: 2, 
+                            times: [0, 0.15, 0.4, 0.7, 1], 
+                            repeat: Infinity, 
+                            repeatDelay: 5,
+                            repeatType: "loop"
+                          }}
                           className="absolute bottom-[35%] right-[10%] w-[60px] h-[60px] rounded-full bg-[#4a4a4a] border-2 border-white/20 flex items-center justify-center text-[24px] text-white z-[110] shadow-xl"
                         >🧑</motion.div>
                         
@@ -224,8 +231,19 @@ export default function Landing() {
                           <motion.div
                             key={`wave-${i}-${waveIndex}`}
                             initial={{ width: 0, height: 0, opacity: 0 }}
-                            whileInView={{ width: 450, height: 450, opacity: [0, 0.8, 0] }}
-                            transition={{ delay: 3 + (waveIndex * 0.4), duration: 2, ease: "easeOut", repeat: Infinity, repeatDelay: 5 }}
+                            whileInView={{ 
+                              width: [0, 0, 450],
+                              height: [0, 0, 450],
+                              opacity: [0, 0.8, 0] 
+                            }}
+                            transition={{ 
+                              delay: 3 + (waveIndex * 0.4), 
+                              duration: 2, 
+                              ease: "easeOut", 
+                              repeat: Infinity, 
+                              repeatDelay: 5,
+                              times: [0, 0.1, 1]
+                            }}
                             className="absolute border-4 border-[#39ff14]/80 rounded-full z-[105] pointer-events-none shadow-[0_0_15px_rgba(57,255,20,0.6)]"
                             style={{ 
                               bottom: "calc(35% + 30px)", 
