@@ -94,7 +94,7 @@ export default function Landing() {
                   </div>
                   <div className="text-sm font-bold text-green-400 mb-2 tracking-widest">{item.step}</div>
                   <h3 className="text-2xl font-bold mb-3 text-white">{item.title}</h3>
-                  <p className="text-gray-400 leading-relaxed max-w-xs mx-auto">{item.desc}</p>
+                  <p className="leading-relaxed max-w-xs mx-auto text-[#ffffff]">{item.desc}</p>
                 </motion.div>
               ))}
             </div>
