@@ -147,61 +147,86 @@ export default function Landing() {
               >
                 {feature.animation ? (
                   <div className="order-2 lg:order-1 flex justify-center lg:justify-start">
-                    <div className="relative w-[220px] h-[450px] scale-90 md:scale-100">
-                      {/* Phone Illustration based on attached HTML */}
-                      <div className="absolute inset-0 border-[8px] border-[#2d2d2d] bg-[#1a1a1a] rounded-[2.5rem] p-1.5 z-10 shadow-2xl overflow-hidden">
-                        <div className="w-full h-full bg-gradient-to-b from-[#2d9f5e] to-[#1e7a42] rounded-[2rem] relative overflow-hidden">
-                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-5 bg-black rounded-b-xl z-20" />
-                          <div className="absolute top-14 left-1/2 -translate-x-1/2 text-3xl font-light text-black/80">12:05</div>
+                    <div className="container relative w-[600px] h-[600px] flex items-center justify-center">
+                      {/* Orbites décoratives */}
+                      <motion.div 
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                        className="absolute w-[350px] h-[350px] border border-white/5 rounded-full pointer-events-none"
+                      />
+                      <motion.div 
+                        animate={{ rotate: -360 }}
+                        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                        className="absolute w-[450px] h-[450px] border border-white/5 rounded-full pointer-events-none"
+                      />
+
+                      {/* Téléphone */}
+                      <div className="phone relative w-[240px] h-[500px] bg-[#1a1a1a] rounded-[40px] p-2 border-[6px] border-[#2d2d2d] z-[100] shadow-2xl overflow-hidden">
+                        <div className="phone-screen w-full h-full bg-gradient-to-b from-[#2d9f5e] to-[#1e7a42] rounded-[32px] relative overflow-hidden">
+                          <div className="phone-notch absolute top-0 left-1/2 -translate-x-1/2 w-28 h-6 bg-black rounded-b-2xl z-[2]" />
+                          <div className="clock absolute top-16 left-1/2 -translate-x-1/2 text-5xl font-light text-black/90">12:05</div>
                           
                           {/* iOS Style Notification */}
                           <motion.div
-                            initial={{ y: 100, opacity: 0 }}
+                            initial={{ y: 200, opacity: 0 }}
                             whileInView={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 1.5, type: "spring", stiffness: 100 }}
-                            className="absolute bottom-4 left-3 right-3 bg-white/20 backdrop-blur-xl border border-white/10 rounded-xl p-3 z-30 shadow-lg"
+                            transition={{ delay: 4.5, type: "spring", stiffness: 100, damping: 20 }}
+                            className="notification absolute bottom-8 left-4 right-4 bg-[#2d9f5e]/85 backdrop-blur-xl border border-white/20 rounded-[20px] p-4 z-[3] shadow-lg"
                           >
-                            <div className="text-[8px] font-bold text-black/60 mb-0.5">Flowtrack</div>
-                            <div className="text-xs text-black font-medium leading-tight">
-                              <strong>Thomas_95</strong> unfollow you
+                            <div className="notification-header mb-1">
+                              <div className="notification-app text-[14px] font-semibold text-black leading-none">Flowtrack</div>
+                            </div>
+                            <div className="notification-body text-[14px] text-black leading-tight">
+                              <strong>Thomas_95</strong> unfollow you on instagram
                             </div>
                           </motion.div>
                         </div>
                       </div>
 
-                      {/* Orbiting Profiles Illustration */}
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[220%] h-[220%] pointer-events-none z-[20]">
+                      {/* Profils gravitants */}
+                      <div className="absolute inset-0 pointer-events-none">
+                        {/* Profile 1 */}
                         <motion.div 
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                          className="absolute inset-0 border border-white/5 rounded-full"
-                        />
-                        <motion.div 
-                          animate={{ rotate: -360 }}
-                          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                          className="absolute inset-12 border border-white/5 rounded-full"
-                        />
+                          animate={{ y: [0, -10, 0] }} 
+                          transition={{ duration: 3, repeat: Infinity }}
+                          className="absolute top-[15%] right-[15%] w-[60px] h-[60px] rounded-full bg-[#4a4a4a] border-2 border-white/20 flex items-center justify-center text-[24px] text-white z-[110] shadow-xl"
+                        >👤</motion.div>
                         
-                        {/* Profiles */}
-                        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity }} className="absolute top-[5%] right-[20%] w-12 h-12 bg-[#2a2a2a] rounded-full border border-white/20 flex items-center justify-center text-2xl z-30 shadow-2xl">👤</motion.div>
-                        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity, delay: 0.5 }} className="absolute top-[30%] left-[0%] w-12 h-12 bg-[#2a2a2a] rounded-full border border-white/20 flex items-center justify-center text-2xl z-30 shadow-2xl">👩</motion.div>
+                        {/* Profile 2 */}
                         <motion.div 
-                          initial={{ scale: 1, opacity: 1 }}
-                          whileInView={{ scale: 0, opacity: 0 }}
-                          transition={{ delay: 2, duration: 1.5 }}
-                          className="absolute bottom-[20%] right-[0%] w-12 h-12 bg-[#2a2a2a] rounded-full border border-white/20 flex items-center justify-center text-2xl z-30 shadow-2xl"
+                          animate={{ y: [0, -10, 0] }} 
+                          transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
+                          className="absolute top-[30%] left-[10%] w-[60px] h-[60px] rounded-full bg-[#4a4a4a] border-2 border-white/20 flex items-center justify-center text-[24px] text-white z-[110] shadow-xl"
+                        >👩</motion.div>
+                        
+                        {/* Profile 3 (Disappears) */}
+                        <motion.div 
+                          initial={{ opacity: 1, scale: 1 }}
+                          whileInView={{ 
+                            opacity: [1, 1, 0.6, 0.3, 0], 
+                            scale: [1, 0.95, 0.7, 0.4, 0.05],
+                            filter: ["blur(0px)", "blur(0px)", "blur(2px)", "blur(5px)", "blur(10px)"]
+                          }}
+                          transition={{ delay: 3, duration: 2, times: [0, 0.15, 0.4, 0.7, 1] }}
+                          className="absolute bottom-[35%] right-[10%] w-[60px] h-[60px] rounded-full bg-[#4a4a4a] border-2 border-white/20 flex items-center justify-center text-[24px] text-white z-[110] shadow-xl"
                         >🧑</motion.div>
-                        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity, delay: 1.5 }} className="absolute bottom-[5%] left-[20%] w-12 h-12 bg-[#2a2a2a] rounded-full border border-white/20 flex items-center justify-center text-2xl z-30 shadow-2xl">👨</motion.div>
+                        
+                        {/* Profile 4 */}
+                        <motion.div 
+                          animate={{ y: [0, -10, 0] }} 
+                          transition={{ duration: 3, repeat: Infinity, delay: 1.5 }}
+                          className="absolute bottom-[20%] left-[15%] w-[60px] h-[60px] rounded-full bg-[#4a4a4a] border-2 border-white/20 flex items-center justify-center text-[24px] text-white z-[110] shadow-xl"
+                        >👨</motion.div>
 
-                        {/* Radar Waves from disappearing profile */}
+                        {/* Radar Waves from disappearing profile (Profile 3) */}
                         {[0, 1, 2].map((i) => (
                           <motion.div
                             key={i}
-                            initial={{ width: 40, height: 40, opacity: 0 }}
-                            whileInView={{ width: 400, height: 400, opacity: [0, 0.8, 0] }}
-                            transition={{ delay: 2 + (i * 0.4), duration: 2 }}
-                            className="absolute bottom-[20%] right-[0%] border-2 border-[#39ff14]/80 rounded-full z-[25] pointer-events-none"
-                            style={{ translate: "50% 50%" }}
+                            initial={{ width: 60, height: 60, opacity: 0 }}
+                            whileInView={{ width: 450, height: 450, opacity: [0, 0.8, 0] }}
+                            transition={{ delay: 3 + (i * 0.4), duration: 2 }}
+                            className="absolute bottom-[35%] right-[10%] border-4 border-[#39ff14]/80 rounded-full z-[105] pointer-events-none shadow-[0_0_10px_rgba(57,255,20,0.5)]"
+                            style={{ x: "-50%", y: "50%", transform: "translate(-50%, -50%)" }}
                           />
                         ))}
                       </div>
