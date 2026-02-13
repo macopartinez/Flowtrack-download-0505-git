@@ -170,7 +170,7 @@ export default function Landing() {
                       </div>
 
                       {/* Orbiting Profiles Illustration */}
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] pointer-events-none z-[20]">
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[220%] h-[220%] pointer-events-none z-[20]">
                         <motion.div 
                           animate={{ rotate: 360 }}
                           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
@@ -179,28 +179,28 @@ export default function Landing() {
                         <motion.div 
                           animate={{ rotate: -360 }}
                           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                          className="absolute inset-6 border border-white/5 rounded-full"
+                          className="absolute inset-12 border border-white/5 rounded-full"
                         />
                         
                         {/* Profiles */}
-                        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity }} className="absolute top-[10%] right-[15%] w-12 h-12 bg-[#2a2a2a] rounded-full border border-white/20 flex items-center justify-center text-2xl z-30 shadow-2xl">👤</motion.div>
-                        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity, delay: 0.5 }} className="absolute top-[35%] left-[5%] w-12 h-12 bg-[#2a2a2a] rounded-full border border-white/20 flex items-center justify-center text-2xl z-30 shadow-2xl">👩</motion.div>
+                        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity }} className="absolute top-[5%] right-[20%] w-12 h-12 bg-[#2a2a2a] rounded-full border border-white/20 flex items-center justify-center text-2xl z-30 shadow-2xl">👤</motion.div>
+                        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity, delay: 0.5 }} className="absolute top-[30%] left-[0%] w-12 h-12 bg-[#2a2a2a] rounded-full border border-white/20 flex items-center justify-center text-2xl z-30 shadow-2xl">👩</motion.div>
                         <motion.div 
                           initial={{ scale: 1, opacity: 1 }}
                           whileInView={{ scale: 0, opacity: 0 }}
                           transition={{ delay: 2, duration: 1.5 }}
-                          className="absolute bottom-[25%] right-[5%] w-12 h-12 bg-[#2a2a2a] rounded-full border border-white/20 flex items-center justify-center text-2xl z-30 shadow-2xl"
+                          className="absolute bottom-[20%] right-[0%] w-12 h-12 bg-[#2a2a2a] rounded-full border border-white/20 flex items-center justify-center text-2xl z-30 shadow-2xl"
                         >🧑</motion.div>
-                        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity, delay: 1.5 }} className="absolute bottom-[10%] left-[15%] w-12 h-12 bg-[#2a2a2a] rounded-full border border-white/20 flex items-center justify-center text-2xl z-30 shadow-2xl">👨</motion.div>
+                        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity, delay: 1.5 }} className="absolute bottom-[5%] left-[20%] w-12 h-12 bg-[#2a2a2a] rounded-full border border-white/20 flex items-center justify-center text-2xl z-30 shadow-2xl">👨</motion.div>
 
                         {/* Radar Waves from disappearing profile */}
                         {[0, 1, 2].map((i) => (
                           <motion.div
                             key={i}
                             initial={{ width: 40, height: 40, opacity: 0 }}
-                            whileInView={{ width: 300, height: 300, opacity: [0, 0.8, 0] }}
+                            whileInView={{ width: 400, height: 400, opacity: [0, 0.8, 0] }}
                             transition={{ delay: 2 + (i * 0.4), duration: 2 }}
-                            className="absolute bottom-[25%] right-[5%] border-2 border-[#39ff14]/80 rounded-full z-[25] pointer-events-none"
+                            className="absolute bottom-[20%] right-[0%] border-2 border-[#39ff14]/80 rounded-full z-[25] pointer-events-none"
                             style={{ translate: "50% 50%" }}
                           />
                         ))}
