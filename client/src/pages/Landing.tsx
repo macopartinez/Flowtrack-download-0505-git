@@ -101,7 +101,7 @@ export default function Landing() {
           </motion.div>
         </div>
       </section>
-      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6 group/features" data-testid="section-features">
+      <section className="h-screen snap-start snap-always relative overflow-hidden group/features" data-testid="section-features">
         <motion.div 
           className="absolute inset-0 bg-black/40 pointer-events-none z-[5] transition-all duration-1000"
           style={{
@@ -110,59 +110,61 @@ export default function Landing() {
           whileInView={{ "--blur-amount": "12px" } as any}
           viewport={{ margin: "-20% 0px -20% 0px" }}
         />
-        <div className="max-w-6xl mx-auto w-full relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-6xl font-display font-black mb-6 text-white tracking-tighter">
-                Everything you need <br /><span className="text-gradient">to grow</span>
-              </h2>
-              <p className="text-lg text-gray-400 max-w-2xl mx-auto">Powerful tools to help you understand your audience better.</p>
+        
+        {/* Nested snap container */}
+        <div className="h-full overflow-y-auto snap-y snap-mandatory relative z-10 scrollbar-hide">
+          {[
+            {
+              icon: BarChart3,
+              title: "Deep Analytics",
+              desc: "Understand exactly when and why people unfollow you with detailed timeline charts.",
+              color: "text-blue-400",
+              tag: "INSIGHTS"
+            },
+            {
+              icon: Zap,
+              title: "Real-time Alerts",
+              desc: "Get notified instantly when someone unfollows your account so you can react fast.",
+              color: "text-yellow-400",
+              tag: "SPEED"
+            },
+            {
+              icon: ShieldCheck,
+              title: "Account Safety",
+              desc: "We use official APIs and bank-grade encryption to keep your account 100% secure.",
+              color: "text-green-400",
+              tag: "SECURITY"
+            }
+          ].map((feature, i) => (
+            <div key={i} className="h-screen snap-start snap-always flex items-center justify-center px-6">
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.5 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="max-w-4xl w-full"
+              >
+                <div className="text-center">
+                  <motion.div 
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    whileInView={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className={`w-20 h-20 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center mx-auto mb-8 ${feature.color}`}
+                  >
+                    <feature.icon className="w-10 h-10" />
+                  </motion.div>
+                  <span className={`text-sm font-bold tracking-[0.3em] mb-4 block ${feature.color}`}>{feature.tag}</span>
+                  <h2 className="text-5xl md:text-7xl font-display font-black mb-8 text-white tracking-tighter leading-tight">
+                    {feature.title.split(' ')[0]} <br />
+                    <span className="text-gradient">{feature.title.split(' ').slice(1).join(' ')}</span>
+                  </h2>
+                  <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+                    {feature.desc}
+                  </p>
+                </div>
+              </motion.div>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                {
-                  icon: BarChart3,
-                  title: "Deep Analytics",
-                  desc: "Understand exactly when and why people unfollow you with detailed timeline charts.",
-                  color: "text-blue-400"
-                },
-                {
-                  icon: Zap,
-                  title: "Real-time Alerts",
-                  desc: "Get notified instantly when someone unfollows your account so you can react fast.",
-                  color: "text-yellow-400"
-                },
-                {
-                  icon: ShieldCheck,
-                  title: "Account Safety",
-                  desc: "We use official APIs and bank-grade encryption to keep your account 100% secure.",
-                  color: "text-green-400"
-                }
-              ].map((feature, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.15, duration: 0.6 }}
-                  className="p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 transition-all duration-300"
-                  data-testid={`card-feature-${i}`}
-                >
-                  <div className={`w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-6 ${feature.color}`}>
-                    <feature.icon className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-3 text-white">{feature.title}</h3>
-                  <p className="text-gray-400 leading-relaxed">{feature.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+          ))}
         </div>
       </section>
       <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-cta">
