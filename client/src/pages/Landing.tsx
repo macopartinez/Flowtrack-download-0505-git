@@ -119,7 +119,8 @@ export default function Landing() {
               title: "Deep Analytics",
               desc: "Understand exactly when and why people unfollow you with detailed timeline charts.",
               color: "text-blue-400",
-              tag: "INSIGHTS"
+              tag: "INSIGHTS",
+              animation: true
             },
             {
               icon: Zap,
@@ -142,14 +143,78 @@ export default function Landing() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: false, amount: 0.5 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="max-w-4xl w-full"
+                className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
               >
-                <div className="text-center">
+                {feature.animation ? (
+                  <div className="order-2 lg:order-1 flex justify-center lg:justify-start">
+                    <div className="relative w-[300px] h-[400px] md:w-[400px] md:h-[500px]">
+                      {/* Phone Illustration based on attached HTML */}
+                      <div className="absolute inset-0 border-8 border-[#2d2d2d] bg-[#1a1a1a] rounded-[3rem] p-2 z-10 shadow-2xl overflow-hidden">
+                        <div className="w-full h-full bg-gradient-to-b from-[#2d9f5e] to-[#1e7a42] rounded-[2.5rem] relative overflow-hidden">
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-b-xl z-20" />
+                          <div className="absolute top-16 left-1/2 -translate-x-1/2 text-4xl font-light text-black/80">12:05</div>
+                          
+                          {/* iOS Style Notification */}
+                          <motion.div
+                            initial={{ y: 100, opacity: 0 }}
+                            whileInView={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 1.5, type: "spring", stiffness: 100 }}
+                            className="absolute bottom-6 left-4 right-4 bg-white/20 backdrop-blur-xl border border-white/10 rounded-2xl p-4 z-30 shadow-lg"
+                          >
+                            <div className="text-[10px] font-bold text-black/60 mb-1">Flowtrack</div>
+                            <div className="text-sm text-black font-medium leading-tight">
+                              <strong>Thomas_95</strong> unfollow you on instagram
+                            </div>
+                          </motion.div>
+                        </div>
+                      </div>
+
+                      {/* Orbiting Profiles Illustration */}
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] pointer-events-none">
+                        <motion.div 
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                          className="absolute inset-0 border border-white/5 rounded-full"
+                        />
+                        <motion.div 
+                          animate={{ rotate: -360 }}
+                          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                          className="absolute inset-4 border border-white/5 rounded-full"
+                        />
+                        
+                        {/* Profiles */}
+                        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity }} className="absolute top-[15%] right-[10%] w-14 h-14 bg-[#4a4a4a] rounded-full border border-white/20 flex items-center justify-center text-2xl z-20 shadow-xl">👤</motion.div>
+                        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity, delay: 0.5 }} className="absolute top-[30%] left-[8%] w-14 h-14 bg-[#4a4a4a] rounded-full border border-white/20 flex items-center justify-center text-2xl z-20 shadow-xl">👩</motion.div>
+                        <motion.div 
+                          initial={{ scale: 1, opacity: 1 }}
+                          whileInView={{ scale: 0, opacity: 0 }}
+                          transition={{ delay: 1, duration: 1 }}
+                          className="absolute bottom-[35%] right-[8%] w-14 h-14 bg-[#4a4a4a] rounded-full border border-white/20 flex items-center justify-center text-2xl z-20 shadow-xl"
+                        >🧑</motion.div>
+                        <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity, delay: 1.5 }} className="absolute bottom-[20%] left-[12%] w-14 h-14 bg-[#4a4a4a] rounded-full border border-white/20 flex items-center justify-center text-2xl z-20 shadow-xl">👨</motion.div>
+
+                        {/* Radar Waves from disappearing profile */}
+                        {[0, 1, 2].map((i) => (
+                          <motion.div
+                            key={i}
+                            initial={{ width: 50, height: 50, opacity: 0 }}
+                            whileInView={{ width: 300, height: 300, opacity: [0, 0.8, 0] }}
+                            transition={{ delay: 1 + (i * 0.4), duration: 2 }}
+                            className="absolute bottom-[35%] right-[8%] border-2 border-[#39ff14]/80 rounded-full z-0 pointer-events-none"
+                            style={{ translate: "50% 50%" }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+
+                <div className={`order-1 lg:order-2 text-center lg:text-left ${!feature.animation ? 'lg:col-span-2 lg:text-center' : ''}`}>
                   <motion.div 
                     initial={{ scale: 0.8, opacity: 0 }}
                     whileInView={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.2 }}
-                    className={`w-20 h-20 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center mx-auto mb-8 ${feature.color}`}
+                    className={`w-20 h-20 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center ${feature.animation ? 'mx-auto lg:mx-0' : 'mx-auto'} mb-8 ${feature.color}`}
                   >
                     <feature.icon className="w-10 h-10" />
                   </motion.div>
@@ -158,7 +223,7 @@ export default function Landing() {
                     {feature.title.split(' ')[0]} <br />
                     <span className="text-gradient">{feature.title.split(' ').slice(1).join(' ')}</span>
                   </h2>
-                  <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+                  <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
                     {feature.desc}
                   </p>
                 </div>
