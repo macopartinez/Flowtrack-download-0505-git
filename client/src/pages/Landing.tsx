@@ -10,8 +10,8 @@ function PhoneNotification() {
   const screenRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const CYCLE = 7000;
-    const NOTIF_DELAY = 4500;
+    const CYCLE = 11000;
+    const NOTIF_DELAY = 6000;
 
     function injectNotification() {
       const screen = screenRef.current;
