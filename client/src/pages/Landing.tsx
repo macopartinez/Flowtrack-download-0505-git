@@ -147,12 +147,12 @@ export default function Landing() {
               >
                 {feature.animation ? (
                   <div className="order-2 lg:order-1 flex justify-center lg:justify-start">
-                    <div className="relative w-[300px] h-[400px] md:w-[400px] md:h-[500px]">
+                    <div className="relative w-[280px] h-[580px]">
                       {/* Phone Illustration based on attached HTML */}
-                      <div className="absolute inset-0 border-8 border-[#2d2d2d] bg-[#1a1a1a] rounded-[3rem] p-2 z-10 shadow-2xl overflow-hidden">
-                        <div className="w-full h-full bg-gradient-to-b from-[#2d9f5e] to-[#1e7a42] rounded-[2.5rem] relative overflow-hidden">
-                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-b-xl z-20" />
-                          <div className="absolute top-16 left-1/2 -translate-x-1/2 text-4xl font-light text-black/80">12:05</div>
+                      <div className="absolute inset-0 border-[10px] border-[#2d2d2d] bg-[#1a1a1a] rounded-[3.5rem] p-2 z-10 shadow-2xl overflow-hidden">
+                        <div className="w-full h-full bg-gradient-to-b from-[#2d9f5e] to-[#1e7a42] rounded-[3rem] relative overflow-hidden">
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-black rounded-b-2xl z-20" />
+                          <div className="absolute top-20 left-1/2 -translate-x-1/2 text-4xl font-light text-black/80">12:05</div>
                           
                           {/* iOS Style Notification */}
                           <motion.div
