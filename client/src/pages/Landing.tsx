@@ -11,7 +11,7 @@ function PhoneNotification() {
 
   useEffect(() => {
     const CYCLE = 11000;
-    const NOTIF_DELAY = 8500;
+    const NOTIF_DELAY = 6000;
 
     function injectNotification() {
       const screen = screenRef.current;
