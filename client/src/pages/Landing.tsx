@@ -168,9 +168,21 @@ export default function Landing() {
                           
                           {/* iOS Style Notification */}
                           <motion.div
+                            key={`notification-${i}`}
                             initial={{ y: 200, opacity: 0 }}
-                            whileInView={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 4.5, type: "spring", stiffness: 100, damping: 20 }}
+                            whileInView={{ 
+                              y: [200, 0, 0, 0, 200],
+                              opacity: [0, 1, 1, 1, 0] 
+                            }}
+                            transition={{ 
+                              delay: 4.5, 
+                              duration: 4, 
+                              times: [0, 0.15, 0.5, 0.85, 1],
+                              repeat: Infinity, 
+                              repeatDelay: 3,
+                              type: "tween",
+                              ease: "easeInOut"
+                            }}
                             className="notification absolute bottom-8 left-4 right-4 bg-[#2d9f5e]/85 backdrop-blur-xl border border-white/20 rounded-[20px] p-4 z-[3] shadow-lg"
                           >
                             <div className="notification-header mb-1">
