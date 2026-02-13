@@ -70,7 +70,7 @@ export default function Landing() {
                 {
                   step: "02",
                   title: "Track",
-                  desc: "Our system monitors your followers in real-time, detecting every change instantly.",
+                  desc: "Our system in real time detecting every change between your followers and your account.",
                   icon: BarChart3
                 },
                 {
