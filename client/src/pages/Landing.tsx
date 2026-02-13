@@ -101,7 +101,15 @@ export default function Landing() {
           </motion.div>
         </div>
       </section>
-      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-features">
+      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6 group/features" data-testid="section-features">
+        <motion.div 
+          className="absolute inset-0 bg-black/40 backdrop-blur-none pointer-events-none z-[-1] transition-all duration-1000"
+          style={{
+            backdropFilter: "blur(var(--blur-amount, 0px))"
+          }}
+          whileInView={{ "--blur-amount": "12px" } as any}
+          viewport={{ margin: "-20% 0px -20% 0px" }}
+        />
         <div className="max-w-6xl mx-auto w-full">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
