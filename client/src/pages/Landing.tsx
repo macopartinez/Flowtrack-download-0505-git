@@ -183,7 +183,7 @@ export default function Landing() {
                               type: "tween",
                               ease: "easeInOut"
                             }}
-                            className="notification absolute bottom-8 left-4 right-4 bg-[#2d9f5e]/85 backdrop-blur-xl border border-white/20 rounded-[20px] p-4 z-[3] shadow-lg"
+                            className="absolute bottom-8 left-4 right-4 bg-[#2d9f5e]/85 backdrop-blur-xl border border-white/20 rounded-[20px] p-4 z-[103] shadow-lg pointer-events-none"
                           >
                             <div className="notification-header mb-1">
                               <div className="notification-app text-[14px] font-semibold text-black leading-none">Flowtrack</div>
