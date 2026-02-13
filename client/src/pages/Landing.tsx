@@ -4,6 +4,56 @@ import { BackgroundFlowtrack } from "@/components/BackgroundFlowtrack";
 import { GlassText } from "@/components/GlassText";
 import { motion } from "framer-motion";
 import { BarChart3, ShieldCheck, Zap, Eye } from "lucide-react";
+import { useEffect, useRef } from "react";
+
+function PhoneNotification() {
+  const screenRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const CYCLE = 7000;
+    const NOTIF_DELAY = 4500;
+
+    function injectNotification() {
+      const screen = screenRef.current;
+      if (!screen) return;
+
+      const existing = screen.querySelector('.phone-notif');
+      if (existing) existing.remove();
+
+      const notif = document.createElement('div');
+      notif.className = 'phone-notif';
+      notif.innerHTML = `
+        <div style="display:flex;align-items:center;margin-bottom:4px">
+          <div style="font-size:14px;font-weight:600;color:#000;letter-spacing:-0.2px">Flowtrack</div>
+        </div>
+        <div style="font-size:14px;color:#000;line-height:1.3;font-weight:400">
+          <strong style="font-weight:600">Thomas_95</strong> unfollow you on instagram
+        </div>
+      `;
+      screen.appendChild(notif);
+    }
+
+    const firstTimeout = setTimeout(() => {
+      injectNotification();
+    }, NOTIF_DELAY);
+
+    const interval = setInterval(() => {
+      setTimeout(injectNotification, NOTIF_DELAY);
+    }, CYCLE);
+
+    return () => {
+      clearTimeout(firstTimeout);
+      clearInterval(interval);
+    };
+  }, []);
+
+  return (
+    <div className="phone-screen w-full h-full bg-gradient-to-b from-[#2d9f5e] to-[#1e7a42] rounded-[32px] relative overflow-hidden" ref={screenRef}>
+      <div className="phone-notch absolute top-0 left-1/2 -translate-x-1/2 w-28 h-6 bg-black rounded-b-2xl z-[2]" />
+      <div className="clock absolute top-16 left-1/2 -translate-x-1/2 text-5xl font-light text-black/90">12:05</div>
+    </div>
+  );
+}
 
 export default function Landing() {
   return (
@@ -162,48 +212,7 @@ export default function Landing() {
 
                       {/* Téléphone */}
                       <div className="phone relative w-[240px] h-[500px] bg-[#1a1a1a] rounded-[40px] p-2 border-[6px] border-[#2d2d2d] z-[100] shadow-2xl overflow-hidden">
-                        <div className="phone-screen w-full h-full bg-gradient-to-b from-[#2d9f5e] to-[#1e7a42] rounded-[32px] relative overflow-visible">
-                          <div className="phone-notch absolute top-0 left-1/2 -translate-x-1/2 w-28 h-6 bg-black rounded-b-2xl z-[2]" />
-                          <div className="clock absolute top-16 left-1/2 -translate-x-1/2 text-5xl font-light text-black/90">12:05</div>
-                          
-                          {/* iOS Style Notification */}
-                          <motion.div
-                            key={`notification-${i}`}
-                            initial={{ y: 200, opacity: 0 }}
-                            whileInView={{ 
-                              y: [200, 0, 0, 0],
-                              opacity: [0, 1, 1, 1] 
-                            }}
-                            transition={{ 
-                              delay: 4.5, 
-                              duration: 1.5,
-                              times: [0, 0.4, 0.8, 1],
-                              repeat: Infinity, 
-                              repeatDelay: 5.5,
-                            }}
-                            style={{ 
-                              position: 'absolute',
-                              bottom: '32px',
-                              left: '16px',
-                              right: '16px',
-                              backgroundColor: 'rgba(45, 159, 94, 0.95)',
-                              backdropFilter: 'blur(20px)',
-                              border: '1px solid rgba(255, 255, 255, 0.3)',
-                              borderRadius: '20px',
-                              padding: '16px 18px',
-                              zIndex: 2000,
-                              pointerEvents: 'none',
-                              boxShadow: '0 10px 40px rgba(0,0,0,0.6)'
-                            }}
-                          >
-                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
-                              <div style={{ fontSize: '14px', fontWeight: 600, color: '#000', letterSpacing: '-0.2px' }}>Flowtrack</div>
-                            </div>
-                            <div style={{ fontSize: '14px', color: '#000', lineHeight: 1.3, fontWeight: 400 }}>
-                              <strong style={{ fontWeight: 600 }}>Thomas_95</strong> unfollow you on instagram
-                            </div>
-                          </motion.div>
-                        </div>
+                        <PhoneNotification />
                       </div>
 
                       {/* Profils gravitants */}
