@@ -10,17 +10,17 @@ function PhoneNotification() {
   const screenRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const CYCLE = 11000;
-    const NOTIF_DELAY = 5800; // Ajusté pour apparaître juste après les ondes
+    const CYCLE = 7000;
+    const FIRST_NOTIF = 5500;
+
+    let intervalId: ReturnType<typeof setInterval> | null = null;
 
     function injectNotification() {
       const screen = screenRef.current;
       if (!screen) return;
 
       const existing = screen.querySelector('.phone-notif');
-      if (existing) {
-        existing.remove();
-      }
+      if (existing) existing.remove();
 
       const notif = document.createElement('div');
       notif.className = 'phone-notif';
@@ -35,15 +35,14 @@ function PhoneNotification() {
       screen.appendChild(notif);
     }
 
-    // Premier déclenchement
-    const timeout = setTimeout(injectNotification, NOTIF_DELAY);
-
-    // Intervalle pour chaque cycle suivant
-    const interval = setInterval(injectNotification, CYCLE);
+    const timeout = setTimeout(() => {
+      injectNotification();
+      intervalId = setInterval(injectNotification, CYCLE);
+    }, FIRST_NOTIF);
 
     return () => {
       clearTimeout(timeout);
-      clearInterval(interval);
+      if (intervalId) clearInterval(intervalId);
     };
   }, []);
 
