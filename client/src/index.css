@@ -118,7 +118,7 @@
     opacity: 1;
     transform: translateY(0);
   }
-  90% {
+  80% {
     opacity: 1;
     transform: translateY(0);
   }
@@ -142,5 +142,5 @@
   opacity: 0;
   z-index: 3;
   pointer-events: none;
-  animation: notificationSlide 5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: notificationSlide 4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
