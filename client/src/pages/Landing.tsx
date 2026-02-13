@@ -169,21 +169,20 @@ export default function Landing() {
                           {/* iOS Style Notification */}
                           <motion.div
                             key={`notification-${i}`}
-                            initial={{ y: 200, opacity: 0 }}
+                            initial={{ y: 150, opacity: 0 }}
                             whileInView={{ 
-                              y: [200, 0, 0, 0, 200],
+                              y: [150, 0, 0, 0, 150],
                               opacity: [0, 1, 1, 1, 0] 
                             }}
                             transition={{ 
                               delay: 4.5, 
                               duration: 4, 
-                              times: [0, 0.15, 0.5, 0.85, 1],
+                              times: [0, 0.1, 0.5, 0.9, 1],
                               repeat: Infinity, 
-                              repeatDelay: 3,
-                              type: "tween",
+                              repeatDelay: 4,
                               ease: "easeInOut"
                             }}
-                            className="absolute bottom-8 left-4 right-4 bg-[#ffffff]/90 backdrop-blur-xl border border-white/20 rounded-[20px] p-4 z-[999] shadow-[0_10px_30px_rgba(0,0,0,0.5)] pointer-events-none"
+                            className="absolute bottom-12 left-3 right-3 bg-white border border-gray-200 rounded-2xl p-3 z-[999] shadow-2xl pointer-events-none"
                           >
                             <div className="notification-header mb-1">
                               <div className="notification-app text-[14px] font-semibold text-black leading-none">Flowtrack</div>
