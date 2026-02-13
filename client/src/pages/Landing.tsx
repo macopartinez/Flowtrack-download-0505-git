@@ -181,13 +181,26 @@ export default function Landing() {
                               repeat: Infinity, 
                               repeatDelay: 6.4,
                             }}
-                            className="absolute bottom-8 left-4 right-4 bg-[#2d9f5e]/85 backdrop-blur-xl border border-white/20 rounded-[20px] p-4 z-[103] shadow-lg pointer-events-none"
+                            style={{ 
+                              position: 'absolute',
+                              bottom: '32px',
+                              left: '16px',
+                              right: '16px',
+                              backgroundColor: 'rgba(45, 159, 94, 0.85)',
+                              backdropFilter: 'blur(20px)',
+                              border: '1px solid rgba(255, 255, 255, 0.2)',
+                              borderRadius: '20px',
+                              padding: '16px 18px',
+                              zIndex: 1000,
+                              pointerEvents: 'none',
+                              boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+                            }}
                           >
-                            <div className="notification-header mb-1 flex items-center">
-                              <div className="notification-app text-[14px] font-semibold text-black leading-none">Flowtrack</div>
+                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+                              <div style={{ fontSize: '14px', fontWeight: 600, color: '#000', letterSpacing: '-0.2px' }}>Flowtrack</div>
                             </div>
-                            <div className="notification-body text-[14px] text-black leading-tight font-normal">
-                              <strong>Thomas_95</strong> unfollow you on instagram
+                            <div style={{ fontSize: '14px', color: '#000', lineHeight: 1.3, fontWeight: 400 }}>
+                              <strong style={{ fontWeight: 600 }}>Thomas_95</strong> unfollow you on instagram
                             </div>
                           </motion.div>
                         </div>
