@@ -10,7 +10,6 @@ export default function Landing() {
     <div className="h-screen overflow-y-auto snap-y snap-mandatory bg-transparent font-body text-white relative" data-testid="scroll-container">
       <RadarBackground />
       <BackgroundFlowtrack />
-
       <nav className="fixed w-full top-0 z-50 bg-transparent">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -22,7 +21,6 @@ export default function Landing() {
           </div>
         </div>
       </nav>
-
       <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-hero">
         <div className="max-w-5xl mx-auto text-center">
           <motion.div
@@ -46,7 +44,6 @@ export default function Landing() {
           </motion.div>
         </div>
       </section>
-
       <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-how-it-works">
         <div className="max-w-5xl mx-auto w-full">
           <motion.div
@@ -59,7 +56,7 @@ export default function Landing() {
               <h2 className="text-4xl md:text-6xl font-display font-black mb-6 text-white tracking-tighter">
                 How it <span className="text-gradient">works</span>
               </h2>
-              <p className="text-lg text-gray-400 max-w-2xl mx-auto">Three simple steps to start tracking your audience.</p>
+              <p className="text-lg max-w-2xl mx-auto text-[#ffffff]">Three simple steps to start tracking your follower.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -104,7 +101,6 @@ export default function Landing() {
           </motion.div>
         </div>
       </section>
-
       <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-features">
         <div className="max-w-6xl mx-auto w-full">
           <motion.div
@@ -161,7 +157,6 @@ export default function Landing() {
           </motion.div>
         </div>
       </section>
-
       <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-cta">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
