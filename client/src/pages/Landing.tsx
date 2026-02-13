@@ -171,29 +171,29 @@ export default function Landing() {
                             key={`notification-${i}`}
                             initial={{ y: 200, opacity: 0 }}
                             whileInView={{ 
-                              y: [200, 0],
-                              opacity: [0, 1] 
+                              y: [200, 0, 0, 0],
+                              opacity: [0, 1, 1, 1] 
                             }}
                             transition={{ 
                               delay: 4.5, 
-                              duration: 0.6, 
-                              ease: [0.34, 1.56, 0.64, 1],
+                              duration: 1.5,
+                              times: [0, 0.4, 0.8, 1],
                               repeat: Infinity, 
-                              repeatDelay: 6.4,
+                              repeatDelay: 5.5,
                             }}
                             style={{ 
                               position: 'absolute',
                               bottom: '32px',
                               left: '16px',
                               right: '16px',
-                              backgroundColor: 'rgba(45, 159, 94, 0.85)',
+                              backgroundColor: 'rgba(45, 159, 94, 0.95)',
                               backdropFilter: 'blur(20px)',
-                              border: '1px solid rgba(255, 255, 255, 0.2)',
+                              border: '1px solid rgba(255, 255, 255, 0.3)',
                               borderRadius: '20px',
                               padding: '16px 18px',
-                              zIndex: 1000,
+                              zIndex: 2000,
                               pointerEvents: 'none',
-                              boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+                              boxShadow: '0 10px 40px rgba(0,0,0,0.6)'
                             }}
                           >
                             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
