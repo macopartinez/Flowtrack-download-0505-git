@@ -5,7 +5,6 @@ import { GlassText } from "@/components/GlassText";
 import { motion } from "framer-motion";
 import { BarChart3, ShieldCheck, Zap, Eye, Search } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { SocialAnalyticsDashboard } from "@/components/SocialAnalyticsDashboard";
 
 function PhoneNotification() {
   const screenRef = useRef<HTMLDivElement>(null);
@@ -177,8 +176,7 @@ export default function Landing() {
               title: "Deep Analytics",
               desc: "Understand exactly when and why people unfollow you with detailed timeline charts.",
               color: "text-blue-400",
-              tag: "INSIGHTS",
-              dashboard: true
+              tag: "INSIGHTS"
             },
             {
               icon: ShieldCheck,
@@ -286,10 +284,6 @@ export default function Landing() {
                         ))}
                       </div>
                     </div>
-                  </div>
-                ) : feature.dashboard ? (
-                  <div className="order-2 lg:order-1 flex justify-center">
-                    <SocialAnalyticsDashboard />
                   </div>
                 ) : null}
 
