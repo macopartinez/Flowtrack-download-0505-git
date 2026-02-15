@@ -166,7 +166,7 @@ export default function Landing() {
             {
               icon: Zap,
               title: "Real-time Alerts",
-              desc: "Get notified instantly when someone unfollows your account so you can react fast.",
+              desc: "Get notified when someone unfollows your account.",
               color: "text-yellow-400",
               tag: "SPEED",
               animation: true
