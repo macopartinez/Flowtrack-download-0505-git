@@ -3,7 +3,7 @@ import { RadarBackground } from "@/components/RadarBackground";
 import { BackgroundFlowtrack } from "@/components/BackgroundFlowtrack";
 import { GlassText } from "@/components/GlassText";
 import { motion } from "framer-motion";
-import { BarChart3, ShieldCheck, Zap, Eye } from "lucide-react";
+import { BarChart3, ShieldCheck, Zap, Eye, Search } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 function PhoneNotification() {
@@ -164,10 +164,10 @@ export default function Landing() {
         <div className="h-full overflow-y-auto snap-y snap-mandatory relative z-10 scrollbar-hide">
           {[
             {
-              icon: Zap,
+              icon: Search,
               title: "Real-time surveillance",
               desc: "Get notified when someone unfollows your account.",
-              color: "text-yellow-400",
+              color: "text-purple-400",
               tag: "SPEED",
               animation: true
             },
