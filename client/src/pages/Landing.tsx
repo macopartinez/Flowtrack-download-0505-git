@@ -11,7 +11,7 @@ function PhoneNotification() {
 
   useEffect(() => {
     const CYCLE = 10000;
-    const FIRST_NOTIF = 6000;
+    const FIRST_NOTIF = 7000;
 
     let intervalId: ReturnType<typeof setInterval> | null = null;
 

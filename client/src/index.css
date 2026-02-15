@@ -148,5 +148,5 @@
   z-index: 3;
   pointer-events: none;
   animation: notifAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
-             notifDisappear 0.6s ease-in 2.4s forwards;
+             notifDisappear 0.6s ease-in 2.0s forwards;
 }
