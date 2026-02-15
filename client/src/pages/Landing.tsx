@@ -296,7 +296,6 @@ export default function Landing() {
                   >
                     <feature.icon className="w-10 h-10" />
                   </motion.div>
-                  <span className={`text-sm font-bold tracking-[0.3em] mb-4 block ${feature.color}`}>{feature.tag}</span>
                   <h2 className="text-5xl md:text-7xl font-display font-black mb-8 text-white tracking-tighter leading-tight">
                     {feature.title.split(' ')[0]} <br />
                     <span className="text-gradient">{feature.title.split(' ').slice(1).join(' ')}</span>
