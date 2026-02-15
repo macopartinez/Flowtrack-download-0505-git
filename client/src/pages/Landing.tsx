@@ -10,8 +10,8 @@ function PhoneNotification() {
   const screenRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const CYCLE = 7000;
-    const FIRST_NOTIF = 5200; // Un peu plus tôt pour mieux s'enchaîner après les ondes
+    const CYCLE = 10000;
+    const FIRST_NOTIF = 6000;
 
     let intervalId: ReturnType<typeof setInterval> | null = null;
 
@@ -233,18 +233,16 @@ export default function Landing() {
                         {/* Profile 3 (Disappears) */}
                         <motion.div 
                           key={`profile-disappear-${i}`}
-                          initial={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                          initial={{ opacity: 0, scale: 0.05, filter: "blur(10px)" }}
                           whileInView={{ 
-                            opacity: [1, 1, 0.6, 0.3, 0], 
-                            scale: [1, 0.95, 0.7, 0.4, 0.05],
-                            filter: ["blur(0px)", "blur(0px)", "blur(2px)", "blur(5px)", "blur(10px)"]
+                            opacity: [0, 1, 1, 0.6, 0.3, 0], 
+                            scale: [0.05, 1, 1, 0.95, 0.7, 0.05],
+                            filter: ["blur(10px)", "blur(0px)", "blur(0px)", "blur(2px)", "blur(5px)", "blur(10px)"]
                           }}
                           transition={{ 
-                            delay: 3, 
-                            duration: 2, 
-                            times: [0, 0.15, 0.4, 0.7, 1], 
+                            duration: 10,
+                            times: [0, 0.05, 0.3, 0.35, 0.45, 0.55], 
                             repeat: Infinity, 
-                            repeatDelay: 5,
                             repeatType: "loop"
                           }}
                           className="absolute bottom-[35%] right-[10%] w-[60px] h-[60px] rounded-full bg-[#4a4a4a] border-2 border-white/20 flex items-center justify-center text-[24px] text-white z-[110] shadow-xl"
@@ -272,7 +270,7 @@ export default function Landing() {
                               duration: 2, 
                               ease: "easeOut", 
                               repeat: Infinity, 
-                              repeatDelay: 5,
+                              repeatDelay: 8,
                               times: [0, 0.1, 1]
                             }}
                             className="absolute border-4 border-[#39ff14]/80 rounded-full z-[105] pointer-events-none shadow-[0_0_15px_rgba(57,255,20,0.6)]"
