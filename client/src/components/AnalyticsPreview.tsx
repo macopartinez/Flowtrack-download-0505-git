@@ -11,17 +11,17 @@ const slides = [
   { 
     total: 66, 
     label: 'Unfollowers',
-    color: '#1DB954',
+    color: '#EF4444',
   },
   { 
     total: 42, 
     label: 'New Followers',
-    color: '#a855f7',
+    color: '#1DB954',
   },
   { 
     total: 32, 
     label: 'Blocked',
-    color: '#EF4444',
+    color: '#6B7280',
   }
 ];
 
