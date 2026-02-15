@@ -136,10 +136,6 @@ export function AnalyticsPreview() {
               Facebook
             </button>
           </div>
-          
-          <div className="flex gap-1 bg-white/5 rounded-lg p-1">
-            <div className="px-3 py-1 bg-white/10 rounded-md text-[10px] font-black text-white">MONTH</div>
-          </div>
         </div>
 
         <div className="flex items-baseline gap-2 mb-6">
