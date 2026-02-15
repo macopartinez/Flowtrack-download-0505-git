@@ -294,18 +294,20 @@ export default function Landing() {
                 ) : null}
 
                 <div className={`order-1 lg:order-2 text-center lg:text-left ${(!feature.animation && !feature.preview) ? 'lg:col-span-2 lg:text-center' : ''}`}>
-                  <motion.div 
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    whileInView={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className={`w-20 h-20 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center ${feature.animation ? 'mx-auto lg:mx-0' : 'mx-auto'} mb-8 ${feature.color}`}
-                  >
-                    <feature.icon className="w-10 h-10" />
-                  </motion.div>
-                  <h2 className="text-5xl md:text-7xl font-display font-black mb-8 text-white tracking-tighter leading-tight">
-                    {feature.title.split(' ')[0]} <br />
-                    <span className="text-gradient">{feature.title.split(' ').slice(1).join(' ')}</span>
-                  </h2>
+                  <div className="flex flex-col items-center lg:items-start">
+                    <motion.div 
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      whileInView={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                      className={`w-20 h-20 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center mb-8 ${feature.color}`}
+                    >
+                      <feature.icon className="w-10 h-10" />
+                    </motion.div>
+                    <h2 className="text-5xl md:text-7xl font-display font-black mb-8 text-white tracking-tighter leading-tight">
+                      {feature.title.split(' ')[0]} <br />
+                      <span className="text-gradient">{feature.title.split(' ').slice(1).join(' ')}</span>
+                    </h2>
+                  </div>
                   <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
                     {feature.desc}
                   </p>
