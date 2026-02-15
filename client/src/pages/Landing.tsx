@@ -5,6 +5,7 @@ import { GlassText } from "@/components/GlassText";
 import { motion } from "framer-motion";
 import { BarChart3, ShieldCheck, Zap, Eye, Search } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { AnalyticsPreview } from "@/components/AnalyticsPreview";
 
 function PhoneNotification() {
   const screenRef = useRef<HTMLDivElement>(null);
@@ -174,9 +175,10 @@ export default function Landing() {
             {
               icon: BarChart3,
               title: "Deep Analytics",
-              desc: "Understand exactly when and why people unfollow you with detailed timeline charts.",
-              color: "text-blue-400",
-              tag: "INSIGHTS"
+              desc: "Track every movement and see who's viewing your profile with our advanced tools.",
+              color: "text-green-400",
+              tag: "INSIGHTS",
+              preview: true
             },
             {
               icon: ShieldCheck,
@@ -194,7 +196,11 @@ export default function Landing() {
                 transition={{ duration: 0.8, ease: "easeOut" }}
                 className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
               >
-                {feature.animation ? (
+                {feature.preview ? (
+                  <div className="order-2 lg:order-1 flex justify-center lg:justify-start">
+                    <AnalyticsPreview />
+                  </div>
+                ) : feature.animation ? (
                   <div className="order-2 lg:order-1 flex justify-center lg:justify-start">
                     <div className="container relative w-[600px] h-[600px] flex items-center justify-center">
                       {/* Orbites décoratives */}
@@ -287,7 +293,7 @@ export default function Landing() {
                   </div>
                 ) : null}
 
-                <div className={`order-1 lg:order-2 text-center lg:text-left ${!feature.animation ? 'lg:col-span-2 lg:text-center' : ''}`}>
+                <div className={`order-1 lg:order-2 text-center lg:text-left ${(!feature.animation && !feature.preview) ? 'lg:col-span-2 lg:text-center' : ''}`}>
                   <motion.div 
                     initial={{ scale: 0.8, opacity: 0 }}
                     whileInView={{ scale: 1, opacity: 1 }}
