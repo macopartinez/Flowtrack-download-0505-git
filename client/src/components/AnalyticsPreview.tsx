@@ -173,6 +173,12 @@ export function AnalyticsPreview() {
           <span>DAY 15</span>
           <span>DAY 31</span>
         </div>
+        
+        <div className="mt-6 text-center">
+          <span className="text-[10px] text-white/20 font-medium italic">
+            *Simplified dashboard, not actual representative dashboard
+          </span>
+        </div>
       </div>
     </div>
   );
