@@ -181,7 +181,7 @@ export default function Landing() {
               preview: true
             },
             {
-              icon: ShieldCheck,
+              icon: Lock,
               title: "Account Safety",
               desc: "We use official APIs and bank-grade encryption to keep your account 100% secure.",
               color: "text-green-400",
