@@ -375,7 +375,7 @@ export default function Landing() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="bg-white/5 backdrop-blur-xl rounded-[40px] border border-white/10 p-8 md:p-12 shadow-2xl h-[600px] overflow-y-auto snap-y snap-mandatory scrollbar-hide"
+            className="bg-white/5 backdrop-blur-xl rounded-[40px] border border-white/10 p-8 md:p-12 shadow-2xl"
           >
             <Accordion type="single" collapsible className="w-full space-y-4">
               {[
@@ -400,7 +400,7 @@ export default function Landing() {
                   a: "Yes! You can connect your account for free to see your current stats. Advanced historical tracking and real-time alerts require a premium subscription."
                 }
               ].map((faq, i) => (
-                <AccordionItem key={i} value={`item-${i}`} className="border-b border-white/10 last:border-0 pb-2 snap-start snap-always">
+                <AccordionItem key={i} value={`item-${i}`} className="border-b border-white/10 last:border-0 pb-2">
                   <AccordionTrigger className="text-xl md:text-2xl font-bold text-white hover:text-purple-400 transition-colors py-6 text-left hover:no-underline">
                     {faq.q}
                   </AccordionTrigger>
