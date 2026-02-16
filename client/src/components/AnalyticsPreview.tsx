@@ -19,6 +19,11 @@ const slides = [
     color: '#1DB954',
   },
   { 
+    total: 12, 
+    label: 'Accounts Deleted',
+    color: '#F59E0B',
+  },
+  { 
     total: 32, 
     label: 'Blocked',
     color: '#6B7280',
