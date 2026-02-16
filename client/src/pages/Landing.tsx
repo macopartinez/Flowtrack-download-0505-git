@@ -3,9 +3,10 @@ import { RadarBackground } from "@/components/RadarBackground";
 import { BackgroundFlowtrack } from "@/components/BackgroundFlowtrack";
 import { GlassText } from "@/components/GlassText";
 import { motion } from "framer-motion";
-import { BarChart3, ShieldCheck, Zap, Eye, Search, Lock } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { BarChart3, ShieldCheck, Zap, Eye, Search, Lock, ChevronDown } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { AnalyticsPreview } from "@/components/AnalyticsPreview";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 function PhoneNotification() {
   const screenRef = useRef<HTMLDivElement>(null);
@@ -354,6 +355,65 @@ export default function Landing() {
           ))}
         </div>
       </section>
+
+      <section className="min-h-screen snap-start snap-always flex items-center justify-center relative px-6 py-24 bg-[#0a0a0a]" data-testid="section-faq">
+        <div className="max-w-4xl w-full mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-6xl font-display font-black text-white mb-6 tracking-tighter">
+              Common <span className="text-gradient">Questions</span>
+            </h2>
+            <p className="text-xl text-gray-400">Everything you need to know about Flowtrack.</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="bg-white/5 backdrop-blur-xl rounded-[40px] border border-white/10 p-8 md:p-12 shadow-2xl"
+          >
+            <Accordion type="single" collapsible className="w-full space-y-4">
+              {[
+                {
+                  q: "Is Flowtrack safe for my account?",
+                  a: "Yes, 100%. We use official Graph APIs and follow all platform guidelines. We never ask for your password and use bank-grade encryption to protect your data."
+                },
+                {
+                  q: "Do I need to provide my login credentials?",
+                  a: "Never. Flowtrack connects via official secure authentication methods. Your privacy and security are our top priorities."
+                },
+                {
+                  q: "Can I track multiple accounts?",
+                  a: "Absolutely. Our premium plans allow you to connect and monitor multiple Instagram and Facebook profiles from a single dashboard."
+                },
+                {
+                  q: "How often are the stats updated?",
+                  a: "We provide real-time tracking. As soon as a change is detected on your profile, your dashboard is updated and notifications are sent."
+                },
+                {
+                  q: "Is there a free trial available?",
+                  a: "Yes! You can connect your account for free to see your current stats. Advanced historical tracking and real-time alerts require a premium subscription."
+                }
+              ].map((faq, i) => (
+                <AccordionItem key={i} value={`item-${i}`} className="border-b border-white/10 last:border-0 pb-2">
+                  <AccordionTrigger className="text-xl md:text-2xl font-bold text-white hover:text-purple-400 transition-colors py-6 text-left hover:no-underline">
+                    {faq.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-lg text-gray-400 leading-relaxed pb-6">
+                    {faq.a}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </motion.div>
+        </div>
+      </section>
+
       <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-cta">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
