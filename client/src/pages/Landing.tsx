@@ -368,11 +368,25 @@ export default function Landing() {
             <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
               Join thousands of creators who already use Flowtrack to understand their audience and grow smarter.
             </p>
-            <div className="flex items-center justify-center mb-16">
+            <div className="flex items-center justify-center gap-4 mb-16">
               <div className="scale-125">
                 <ConnectDialog />
               </div>
             </div>
+            
+            {/* Language Switcher */}
+            <div className="flex items-center justify-center gap-6 mb-12">
+              <button className="text-sm font-bold text-white flex items-center gap-2 hover:text-purple-400 transition-colors">
+                <span className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px]">EN</span>
+                ENGLISH
+              </button>
+              <div className="w-px h-4 bg-white/10" />
+              <button className="text-sm font-bold text-gray-500 flex items-center gap-2 hover:text-purple-400 transition-colors">
+                <span className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px]">FR</span>
+                FRANÇAIS
+              </button>
+            </div>
+
             <div className="text-sm text-gray-500">
               &copy; 2024 Flowtrack Analytics. All rights reserved.
             </div>
