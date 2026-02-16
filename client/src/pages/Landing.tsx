@@ -58,7 +58,7 @@ function PhoneNotification() {
 
 export default function Landing() {
   return (
-    <div className="h-screen overflow-y-auto snap-y snap-mandatory bg-transparent font-body text-white relative" data-testid="scroll-container">
+    <div className="h-screen overflow-y-auto bg-transparent font-body text-white relative" data-testid="scroll-container">
       <RadarBackground />
       <BackgroundFlowtrack />
       <nav className="fixed w-full top-0 z-50 bg-transparent">
@@ -72,7 +72,7 @@ export default function Landing() {
           </div>
         </div>
       </nav>
-      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-hero">
+      <section className="h-screen relative px-6" data-testid="section-hero">
         <div className="max-w-5xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -95,7 +95,7 @@ export default function Landing() {
           </motion.div>
         </div>
       </section>
-      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-how-it-works">
+      <section className="h-screen relative px-6" data-testid="section-how-it-works">
         <div className="max-w-5xl mx-auto w-full">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -189,7 +189,7 @@ export default function Landing() {
               tag: "SECURITY"
             }
           ].map((feature, i) => (
-            <div key={i} className="h-screen snap-start snap-always flex items-center justify-center px-6 shrink-0">
+            <div key={i} className="h-screen flex items-center justify-center px-6 shrink-0">
               <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -356,7 +356,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="min-h-screen snap-start snap-always flex items-center justify-center relative px-6 py-24 bg-[#0a0a0a]" data-testid="section-faq">
+      <section className="min-h-screen flex items-center justify-center relative px-6 py-24 bg-[#0a0a0a]" data-testid="section-faq">
         <div className="max-w-4xl w-full mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -414,7 +414,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-cta">
+      <section className="h-screen flex items-center justify-center relative px-6" data-testid="section-cta">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
