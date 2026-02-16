@@ -183,7 +183,7 @@ export default function Landing() {
             {
               icon: Lock,
               title: "Account Safety",
-              desc: "We use official APIs and bank-grade encryption to keep your account 100% secure. No intrusion privicies guarantee.",
+              desc: "We use official APIs and bank-grade encryption to keep your account 100% secure. Privacy guaranteed, no intrusion.",
               color: "text-green-400",
               tag: "SECURITY"
             }
