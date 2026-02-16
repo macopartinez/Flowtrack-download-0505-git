@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '@/lib/i18n';
 
 const monthData = [
   320, 350, 340, 360, 355, 370, 365, 380, 375, 390, 
@@ -7,34 +8,35 @@ const monthData = [
   420, 410, 390, 380, 370, 390, 400, 410, 420, 415, 410
 ];
 
-const slides = [
-  { 
-    total: 66, 
-    label: 'Unfollowers',
-    color: '#EF4444',
-  },
-  { 
-    total: 42, 
-    label: 'New Followers',
-    color: '#1DB954',
-  },
-  { 
-    total: 32, 
-    label: 'Blocked',
-    color: '#6B7280',
-  }
-];
-
 export function AnalyticsPreview() {
+  const { t } = useLanguage();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [selectedPlatform, setSelectedPlatform] = useState<'instagram' | 'facebook'>('instagram');
+
+  const slides = [
+    { 
+      total: 66, 
+      label: t("analytics.unfollowers"),
+      color: '#EF4444',
+    },
+    { 
+      total: 42, 
+      label: t("analytics.followers"),
+      color: '#1DB954',
+    },
+    { 
+      total: 32, 
+      label: t("analytics.blocked"),
+      color: '#6B7280',
+    }
+  ];
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, []);
+  }, [slides.length]);
 
   const current = slides[currentSlide];
   const maxValue = Math.max(...monthData);
@@ -81,7 +83,7 @@ export function AnalyticsPreview() {
           </svg>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className="text-white/40 text-[10px] font-bold tracking-widest mb-1">TOTAL</div>
+            <div className="text-white/40 text-[10px] font-bold tracking-widest mb-1">{t("analytics.total")}</div>
             <div 
               className="text-6xl font-black leading-none mb-1"
               style={{ 
@@ -91,7 +93,7 @@ export function AnalyticsPreview() {
             >
               {current.total}
             </div>
-            <div className="text-white/90 text-sm font-bold tracking-tight">
+            <div className="text-white/90 text-sm font-bold tracking-tight text-center">
               {current.label}
             </div>
           </div>
@@ -105,7 +107,7 @@ export function AnalyticsPreview() {
             boxShadow: `0 0 15px ${current.color}20`
           }}
         >
-          📋 Accounts list
+          📋 {t("analytics.accounts")}
         </button>
       </motion.div>
 
@@ -140,7 +142,7 @@ export function AnalyticsPreview() {
 
         <div className="flex items-baseline gap-2 mb-6">
           <div className="text-white/30 text-[10px] font-black tracking-widest uppercase">Analytics</div>
-          <div className="text-white/10 text-[10px] font-bold">FEBRUARY 2024</div>
+          <div className="text-white/10 text-[10px] font-bold text-uppercase">FEBRUARY 2024</div>
         </div>
 
         <div className="relative h-[200px] flex items-end gap-[2px]">
@@ -168,7 +170,7 @@ export function AnalyticsPreview() {
           })}
         </div>
 
-        <div className="mt-4 flex justify-between text-white/10 text-[8px] font-bold px-1">
+        <div className="mt-4 flex justify-between text-white/10 text-[8px] font-bold px-1 uppercase">
           <span>DAY 1</span>
           <span>DAY 15</span>
           <span>DAY 31</span>
@@ -176,7 +178,7 @@ export function AnalyticsPreview() {
         
         <div className="mt-6 text-center">
           <span className="text-[10px] text-white/20 font-medium italic">
-            *Simplified dashboard, not actual representative dashboard
+            {t("analytics.disclaimer")}
           </span>
         </div>
       </div>
