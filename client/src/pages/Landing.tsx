@@ -189,7 +189,7 @@ export default function Landing() {
               tag: "SECURITY"
             }
           ].map((feature, i) => (
-            <div key={i} className="h-screen snap-start snap-always flex items-center justify-center px-6">
+            <div key={i} className="h-screen snap-start snap-always flex items-center justify-center px-6 shrink-0">
               <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
