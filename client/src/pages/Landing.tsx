@@ -414,7 +414,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="h-screen flex items-center justify-center relative px-6" data-testid="section-cta">
+      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-cta">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
