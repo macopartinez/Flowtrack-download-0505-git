@@ -175,7 +175,7 @@ export default function Landing() {
             {
               icon: BarChart3,
               title: "Deep Analytics",
-              desc: "Viewing your profile(s) with our advanced tools.",
+              desc: "Track and viewing your profile(s) with our advanced tools.",
               color: "text-green-400",
               tag: "INSIGHTS",
               preview: true
