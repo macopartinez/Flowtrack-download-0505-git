@@ -3,7 +3,7 @@ import { RadarBackground } from "@/components/RadarBackground";
 import { BackgroundFlowtrack } from "@/components/BackgroundFlowtrack";
 import { GlassText } from "@/components/GlassText";
 import { motion } from "framer-motion";
-import { BarChart3, ShieldCheck, Zap, Eye, Search } from "lucide-react";
+import { BarChart3, ShieldCheck, Zap, Eye, Search, Lock } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { AnalyticsPreview } from "@/components/AnalyticsPreview";
 
@@ -181,7 +181,7 @@ export default function Landing() {
               preview: true
             },
             {
-              icon: ShieldCheck,
+              icon: Lock,
               title: "Account Safety",
               desc: "We use official APIs and bank-grade encryption to keep your account 100% secure.",
               color: "text-green-400",
@@ -303,7 +303,7 @@ export default function Landing() {
                       <div className="absolute inset-0 bg-green-500/10 blur-[100px] rounded-full" />
                       <ShieldCheck className="w-full h-full text-green-400/20 absolute" strokeWidth={0.5} />
                       <div className="relative z-10 p-12 bg-white/5 backdrop-blur-xl rounded-[60px] border border-white/10 shadow-2xl">
-                        <ShieldCheck className="w-32 h-32 lg:w-48 lg:h-48 text-green-400 drop-shadow-[0_0_30px_rgba(74,222,128,0.5)]" />
+                        <Lock className="w-32 h-32 lg:w-48 lg:h-48 text-green-400 drop-shadow-[0_0_30px_rgba(74,222,128,0.5)]" />
                       </div>
                       
                       {/* Floating particles */}
