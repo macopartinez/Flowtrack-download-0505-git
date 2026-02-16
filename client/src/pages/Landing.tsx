@@ -6,11 +6,9 @@ import { motion } from "framer-motion";
 import { BarChart3, ShieldCheck, Zap, Eye, Search } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { AnalyticsPreview } from "@/components/AnalyticsPreview";
-import { useLanguage } from "@/lib/i18n";
 
 function PhoneNotification() {
   const screenRef = useRef<HTMLDivElement>(null);
-  const { t } = useLanguage();
 
   useEffect(() => {
     const CYCLE = 10000;
@@ -32,7 +30,7 @@ function PhoneNotification() {
           <div style="font-size:14px;font-weight:600;color:#000;letter-spacing:-0.2px">Flowtrack</div>
         </div>
         <div style="font-size:14px;color:#000;line-height:1.3;font-weight:400">
-          <strong style="font-weight:600">Thomas_95</strong> ${t("notif.unfollowed")}
+          <strong style="font-weight:600">Thomas_95</strong> unfollow you on instagram
         </div>
       `;
       screen.appendChild(notif);
@@ -47,7 +45,7 @@ function PhoneNotification() {
       clearTimeout(timeout);
       if (intervalId) clearInterval(intervalId);
     };
-  }, [t]);
+  }, []);
 
   return (
     <div className="phone-screen w-full h-full bg-gradient-to-b from-[#2d9f5e] to-[#1e7a42] rounded-[32px] relative overflow-hidden" ref={screenRef}>
@@ -58,8 +56,6 @@ function PhoneNotification() {
 }
 
 export default function Landing() {
-  const { t, setLanguage, language } = useLanguage();
-
   return (
     <div className="h-screen overflow-y-auto snap-y snap-mandatory bg-transparent font-body text-white relative" data-testid="scroll-container">
       <RadarBackground />
@@ -71,9 +67,7 @@ export default function Landing() {
           </div>
           <div className="flex items-center gap-6">
             <ConnectDialog />
-            <button className="text-sm font-bold text-white hover:text-white/80 transition-colors" data-testid="button-login">
-              {t("nav.login")}
-            </button>
+            <button className="text-sm font-bold text-white hover:text-white/80 transition-colors" data-testid="button-login">Login</button>
           </div>
         </div>
       </nav>
@@ -86,11 +80,11 @@ export default function Landing() {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <h1 className="text-6xl md:text-8xl font-display font-black leading-[1] mb-8 text-white tracking-tighter">
-              {t("hero.title1")} <br />
-              <span className="text-gradient">{t("hero.title2")}</span>
+              The ultimate tracking tool <br />
+              <span className="text-gradient">for a better relationship.</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
-              {t("hero.subtitle")}
+              Don't just track numbers. Start seeing faces, know exactly who stays and who fades
             </p>
             <div className="flex items-center justify-center">
               <div className="scale-110">
@@ -110,29 +104,29 @@ export default function Landing() {
           >
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-6xl font-display font-black mb-6 text-white tracking-tighter">
-                {t("how.title1")} <span className="text-gradient">{t("how.title2")}</span>
+                How it <span className="text-gradient">works</span>
               </h2>
-              <p className="text-lg max-w-2xl mx-auto text-[#ffffff]">{t("how.subtitle")}</p>
+              <p className="text-lg max-w-2xl mx-auto text-[#ffffff]">Three simple steps to start tracking your follower.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
                 {
                   step: "01",
-                  title: t("how.step1.title"),
-                  desc: t("how.step1.desc"),
+                  title: "Connect",
+                  desc: "Connect your Instagram or Facebook account and add your email to link them securely.",
                   icon: Eye
                 },
                 {
                   step: "02",
-                  title: t("how.step2.title"),
-                  desc: t("how.step2.desc"),
+                  title: "Track",
+                  desc: "Our system in real time detecting every change between your followers and your account.",
                   icon: BarChart3
                 },
                 {
                   step: "03",
-                  title: t("how.step3.title"),
-                  desc: t("how.step3.desc"),
+                  title: "Analyze",
+                  desc: "Access detailed analytics and insights to understand your audience behavior.",
                   icon: Zap
                 }
               ].map((item, i) => (
@@ -172,27 +166,26 @@ export default function Landing() {
           {[
             {
               icon: Search,
-              title: t("features.surveillance.title"),
-              desc: t("features.surveillance.desc"),
+              title: "Real-time surveillance",
+              desc: "Get notified when someone unfollows your account.",
               color: "text-purple-400",
-              tag: t("features.surveillance.tag"),
+              tag: "SPEED",
               animation: true
             },
             {
               icon: BarChart3,
-              title: t("features.analytics.title"),
-              desc: t("features.analytics.desc"),
+              title: "Deep Analytics",
+              desc: "Track and viewing your profile(s) with our advanced tools.",
               color: "text-green-400",
-              tag: t("features.analytics.tag"),
+              tag: "INSIGHTS",
               preview: true
             },
             {
               icon: ShieldCheck,
-              title: t("features.safety.title"),
-              desc: t("features.safety.desc"),
+              title: "Account Safety",
+              desc: "We use official APIs and bank-grade encryption to keep your account 100% secure.",
               color: "text-green-400",
-              tag: t("features.safety.tag"),
-              security: true
+              tag: "SECURITY"
             }
           ].map((feature, i) => (
             <div key={i} className="h-screen snap-start snap-always flex items-center justify-center px-6">
@@ -298,7 +291,7 @@ export default function Landing() {
                       </div>
                     </div>
                   </div>
-                ) : feature.security ? (
+                ) : feature.tag === "SECURITY" ? (
                   <div className="order-2 lg:order-1 flex justify-center lg:justify-start">
                     <motion.div
                       initial={{ scale: 0.8, opacity: 0, rotate: -10 }}
@@ -337,7 +330,7 @@ export default function Landing() {
                   </div>
                 ) : null}
 
-                <div className={`order-1 lg:order-2 text-center lg:text-left ${(!feature.animation && !feature.preview && !feature.security) ? 'lg:col-span-2 lg:text-center' : ''}`}>
+                <div className={`order-1 lg:order-2 text-center lg:text-left ${(!feature.animation && !feature.preview && feature.tag !== "SECURITY") ? 'lg:col-span-2 lg:text-center' : ''}`}>
                   <div className="flex flex-col items-center lg:items-start">
                     <motion.div 
                       initial={{ scale: 0.8, opacity: 0 }}
@@ -370,40 +363,18 @@ export default function Landing() {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <h2 className="text-4xl md:text-7xl font-display font-black mb-8 text-white tracking-tighter">
-              {t("cta.title1")} <br /><span className="text-gradient">{t("cta.title2")}</span>
+              Ready to see <br /><span className="text-gradient">who's watching?</span>
             </h2>
             <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-              {t("cta.subtitle")}
+              Join thousands of creators who already use Flowtrack to understand their audience and grow smarter.
             </p>
-            <div className="flex items-center justify-center gap-4 mb-16">
+            <div className="flex items-center justify-center mb-16">
               <div className="scale-125">
                 <ConnectDialog />
               </div>
             </div>
-            
-            {/* Language Switcher */}
-            <div className="flex items-center justify-center gap-6 mb-12">
-              <button 
-                onClick={() => setLanguage('en')}
-                className={`text-sm font-bold flex items-center gap-2 transition-colors ${language === 'en' ? 'text-purple-400' : 'text-gray-500 hover:text-white'}`}
-                data-testid="button-lang-en"
-              >
-                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${language === 'en' ? 'bg-purple-400/20' : 'bg-white/10'}`}>EN</span>
-                ENGLISH
-              </button>
-              <div className="w-px h-4 bg-white/10" />
-              <button 
-                onClick={() => setLanguage('fr')}
-                className={`text-sm font-bold flex items-center gap-2 transition-colors ${language === 'fr' ? 'text-purple-400' : 'text-gray-500 hover:text-white'}`}
-                data-testid="button-lang-fr"
-              >
-                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${language === 'fr' ? 'bg-purple-400/20' : 'bg-white/10'}`}>FR</span>
-                FRANÇAIS
-              </button>
-            </div>
-
             <div className="text-sm text-gray-500">
-              &copy; 2024 Flowtrack Analytics. {t("footer.rights")}
+              &copy; 2024 Flowtrack Analytics. All rights reserved.
             </div>
           </motion.div>
         </div>
