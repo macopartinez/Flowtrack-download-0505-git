@@ -330,7 +330,7 @@ export default function Landing() {
                   </div>
                 ) : null}
 
-                <div className={`order-1 lg:order-2 text-center lg:text-left ${(!feature.animation && !feature.preview) ? 'lg:col-span-2 lg:text-center' : ''}`}>
+                <div className={`order-1 lg:order-2 text-center lg:text-left ${(!feature.animation && !feature.preview && feature.tag !== "SECURITY") ? 'lg:col-span-2 lg:text-center' : ''}`}>
                   <div className="flex flex-col items-center lg:items-start">
                     <motion.div 
                       initial={{ scale: 0.8, opacity: 0 }}
