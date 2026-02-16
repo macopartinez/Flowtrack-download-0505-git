@@ -291,6 +291,43 @@ export default function Landing() {
                       </div>
                     </div>
                   </div>
+                ) : feature.tag === "SECURITY" ? (
+                  <div className="order-2 lg:order-1 flex justify-center lg:justify-start">
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0, rotate: -10 }}
+                      whileInView={{ scale: 1, opacity: 1, rotate: 0 }}
+                      transition={{ duration: 1, ease: "easeOut" }}
+                      className="relative w-[300px] h-[300px] lg:w-[400px] lg:h-[400px] flex items-center justify-center"
+                    >
+                      {/* Glow effect */}
+                      <div className="absolute inset-0 bg-green-500/10 blur-[100px] rounded-full" />
+                      <ShieldCheck className="w-full h-full text-green-400/20 absolute" strokeWidth={0.5} />
+                      <div className="relative z-10 p-12 bg-white/5 backdrop-blur-xl rounded-[60px] border border-white/10 shadow-2xl">
+                        <ShieldCheck className="w-32 h-32 lg:w-48 lg:h-48 text-green-400 drop-shadow-[0_0_30px_rgba(74,222,128,0.5)]" />
+                      </div>
+                      
+                      {/* Floating particles */}
+                      {[...Array(6)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          animate={{
+                            y: [0, -20, 0],
+                            opacity: [0.2, 0.5, 0.2]
+                          }}
+                          transition={{
+                            duration: 3 + i,
+                            repeat: Infinity,
+                            delay: i * 0.5
+                          }}
+                          className="absolute w-2 h-2 bg-green-400 rounded-full"
+                          style={{
+                            top: `${Math.random() * 100}%`,
+                            left: `${Math.random() * 100}%`
+                          }}
+                        />
+                      ))}
+                    </motion.div>
+                  </div>
                 ) : null}
 
                 <div className={`order-1 lg:order-2 text-center lg:text-left ${(!feature.animation && !feature.preview) ? 'lg:col-span-2 lg:text-center' : ''}`}>
