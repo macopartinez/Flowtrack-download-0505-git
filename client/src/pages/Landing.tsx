@@ -67,13 +67,8 @@ export default function Landing() {
             <GlassText text="FLOWTRACK" fontSize={36} />
           </div>
           <div className="flex items-center gap-6">
-            <ConnectDialog 
-              trigger={
-                <button className="text-sm font-bold text-white hover:text-white/80 transition-colors" data-testid="button-login">
-                  Login
-                </button>
-              } 
-            />
+            <ConnectDialog />
+            <button className="text-sm font-bold text-white hover:text-white/80 transition-colors" data-testid="button-login">Login</button>
           </div>
         </div>
       </nav>
