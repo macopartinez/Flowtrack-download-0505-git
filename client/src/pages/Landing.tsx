@@ -412,7 +412,7 @@ export default function Landing() {
                 }
               ].map((faq, i) => (
                 <AccordionItem key={i} value={`item-${i}`} className="border-b border-white/10 last:border-0 pb-2">
-                  <AccordionTrigger className="text-xl md:text-2xl font-bold text-white hover:text-purple-400 transition-colors py-6 text-left hover:no-underline">
+                  <AccordionTrigger className="text-xl md:text-2xl font-bold text-white hover:text-green-400 transition-colors py-6 text-left hover:no-underline">
                     {faq.q}
                   </AccordionTrigger>
                   <AccordionContent className="text-lg text-gray-400 leading-relaxed pb-6">
