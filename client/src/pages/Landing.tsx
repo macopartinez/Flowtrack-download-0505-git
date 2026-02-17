@@ -351,8 +351,8 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="min-h-screen snap-start snap-always flex items-center justify-center relative px-6 py-24 bg-[#0a0a0a]" data-testid="section-faq">
-        <div className="max-w-4xl w-full mx-auto">
+      <section className="h-screen snap-start snap-always relative bg-[#0a0a0a] overflow-y-auto scrollbar-hide" data-testid="section-faq">
+        <div className="max-w-4xl w-full mx-auto px-6 py-24">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
