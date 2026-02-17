@@ -1,11 +1,12 @@
-import { ConnectDialog } from "@/components/ConnectDialog";
 import { RadarBackground } from "@/components/RadarBackground";
 import { BackgroundFlowtrack } from "@/components/BackgroundFlowtrack";
 import { GlassText } from "@/components/GlassText";
 import { motion } from "framer-motion";
 import { BarChart3, ShieldCheck, Zap, Eye, Search, Lock, ChevronDown, ArrowRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useLocation } from "wouter";
 import { AnalyticsPreview } from "@/components/AnalyticsPreview";
+import { ConnectDialog } from "@/components/ConnectDialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 function PhoneNotification() {
@@ -58,6 +59,7 @@ function PhoneNotification() {
 
 export default function Landing() {
   const [isOpen, setIsOpen] = useState(false);
+  const [, navigate] = useLocation();
 
   return (
     <div className="h-screen overflow-y-auto snap-y snap-mandatory bg-transparent font-body text-white relative" data-testid="scroll-container">
@@ -71,7 +73,7 @@ export default function Landing() {
           </div>
           <div className="flex items-center gap-6">
             <button 
-              onClick={() => setIsOpen(true)}
+              onClick={() => navigate("/onboard")}
               className="text-base font-bold px-6 py-2.5 rounded-full transition-all duration-300 bg-[#02c950]/20 backdrop-blur-md border border-white/20 hover:shadow-[0_0_20px_rgba(2,201,80,0.4)] hover:bg-[#02c950]/30 text-white" 
               data-testid="button-start-tracking"
             >
@@ -456,8 +458,9 @@ export default function Landing() {
             <div className="flex items-center justify-center mb-16">
               <div className="scale-125">
                 <button 
-                  onClick={() => setIsOpen(true)}
+                  onClick={() => navigate("/onboard")}
                   className="text-base px-8 py-4 rounded-full transition-all duration-300 bg-[#02c950]/20 backdrop-blur-md border border-white/20 hover:shadow-[0_0_20px_rgba(2,201,80,0.4)] hover:bg-[#02c950]/30 font-bold text-white flex items-center gap-2"
+                  data-testid="button-cta-start-tracking"
                 >
                   Start Tracking Free <ArrowRight className="ml-2 w-5 h-5" />
                 </button>
