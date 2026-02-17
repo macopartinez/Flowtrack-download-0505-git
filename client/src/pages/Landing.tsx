@@ -312,7 +312,6 @@ export default function Landing() {
                     >
                       {/* Glow effect */}
                       <div className="absolute inset-0 bg-green-500/10 blur-[100px] rounded-full" />
-                      <ShieldCheck className="w-full h-full text-green-400/20 absolute" strokeWidth={0.5} />
                       <div className="relative z-10 p-12 bg-white/5 backdrop-blur-xl rounded-[60px] border border-white/10 shadow-2xl">
                         <ShieldCheck className="w-32 h-32 lg:w-48 lg:h-48 text-green-400 drop-shadow-[0_0_30px_rgba(74,222,128,0.5)]" />
                       </div>
