@@ -408,6 +408,10 @@ export default function Landing() {
                   a: "No. Flowtrack is a silent monitoring tool. Your tracking activity is completely private and invisible to the accounts you monitor."
                 },
                 {
+                  q: "Is it guaranteed that I receive a notification as soon as a change occurs?",
+                  a: "Yes. Our real-time monitoring system is designed to trigger instant notifications the moment a change is detected on your profile snapshot."
+                },
+                {
                   q: "Is there a free trial available?",
                   a: "Yes! You can connect your account for free to see your current stats. Advanced historical tracking and real-time alerts require a premium subscription."
                 },
