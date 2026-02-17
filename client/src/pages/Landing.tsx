@@ -95,6 +95,16 @@ export default function Landing() {
             <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
               Don't just track numbers. Start seeing faces, know exactly who stays and who fades
             </p>
+            <div className="flex items-center justify-center">
+              <div className="scale-110">
+                <button 
+                  onClick={() => setIsOpen(true)}
+                  className="text-base px-8 py-4 rounded-full transition-all duration-300 bg-[#02c950]/20 backdrop-blur-md border border-white/20 hover:shadow-[0_0_20px_rgba(2,201,80,0.4)] hover:bg-[#02c950]/30 font-bold text-white flex items-center gap-2"
+                >
+                  Start Tracking Free <ArrowRight className="ml-2 w-5 h-5" />
+                </button>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
