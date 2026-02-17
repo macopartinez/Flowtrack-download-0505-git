@@ -1,3 +1,4 @@
+import { ConnectDialog } from "@/components/ConnectDialog";
 import { RadarBackground } from "@/components/RadarBackground";
 import { BackgroundFlowtrack } from "@/components/BackgroundFlowtrack";
 import { GlassText } from "@/components/GlassText";
@@ -66,6 +67,7 @@ export default function Landing() {
             <GlassText text="FLOWTRACK" fontSize={36} />
           </div>
           <div className="flex items-center gap-6">
+            <ConnectDialog />
             <button className="text-sm font-bold text-white hover:text-white/80 transition-colors" data-testid="button-login">Login</button>
           </div>
         </div>
@@ -86,11 +88,14 @@ export default function Landing() {
               Don't just track numbers. Start seeing faces, know exactly who stays and who fades
             </p>
             <div className="flex items-center justify-center">
+              <div className="scale-110">
+                <ConnectDialog />
+              </div>
             </div>
           </motion.div>
         </div>
       </section>
-      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6 bg-[#0a0a0a]/80 backdrop-blur-md" data-testid="section-features">
+      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-how-it-works">
         <div className="max-w-5xl mx-auto w-full">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
