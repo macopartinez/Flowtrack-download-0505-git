@@ -389,7 +389,7 @@ export default function Landing() {
                 },
                 {
                   q: "How does the tracking work exactly?",
-                  a: "\"Our employee\" will follow your account and creates a snapshot of your follower list and compares it periodically with new data. This allows us to detect exactly who unfollowed you, who followed you, and which accounts were deactivated or deleted."
+                  a: "\"Our employee\" will follow your account to create a snapshot of your follower list and compare it periodically with new data. This allows us to detect exactly who unfollowed you, who followed you, and which accounts were deactivated or deleted."
                 },
                 {
                   q: "Can I track multiple accounts?",
