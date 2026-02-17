@@ -434,7 +434,7 @@ export default function Landing() {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <h2 className="text-4xl md:text-7xl font-display font-black mb-8 text-white tracking-tighter">
-              Ready to see <br /><span className="text-gradient">who's watching?</span>
+              Ready to know <br /><span className="text-gradient">who fades?</span>
             </h2>
             <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
               Join thousands of creators who already use Flowtrack to understand their audience and grow smarter.
