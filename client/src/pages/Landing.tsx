@@ -80,12 +80,12 @@ export default function Landing() {
             viewport={{ once: true, amount: 0.5 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <h1 className="text-6xl md:text-8xl font-display font-black leading-[1] mb-8 text-white tracking-tighter">
-              The ultimate tracking tool <br />
-              <span className="text-gradient">for a better relationship.</span>
+            <h1 className="text-6xl md:text-8xl font-display font-black leading-[1] mb-8 text-white tracking-tighter text-center">
+              L'outil de suivi ultime <br />
+              <span className="text-gradient">pour de meilleures relations.</span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
-              Don't just track numbers. Start seeing faces, know exactly who stays and who fades
+            <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed font-medium text-center">
+              Ne vous contentez pas de suivre des chiffres. Commencez à voir des visages, sachez exactement qui reste et qui s'efface pour mieux comprendre vos relations.
             </p>
           </motion.div>
         </div>
@@ -100,29 +100,29 @@ export default function Landing() {
           >
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-6xl font-display font-black mb-6 text-white tracking-tighter">
-                How it <span className="text-gradient">works</span>
+                Comment ça <span className="text-gradient">marche</span>
               </h2>
-              <p className="text-lg max-w-2xl mx-auto text-[#ffffff]">Three simple steps to start tracking your follower.</p>
+              <p className="text-lg max-w-2xl mx-auto text-[#ffffff]">Trois étapes simples pour commencer à suivre vos abonnés.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
                 {
                   step: "01",
-                  title: "Connect",
-                  desc: "Connect your Instagram or Facebook account and add your email to link them securely.",
+                  title: "Connexion",
+                  desc: "Connectez votre compte Instagram ou Facebook et ajoutez votre email pour les lier en toute sécurité.",
                   icon: Eye
                 },
                 {
                   step: "02",
-                  title: "Track",
-                  desc: "Our system in real time detecting every change between your followers and your account.",
+                  title: "Suivi",
+                  desc: "Notre système détecte en temps réel chaque changement entre vos abonnés et votre compte.",
                   icon: BarChart3
                 },
                 {
                   step: "03",
-                  title: "Analyze",
-                  desc: "Access detailed analytics and insights to understand your audience behavior.",
+                  title: "Analyse",
+                  desc: "Accédez à des analyses détaillées et des insights pour comprendre le comportement de votre audience.",
                   icon: Zap
                 }
               ].map((item, i) => (
@@ -162,26 +162,26 @@ export default function Landing() {
           {[
             {
               icon: Search,
-              title: "Real-time surveillance",
-              desc: "Get notified when someone unfollows your account.",
+              title: "Surveillance en temps réel",
+              desc: "Soyez notifié dès que quelqu'un se désabonne de votre compte.",
               color: "text-purple-400",
-              tag: "SPEED",
+              tag: "RAPIDITÉ",
               animation: true
             },
             {
               icon: BarChart3,
-              title: "Deep Analytics",
-              desc: "Track and viewing your profile(s) with our advanced tools.",
+              title: "Analyses Profondes",
+              desc: "Suivez et visualisez vos profils avec nos outils avancés.",
               color: "text-green-400",
               tag: "INSIGHTS",
               preview: true
             },
             {
               icon: Lock,
-              title: "Account Safety",
-              desc: "We use official APIs and bank-grade encryption to keep your account 100% secure. Privacy guaranteed, no intrusion.",
+              title: "Sécurité du Compte",
+              desc: "Nous utilisons les APIs officielles et un chiffrement de niveau bancaire pour garder votre compte 100% sécurisé. Confidentialité garantie, aucune intrusion.",
               color: "text-green-400",
-              tag: "SECURITY"
+              tag: "SÉCURITÉ"
             }
           ].map((feature, i) => (
             <div key={i} className="h-screen snap-start snap-always flex items-center justify-center px-6">
@@ -360,9 +360,9 @@ export default function Landing() {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-6xl font-display font-black text-white mb-6 tracking-tighter">
-              Common <span className="text-gradient">Questions</span>
+              Questions <span className="text-gradient">Fréquentes</span>
             </h2>
-            <p className="text-xl text-gray-400">Everything you need to know about Flowtrack.</p>
+            <p className="text-xl text-gray-400">Tout ce que vous devez savoir sur Flowtrack.</p>
           </motion.div>
 
           <motion.div
@@ -375,40 +375,40 @@ export default function Landing() {
             <Accordion type="single" collapsible className="w-full space-y-4">
               {[
                 {
-                  q: "Is Flowtrack safe for my account?",
-                  a: "Yes, 100%. We use official Graph APIs and follow all platform guidelines. We never ask for your password and use bank-grade encryption to protect your data."
+                  q: "Flowtrack est-il sûr pour mon compte ?",
+                  a: "Oui, à 100%. Nous utilisons les APIs officielles Graph et suivons toutes les directives des plateformes. Nous ne demandons jamais votre mot de passe et utilisons un chiffrement de niveau bancaire pour protéger vos données."
                 },
                 {
-                  q: "Do I need to provide my login credentials?",
-                  a: "Never. Flowtrack connects via official secure authentication methods. Your privacy and security are our top priorities."
+                  q: "Dois-je fournir mes identifiants de connexion ?",
+                  a: "Jamais. Flowtrack se connecte via des méthodes d'authentification sécurisées officielles. Votre vie privée et votre sécurité sont nos priorités absolues."
                 },
                 {
-                  q: "How does the tracking work exactly?",
-                  a: "\"Our employee\" will follow your account to monitor your follower list and compare it periodically with new data. This allows us to detect exactly who unfollowed you, who followed you, and which accounts were deactivated or deleted."
+                  q: "Comment fonctionne le suivi exactement ?",
+                  a: "\"Notre employé\" suivra votre compte pour surveiller votre liste d'abonnés et la comparer périodiquement avec de nouvelles données. Cela nous permet de détecter exactement qui s'est désabonné, qui vous a suivi, et quels comptes ont été désactivés ou supprimés."
                 },
                 {
-                  q: "Can I track multiple accounts?",
-                  a: "Absolutely. Our premium plans allow you to connect and monitor multiple Instagram and Facebook profiles from a single dashboard."
+                  q: "Puis-je suivre plusieurs comptes ?",
+                  a: "Absolument. Nos plans premium vous permettent de connecter et de surveiller plusieurs profils Instagram et Facebook depuis un seul tableau de bord."
                 },
                 {
-                  q: "Is it possible to see who viewed my profile?",
-                  a: "While official APIs don't provide a direct 'visitor list', our advanced analytics use engagement patterns and interaction data to give you the most accurate insights available on who's interacting with your content."
+                  q: "Est-il possible de voir qui a visité mon profil ?",
+                  a: "Bien que les APIs officielles ne fournissent pas de 'liste de visiteurs' directe, nos analyses avancées utilisent les schémas d'engagement et les données d'interaction pour vous donner les insights les plus précis possibles sur qui interagit avec votre contenu."
                 },
                 {
-                  q: "How often are the stats updated?",
-                  a: "We provide real-time tracking. As soon as a change is detected on your profile, your dashboard is updated and notifications are sent."
+                  q: "À quelle fréquence les statistiques sont-elles mises à jour ?",
+                  a: "Nous proposons un suivi en temps réel. Dès qu'un changement est détecté sur votre profil, votre tableau de bord est mis à jour et des notifications sont envoyées."
                 },
                 {
-                  q: "Will the people I track be notified?",
-                  a: "No. Flowtrack is a silent monitoring tool. Your tracking activity is completely private and invisible to the accounts you monitor."
+                  q: "Les personnes que je suis seront-elles informées ?",
+                  a: "Non. Flowtrack est un outil de surveillance silencieux. Votre activité de suivi est totalement privée et invisible pour les comptes que vous surveillez."
                 },
                 {
-                  q: "How fast will I receive a notification after a change occurs?",
-                  a: "Notifications are sent as soon as our system detects a change during its regular monitoring cycles. While not always instantaneous due to high demand, we strive to keep you updated as quickly as possible."
+                  q: "À quelle vitesse recevrai-je une notification après un changement ?",
+                  a: "Les notifications sont envoyées dès que notre système détecte un changement lors de ses cycles de surveillance réguliers. Bien que ce ne soit pas toujours instantané en raison de la forte demande, nous nous efforçons de vous tenir informé le plus rapidement possible."
                 },
                 {
-                  q: "Is there a free trial available?",
-                  a: "Yes! You can connect your account for free to see your current stats. Advanced historical tracking and real-time alerts require a premium subscription."
+                  q: "Existe-t-il un essai gratuit ?",
+                  a: "Oui ! Vous pouvez connecter votre compte gratuitement pour voir vos statistiques actuelles. Le suivi historique avancé et les alertes en temps réel nécessitent un abonnement premium."
                 }
               ].map((faq, i) => (
                 <AccordionItem key={i} value={`item-${i}`} className="border-b border-white/10 last:border-0 pb-2">
@@ -434,10 +434,10 @@ export default function Landing() {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <h2 className="text-4xl md:text-7xl font-display font-black mb-8 text-white tracking-tighter">
-              Ready to know <br /><span className="text-gradient">who fades?</span>
+              Prêt à savoir <br /><span className="text-gradient">qui s'efface ?</span>
             </h2>
             <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-              Join thousands of creators who already use Flowtrack to understand their audience and grow smarter.
+              Rejoignez des milliers d'utilisateurs qui font confiance à Flowtrack pour décrypter leurs relations et comprendre qui reste vraiment à leurs côtés.
             </p>
             <div className="flex items-center justify-center mb-16">
               <div className="scale-125">
