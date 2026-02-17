@@ -72,7 +72,7 @@ export default function Landing() {
           <div className="flex items-center gap-6">
             <button 
               onClick={() => setIsOpen(true)}
-              className="text-sm font-bold px-5 py-2 rounded-full transition-all duration-300 bg-[#02c950]/20 backdrop-blur-md border border-white/20 hover:shadow-[0_0_20px_rgba(2,201,80,0.4)] hover:bg-[#02c950]/30 text-white" 
+              className="text-base font-bold px-6 py-2.5 rounded-full transition-all duration-300 bg-[#02c950]/20 backdrop-blur-md border border-white/20 hover:shadow-[0_0_20px_rgba(2,201,80,0.4)] hover:bg-[#02c950]/30 text-white" 
               data-testid="button-start-tracking"
             >
               Start Tracking Free
