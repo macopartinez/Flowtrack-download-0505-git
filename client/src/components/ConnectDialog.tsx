@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Instagram, Facebook, ArrowRight } from "lucide-react";
+import { Loader2, Instagram, Facebook, ArrowRight, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface ConnectDialogProps {
@@ -19,16 +19,17 @@ export function ConnectDialog({ isOpen: controlledOpen, setIsOpen: setControlled
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setIsOpen = setControlledOpen !== undefined ? setControlledOpen : setInternalOpen;
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [platform, setPlatform] = useState<"instagram" | "facebook">("instagram");
   const { mutate: connect, isPending } = useConnectAccount();
   const [, setLocation] = useLocation();
 
   const handleConnect = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username) return;
+    if (!username || !email) return;
 
     connect(
-      { username, platform },
+      { username, email, platform },
       {
         onSuccess: (user) => {
           setIsOpen(false);
@@ -79,6 +80,22 @@ export function ConnectDialog({ isOpen: controlledOpen, setIsOpen: setControlled
                 </SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium text-gray-300">Email</Label>
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="email@example.com"
+                className="pl-10 rounded-xl border-white/10 h-12 bg-white/5 text-white placeholder:text-gray-600 focus:ring-[#02c950]/20 focus:border-[#02c950] transition-all"
+                required
+              />
+            </div>
           </div>
 
           <div className="space-y-2">

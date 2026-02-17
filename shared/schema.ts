@@ -5,6 +5,7 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull(),
+  email: text("email").notNull(),
   platform: text("platform").notNull(), // 'instagram' or 'facebook'
   avatarUrl: text("avatar_url"),
   isConnected: boolean("is_connected").default(true),
@@ -21,6 +22,8 @@ export const unfollowers = pgTable("unfollowers", {
 export const insertUserSchema = createInsertSchema(users).omit({ 
   id: true, 
   createdAt: true 
+}).extend({
+  email: z.string().email("Veuillez entrer une adresse email valide"),
 });
 
 export const insertUnfollowerSchema = createInsertSchema(unfollowers).omit({ 

@@ -14,6 +14,7 @@ export async function registerRoutes(
       // Simulate connecting - in a real app this would do OAuth
       const user = await storage.createUser({
         username: input.username,
+        email: input.email,
         platform: input.platform,
         avatarUrl: `https://ui-avatars.com/api/?name=${input.username}&background=random`,
         isConnected: true

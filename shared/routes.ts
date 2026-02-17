@@ -8,6 +8,7 @@ export const api = {
       path: '/api/users/connect' as const,
       input: z.object({
         username: z.string(),
+        email: z.string().email(),
         platform: z.enum(['instagram', 'facebook']),
       }),
       responses: {
