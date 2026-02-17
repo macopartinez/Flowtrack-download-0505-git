@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Instagram, Facebook, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
-export function ConnectDialog() {
+export function ConnectDialog({ trigger }: { trigger?: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [username, setUsername] = useState("");
   const [platform, setPlatform] = useState<"instagram" | "facebook">("instagram");
@@ -34,12 +34,14 @@ export function ConnectDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button 
-          size="lg" 
-          className="text-base px-6 py-5 rounded-full transition-all duration-300 bg-[#02c950]/20 backdrop-blur-md border border-white/20 hover:shadow-[0_0_20px_rgba(2,201,80,0.4)] hover:bg-[#02c950]/30"
-        >
-          Start Tracking Free <ArrowRight className="ml-2 w-5 h-5" />
-        </Button>
+        {trigger || (
+          <Button 
+            size="lg" 
+            className="text-base px-6 py-5 rounded-full transition-all duration-300 bg-[#02c950]/20 backdrop-blur-md border border-white/20 hover:shadow-[0_0_20px_rgba(2,201,80,0.4)] hover:bg-[#02c950]/30"
+          >
+            Start Tracking Free <ArrowRight className="ml-2 w-5 h-5" />
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] rounded-3xl border border-white/10 shadow-2xl bg-[#050505] text-white">
         <DialogHeader>
