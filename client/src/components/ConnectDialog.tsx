@@ -36,7 +36,7 @@ export function ConnectDialog() {
       <DialogTrigger asChild>
         <Button 
           size="lg" 
-          className="text-base px-6 py-5 rounded-full transition-all duration-300 bg-[#02c950]/20 backdrop-blur-md border border-white/20 hover:shadow-[0_0_20px_rgba(2,201,80,0.4)] hover:bg-[#02c950]/30"
+          className="text-base px-6 py-5 rounded-full transition-all duration-300 bg-white text-black border border-white hover:bg-white/90 hover:shadow-[0_0_20px_rgba(255,255,255,0.4)]"
         >
           Start Tracking Free <ArrowRight className="ml-2 w-5 h-5" />
         </Button>
@@ -91,7 +91,7 @@ export function ConnectDialog() {
 
           <Button 
             type="submit" 
-            className="w-full h-12 rounded-xl text-base font-semibold bg-primary hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+            className="w-full h-12 rounded-xl text-base font-semibold bg-white text-black hover:bg-white/90 transition-all shadow-lg shadow-white/10"
             disabled={isPending}
           >
             {isPending ? (
