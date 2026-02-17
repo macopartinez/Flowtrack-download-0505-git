@@ -3,7 +3,7 @@ import { RadarBackground } from "@/components/RadarBackground";
 import { BackgroundFlowtrack } from "@/components/BackgroundFlowtrack";
 import { GlassText } from "@/components/GlassText";
 import { motion } from "framer-motion";
-import { BarChart3, ShieldCheck, Zap, Eye, Search, Lock, ChevronDown } from "lucide-react";
+import { BarChart3, ShieldCheck, Zap, Eye, Search, Lock, ChevronDown, ArrowRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AnalyticsPreview } from "@/components/AnalyticsPreview";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -57,18 +57,26 @@ function PhoneNotification() {
 }
 
 export default function Landing() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <div className="h-screen overflow-y-auto snap-y snap-mandatory bg-transparent font-body text-white relative" data-testid="scroll-container">
       <RadarBackground />
       <BackgroundFlowtrack />
+      <ConnectDialog isOpen={isOpen} setIsOpen={setIsOpen} />
       <nav className="fixed w-full top-0 z-50 bg-transparent">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <GlassText text="FLOWTRACK" fontSize={36} />
           </div>
           <div className="flex items-center gap-6">
-            <ConnectDialog />
-            <button className="text-sm font-bold text-white hover:text-white/80 transition-colors" data-testid="button-login">Login</button>
+            <button 
+              onClick={() => setIsOpen(true)}
+              className="text-sm font-bold text-white hover:text-white/80 transition-colors" 
+              data-testid="button-login"
+            >
+              Login
+            </button>
           </div>
         </div>
       </nav>
@@ -441,7 +449,12 @@ export default function Landing() {
             </p>
             <div className="flex items-center justify-center mb-16">
               <div className="scale-125">
-                <ConnectDialog />
+                <button 
+                  onClick={() => setIsOpen(true)}
+                  className="text-base px-8 py-4 rounded-full transition-all duration-300 bg-[#02c950]/20 backdrop-blur-md border border-white/20 hover:shadow-[0_0_20px_rgba(2,201,80,0.4)] hover:bg-[#02c950]/30 font-bold text-white flex items-center gap-2"
+                >
+                  Start Tracking Free <ArrowRight className="ml-2 w-5 h-5" />
+                </button>
               </div>
             </div>
             <div className="text-sm text-gray-500">

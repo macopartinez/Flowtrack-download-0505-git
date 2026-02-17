@@ -9,8 +9,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Instagram, Facebook, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
-export function ConnectDialog() {
-  const [isOpen, setIsOpen] = useState(false);
+interface ConnectDialogProps {
+  isOpen?: boolean;
+  setIsOpen?: (open: boolean) => void;
+}
+
+export function ConnectDialog({ isOpen: controlledOpen, setIsOpen: setControlledOpen }: ConnectDialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setIsOpen = setControlledOpen !== undefined ? setControlledOpen : setInternalOpen;
   const [username, setUsername] = useState("");
   const [platform, setPlatform] = useState<"instagram" | "facebook">("instagram");
   const { mutate: connect, isPending } = useConnectAccount();
@@ -43,9 +50,9 @@ export function ConnectDialog() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] rounded-3xl border-0 shadow-2xl bg-white/95 backdrop-blur-xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center">Connect Account</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-center">Login</DialogTitle>
           <DialogDescription className="text-center text-muted-foreground">
-            Enter your details to start tracking unfollowers instantly.
+            Enter your details to access your dashboard.
           </DialogDescription>
         </DialogHeader>
 
@@ -96,16 +103,16 @@ export function ConnectDialog() {
           >
             {isPending ? (
               <span className="flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" /> Connecting...
+                <Loader2 className="w-4 h-4 animate-spin" /> Logging in...
               </span>
             ) : (
-              "Connect Account"
+              "Login"
             )}
           </Button>
         </form>
 
         <div className="text-center text-xs text-muted-foreground mt-4">
-          By connecting, you agree to our Terms of Service.
+          By logging in, you agree to our Terms of Service.
         </div>
       </DialogContent>
     </Dialog>
