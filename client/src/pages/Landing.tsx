@@ -414,10 +414,6 @@ export default function Landing() {
                 {
                   q: "Is there a free trial available?",
                   a: "Yes! You can connect your account for free to see your current stats. Advanced historical tracking and real-time alerts require a premium subscription."
-                },
-                {
-                  q: "What happens if I disconnect my account?",
-                  a: "If you disconnect, we stop tracking your data immediately. You can reconnect at any time to resume monitoring, though historical data during the disconnected period may be limited."
                 }
               ].map((faq, i) => (
                 <AccordionItem key={i} value={`item-${i}`} className="border-b border-white/10 last:border-0 pb-2">
