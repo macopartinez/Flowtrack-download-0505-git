@@ -1,4 +1,3 @@
-import { ConnectDialog } from "@/components/ConnectDialog";
 import { RadarBackground } from "@/components/RadarBackground";
 import { BackgroundFlowtrack } from "@/components/BackgroundFlowtrack";
 import { GlassText } from "@/components/GlassText";
@@ -67,7 +66,6 @@ export default function Landing() {
             <GlassText text="FLOWTRACK" fontSize={36} />
           </div>
           <div className="flex items-center gap-6">
-            <ConnectDialog />
             <button className="text-sm font-bold text-white hover:text-white/80 transition-colors" data-testid="button-login">Login</button>
           </div>
         </div>
@@ -88,14 +86,11 @@ export default function Landing() {
               Don't just track numbers. Start seeing faces, know exactly who stays and who fades
             </p>
             <div className="flex items-center justify-center">
-              <div className="scale-110">
-                <ConnectDialog />
-              </div>
             </div>
           </motion.div>
         </div>
       </section>
-      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-how-it-works">
+      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6 bg-[#0a0a0a]/80 backdrop-blur-md" data-testid="section-features">
         <div className="max-w-5xl mx-auto w-full">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -441,15 +436,10 @@ export default function Landing() {
             <h2 className="text-4xl md:text-7xl font-display font-black mb-8 text-white tracking-tighter">
               Ready to see <br /><span className="text-gradient">who's watching?</span>
             </h2>
-            <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed text-center">
               Join thousands of creators who already use Flowtrack to understand their audience and grow smarter.
             </p>
-            <div className="flex items-center justify-center mb-16">
-              <div className="scale-125">
-                <ConnectDialog />
-              </div>
-            </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-500 text-center">
               &copy; 2024 Flowtrack Analytics. All rights reserved.
             </div>
           </motion.div>
