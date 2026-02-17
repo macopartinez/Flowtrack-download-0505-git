@@ -70,11 +70,6 @@ export function BackgroundFlowtrack() {
           ctx.shadowColor = `rgba(0, 255, 100, ${intensity * 0.8})`;
           ctx.strokeText(text, textX, textY);
 
-          ctx.shadowBlur = 0;
-          ctx.strokeStyle = `rgba(150, 255, 200, ${intensity * 0.4})`;
-          ctx.lineWidth = 1;
-          ctx.strokeText(text, textX, textY);
-
           ctx.restore();
         }
       }

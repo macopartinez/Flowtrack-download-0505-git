@@ -124,7 +124,7 @@ export function AnalyticsPreview() {
               onClick={() => setSelectedPlatform('instagram')}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 selectedPlatform === 'instagram'
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white'
+                  ? 'bg-[#02c950] text-black'
                   : 'bg-white/5 text-gray-400 hover:bg-white/10'
               }`}
             >
@@ -162,10 +162,10 @@ export function AnalyticsPreview() {
                 className="flex-1 rounded-t-[2px] relative group"
                 style={{
                   background: isInstagram
-                    ? 'linear-gradient(180deg, #E1306C 0%, #FCAF45 100%)'
+                    ? 'linear-gradient(180deg, #02c950 0%, #018a37 100%)'
                     : 'linear-gradient(180deg, #1877F2 0%, #0A66C2 100%)',
                   boxShadow: isInstagram
-                    ? '0 0 10px rgba(225, 48, 108, 0.2)'
+                    ? '0 0 10px rgba(2, 201, 80, 0.2)'
                     : '0 0 10px rgba(24, 119, 242, 0.2)'
                 }}
               />

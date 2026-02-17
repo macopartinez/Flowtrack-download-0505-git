@@ -69,12 +69,6 @@ export function RadarBackground() {
         ctx.strokeStyle = `rgba(0, 255, 100, ${this.opacity})`;
         ctx.lineWidth = config.maxWaveWidth;
         ctx.stroke();
-        ctx.shadowBlur = 0;
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, this.radius, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(150, 255, 200, ${this.opacity * 0.6})`;
-        ctx.lineWidth = config.maxWaveWidth * 0.4;
-        ctx.stroke();
         ctx.restore();
       }
 

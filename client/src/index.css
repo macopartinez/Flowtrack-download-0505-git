@@ -17,7 +17,7 @@
   --popover: 240 10% 3.9%;
   --popover-foreground: 0 0% 98%;
 
-  --primary: 263.4 70% 50.4%; /* Figma Purple */
+  --primary: 142 70% 50.4%; /* Figma Green */
   --primary-foreground: 210 40% 98%;
 
   --secondary: 240 3.7% 15.9%;
@@ -34,7 +34,7 @@
 
   --border: 240 3.7% 15.9%;
   --input: 240 3.7% 15.9%;
-  --ring: 263.4 70% 50.4%;
+  --ring: 142 70% 50.4%;
 
   --radius: 0.75rem;
 }
@@ -71,7 +71,7 @@
 
 .text-gradient {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-white via-white/90 to-white;
-  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 24px rgba(255, 200, 200, 0.4));
+  filter: drop-shadow(0 0-12px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 24px rgba(2, 201, 80, 0.4));
   padding-right: 0.1em;
   margin-right: -0.1em;
 }
