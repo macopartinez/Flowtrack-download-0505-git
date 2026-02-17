@@ -441,10 +441,10 @@ export default function Landing() {
             <h2 className="text-4xl md:text-7xl font-display font-black mb-8 text-white tracking-tighter">
               Ready to see <br /><span className="text-gradient">who's watching?</span>
             </h2>
-            <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed text-center">
+            <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
               Join thousands of creators who already use Flowtrack to understand their audience and grow smarter.
             </p>
-            <div className="text-sm text-gray-500 text-center">
+            <div className="text-sm text-gray-500">
               &copy; 2024 Flowtrack Analytics. All rights reserved.
             </div>
           </motion.div>
