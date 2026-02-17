@@ -437,7 +437,7 @@ export default function Landing() {
               Ready to know <br /><span className="text-gradient">who fades?</span>
             </h2>
             <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-              Join thousands of creators who already use Flowtrack to understand their audience and grow smarter.
+              Rejoignez des milliers d'utilisateurs qui utilisent déjà Flowtrack pour comprendre leurs relations et mieux se connaître.
             </p>
             <div className="flex items-center justify-center mb-16">
               <div className="scale-125">
