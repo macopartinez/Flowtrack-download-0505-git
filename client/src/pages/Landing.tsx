@@ -87,11 +87,6 @@ export default function Landing() {
             <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
               Don't just track numbers. Start seeing faces, know exactly who stays and who fades
             </p>
-            <div className="flex items-center justify-center">
-              <div className="scale-110">
-                <ConnectDialog />
-              </div>
-            </div>
           </motion.div>
         </div>
       </section>
@@ -444,6 +439,11 @@ export default function Landing() {
             <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
               Join thousands of creators who already use Flowtrack to understand their audience and grow smarter.
             </p>
+            <div className="flex items-center justify-center mb-16">
+              <div className="scale-125">
+                <ConnectDialog />
+              </div>
+            </div>
             <div className="text-sm text-gray-500">
               &copy; 2024 Flowtrack Analytics. All rights reserved.
             </div>
