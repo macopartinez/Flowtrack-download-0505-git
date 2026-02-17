@@ -388,16 +388,32 @@ export default function Landing() {
                   a: "Never. Flowtrack connects via official secure authentication methods. Your privacy and security are our top priorities."
                 },
                 {
+                  q: "How does the tracking work exactly?",
+                  a: "Flowtrack creates a snapshot of your follower list and compares it periodically with new data. This allows us to detect exactly who unfollowed you, who followed you, and which accounts were deactivated or deleted."
+                },
+                {
                   q: "Can I track multiple accounts?",
                   a: "Absolutely. Our premium plans allow you to connect and monitor multiple Instagram and Facebook profiles from a single dashboard."
+                },
+                {
+                  q: "Is it possible to see who viewed my profile?",
+                  a: "While official APIs don't provide a direct 'visitor list', our advanced analytics use engagement patterns and interaction data to give you the most accurate insights available on who's interacting with your content."
                 },
                 {
                   q: "How often are the stats updated?",
                   a: "We provide real-time tracking. As soon as a change is detected on your profile, your dashboard is updated and notifications are sent."
                 },
                 {
+                  q: "Will the people I track be notified?",
+                  a: "No. Flowtrack is a silent monitoring tool. Your tracking activity is completely private and invisible to the accounts you monitor."
+                },
+                {
                   q: "Is there a free trial available?",
                   a: "Yes! You can connect your account for free to see your current stats. Advanced historical tracking and real-time alerts require a premium subscription."
+                },
+                {
+                  q: "What happens if I disconnect my account?",
+                  a: "If you disconnect, we stop tracking your data immediately. You can reconnect at any time to resume monitoring, though historical data during the disconnected period may be limited."
                 }
               ].map((faq, i) => (
                 <AccordionItem key={i} value={`item-${i}`} className="border-b border-white/10 last:border-0 pb-2">
