@@ -95,7 +95,7 @@ export default function Landing() {
             <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
               Don't just track numbers. Start seeing faces, know exactly who stays and who fades
             </p>
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center mb-16">
               <div className="scale-110">
                 <button 
                   onClick={() => setIsOpen(true)}
