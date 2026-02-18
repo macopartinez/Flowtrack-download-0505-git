@@ -89,7 +89,7 @@ export default function Onboard() {
 
       <nav className="fixed w-full top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <button onClick={() => setLocation("/")} data-testid="link-home">
+          <button onClick={() => setLocation("/")} data-testid="link-home" className="hover-elevate">
             <GlassText text="FLOWTRACK" fontSize={36} />
           </button>
         </div>
