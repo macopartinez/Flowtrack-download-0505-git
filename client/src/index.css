@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lalezar&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Doppio+One&family=Lalezar&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,6 +7,7 @@
 :root {
   --font-display: 'Outfit', sans-serif;
   --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-doppio: 'Doppio One', sans-serif;
 
   /* Dark theme colors from Figma */
   --background: 240 10% 3.9%;
@@ -70,8 +71,8 @@
 }
 
 .text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-white via-white/90 to-white;
-  filter: drop-shadow(0 0-12px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 24px rgba(2, 201, 80, 0.4));
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 1)) drop-shadow(0 0 16px rgba(2, 201, 80, 0.8)) drop-shadow(0 0 32px rgba(2, 201, 80, 0.6));
   padding-right: 0.1em;
   margin-right: -0.1em;
 }
@@ -149,4 +150,13 @@
   pointer-events: none;
   animation: notifAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
              notifDisappear 0.6s ease-in 2.0s forwards;
+}
+
+/* Animation delays for blob */
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
 }

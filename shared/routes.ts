@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { insertUserSchema, insertUnfollowerSchema, users, unfollowers } from './schema';
+import { insertUserSchema, insertUnfollowerSchema, users, unfollowers, followers, blockers } from './schema';
 
 export const api = {
   users: {
@@ -9,6 +9,7 @@ export const api = {
       input: z.object({
         username: z.string(),
         email: z.string().email(),
+        password: z.string().min(6),
         platform: z.enum(['instagram', 'facebook']),
       }),
       responses: {
@@ -31,8 +32,27 @@ export const api = {
       path: '/api/stats/:userId' as const,
       responses: {
         200: z.object({
+          // Instagram profile stats
+          instagramFollowers: z.number().optional(),
+          instagramFollowing: z.number().optional(),
+          instagramPosts: z.number().optional(),
+          instagramBio: z.string().optional(),
+          isPrivate: z.boolean().optional(),
+          analysisStatus: z.string().optional(),
+          lastAnalyzedAt: z.string().nullable().optional(),
+          // Activity tracking stats
           totalUnfollowers: z.number(),
+          totalFollowers: z.number(),
+          totalBlockers: z.number(),
           recentUnfollowers: z.array(z.custom<typeof unfollowers.$inferSelect>()),
+          recentFollowers: z.array(z.custom<typeof followers.$inferSelect>()),
+          recentBlockers: z.array(z.custom<typeof blockers.$inferSelect>()),
+          chartData: z.array(z.object({
+            day: z.number(),
+            followers: z.number(),
+            unfollowers: z.number(),
+            blockers: z.number().optional(),
+          })),
           growthRate: z.number(),
         }),
       },

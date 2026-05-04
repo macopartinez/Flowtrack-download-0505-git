@@ -1,263 +1,1286 @@
-import { useEffect } from "react";
-import { useRoute } from "wouter";
-import { useUser, useStats } from "@/hooks/use-flowtrack";
-import { StatsCard } from "@/components/StatsCard";
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
-import { motion } from "framer-motion";
-import { 
-  Users, 
-  UserMinus, 
-  TrendingUp, 
-  LayoutDashboard, 
-  Settings, 
-  LogOut,
-  Instagram,
-  Facebook,
-  MoreHorizontal
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRoute, useLocation } from "wouter";
+import { useUser, useStats } from "@/hooks/use-waler";
+import { useAuth } from "@/hooks/use-auth";
+import { useAnimationPreference } from "@/hooks/use-animation-preference";
+import { BarChart, Bar, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell } from "recharts";
+import { motion, AnimatePresence, useSpring } from "framer-motion";
+import { Instagram, LogOut, List, X, ChevronLeft, ChevronRight, Settings, AlertTriangle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { format } from "date-fns";
 import { RadarBackground } from "@/components/RadarBackground";
+import { GlassText } from "@/components/GlassText";
+import { RevealGate } from "@/components/RevealGate";
+import { useSubscription } from "@/contexts/SubscriptionContext";
+import { ProDashboard } from "@/components/pro/ProDashboard";
+import { Crown, Briefcase, User } from "lucide-react";
+import Onboarding from "@/components/Onboarding";
+import UnfollowerModal from "@/components/UnfollowerModal";
+import { SettingsModal } from "@/components/SettingsModal";
 
-// Mock data for the chart since schema doesn't support history yet
-const chartData = [
-  { name: 'Mon', followers: 4000, unfollowers: 24 },
-  { name: 'Tue', followers: 4020, unfollowers: 18 },
-  { name: 'Wed', followers: 4080, unfollowers: 32 },
-  { name: 'Thu', followers: 4100, unfollowers: 12 },
-  { name: 'Fri', followers: 4150, unfollowers: 45 },
-  { name: 'Sat', followers: 4200, unfollowers: 20 },
-  { name: 'Sun', followers: 4250, unfollowers: 15 },
-];
+type Section = "followers" | "unfollowers" | "blockers";
+type Platform = "instagram";
+type Period = "month" | "year";
 
-export default function Dashboard() {
-  const [, params] = useRoute("/dashboard/:userId");
-  const userId = params ? parseInt(params.userId) : null;
-  
-  const { data: user, isLoading: userLoading } = useUser(userId);
-  const { data: stats, isLoading: statsLoading } = useStats(userId);
+const SECTION_CONFIG = {
+  followers:   { label: "Followers",        arcColor: "#02c950", textColor: "text-[#02c950]" },
+  unfollowers: { label: "Connections Changed",       arcColor: "#f59e0b", textColor: "text-amber-500"   },
+  blockers:    { label: "Ghosts", arcColor: "#ffffff", textColor: "text-gray-300"  },
+};
 
-  if (userLoading || statsLoading) {
-    return <DashboardLoading />;
-  }
+const MONTHS = ["JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE","JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"];
 
-  if (!user || !stats) {
-    return <div>Error loading dashboard</div>;
-  }
+const SPHERE_SIZE = 352;
+const WHITE_ARC_RADIUS = 148;
+const WHITE_ARC_STROKE = 14;
+const NAV_GAP = 20;
+const NAV_INNER_RATIO = 0.83; // 83%
+const NAV_START_DEG = 0; // 0°
+const NAV_SWEEP_PERCENT = -25; // -25%
+const SECTION_SPLITS: Record<Section, number> = {
+  blockers: 0.33,
+  unfollowers: 0.34,
+  followers: 0.33,
+};
+
+const ARC_INNER_RADIUS = WHITE_ARC_RADIUS + WHITE_ARC_STROKE / 2 + NAV_GAP;
+const ARC_OUTER_RADIUS = ARC_INNER_RADIUS / NAV_INNER_RATIO;
+const NAV_THICKNESS = ARC_OUTER_RADIUS - ARC_INNER_RADIUS;
+const NAV_STROKE_WIDTH = NAV_THICKNESS + 5;
+const NAV_ARC_OFFSET = 2;
+const NAV_BASE_RADIUS = ARC_INNER_RADIUS + NAV_STROKE_WIDTH / 2 + NAV_ARC_OFFSET;
+const NAV_INNER_BOUNDARY = NAV_BASE_RADIUS - NAV_STROKE_WIDTH / 2;
+const NAV_OUTER_BOUNDARY = NAV_BASE_RADIUS + NAV_STROKE_WIDTH / 2;
+const INDICATOR_OFFSET = 10;
+const INDICATOR_RADIUS = NAV_OUTER_BOUNDARY + INDICATOR_OFFSET;
+const INDICATOR_LENGTH_RATIO = 0.7;
+const NAV_CANVAS = Math.ceil((INDICATOR_RADIUS + 12) * 2);
+const SPHERE_OFFSET = (NAV_CANVAS - SPHERE_SIZE) / 2;
+const SPHERE_CENTER = { x: NAV_CANVAS / 2, y: NAV_CANVAS / 2 };
+const ARC_CENTER = SPHERE_CENTER;
+const TOTAL_SWEEP_DEG = (NAV_SWEEP_PERCENT / 100) * 360;
+
+const SECTION_ARC_SEGMENTS: Record<Section, { start: number; end: number }> = (() => {
+  let cumulative = 0;
+  const entries = {} as Record<Section, { start: number; end: number }>;
+  (Object.keys(SECTION_SPLITS) as Section[]).forEach((section) => {
+    const fraction = SECTION_SPLITS[section];
+    const start = NAV_START_DEG + TOTAL_SWEEP_DEG * cumulative;
+    const end = start + TOTAL_SWEEP_DEG * fraction;
+    entries[section] = { start, end };
+    cumulative += fraction;
+  });
+  return entries;
+})();
+
+const SEPARATOR_ANGLES = Object.values(SECTION_ARC_SEGMENTS)
+  .slice(0, -1)
+  .map((segment) => segment.end);
+
+const INDICATOR_SPRING = { stiffness: 120, damping: 18 };
+
+function polarToCartesian(cx: number, cy: number, radius: number, angleInDegrees: number) {
+  const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
+  return {
+    x: cx + radius * Math.cos(angleInRadians),
+    y: cy + radius * Math.sin(angleInRadians),
+  };
+}
+
+function describeArc(startAngle: number, endAngle: number, radius: number) {
+  const start = polarToCartesian(ARC_CENTER.x, ARC_CENTER.y, radius, startAngle);
+  const end = polarToCartesian(ARC_CENTER.x, ARC_CENTER.y, radius, endAngle);
+  const sweep = endAngle - startAngle;
+  const largeArcFlag = Math.abs(sweep) > 180 ? "1" : "0";
+  const sweepFlag = sweep > 0 ? "1" : "0";
+  return `M ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArcFlag} ${sweepFlag} ${end.x} ${end.y}`;
+}
+
+type SectionArcNavProps = {
+  activeSection: Section;
+  onSelect: (section: Section) => void;
+};
+
+function shortenSegment(start: number, end: number, ratio: number) {
+  const sweep = end - start;
+  const midpoint = start + sweep / 2;
+  const halfLength = (sweep * ratio) / 2;
+  return {
+    start: midpoint - halfLength,
+    end: midpoint + halfLength,
+  };
+}
+
+function SectionArcNav({ activeSection, onSelect }: SectionArcNavProps) {
+  const centerRadius = NAV_BASE_RADIUS;
+  const basePath = useMemo(() => {
+    return describeArc(NAV_START_DEG, NAV_START_DEG + TOTAL_SWEEP_DEG, centerRadius);
+  }, []);
+
+  const initialSegment = useRef(
+    shortenSegment(
+      SECTION_ARC_SEGMENTS[activeSection].start,
+      SECTION_ARC_SEGMENTS[activeSection].end,
+      INDICATOR_LENGTH_RATIO,
+    ),
+  );
+  const indicatorStart = useSpring(initialSegment.current.start, INDICATOR_SPRING);
+  const indicatorEnd = useSpring(initialSegment.current.end, INDICATOR_SPRING);
+  const [indicatorPath, setIndicatorPath] = useState(() =>
+    describeArc(initialSegment.current.start, initialSegment.current.end, INDICATOR_RADIUS),
+  );
+
+  useEffect(() => {
+    const segment = SECTION_ARC_SEGMENTS[activeSection];
+    const shortened = shortenSegment(segment.start, segment.end, INDICATOR_LENGTH_RATIO);
+    indicatorStart.set(shortened.start);
+    indicatorEnd.set(shortened.end);
+  }, [activeSection, indicatorStart, indicatorEnd]);
+
+  useEffect(() => {
+    const updatePath = () => {
+      setIndicatorPath(describeArc(indicatorStart.get(), indicatorEnd.get(), INDICATOR_RADIUS));
+    };
+    const unsubStart = indicatorStart.on("change", updatePath);
+    const unsubEnd = indicatorEnd.on("change", updatePath);
+    updatePath();
+    return () => {
+      unsubStart();
+      unsubEnd();
+    };
+  }, [indicatorStart, indicatorEnd]);
+
+  const segmentEntries = useMemo(() => Object.entries(SECTION_ARC_SEGMENTS) as [Section, { start: number; end: number }][], []);
 
   return (
-    <div className="min-h-screen bg-transparent flex font-body text-white relative">
-      <RadarBackground />
-      {/* Sidebar */}
-      <aside className="w-72 bg-[#0a0a0a]/80 backdrop-blur-xl border-r border-white/5 hidden md:flex flex-col fixed h-full z-10 shadow-2xl">
-        <div className="p-10">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-white font-black text-2xl shadow-xl shadow-primary/30">
-              F
-            </div>
-            <span className="font-display font-black text-2xl tracking-tighter text-white">Flowtrack</span>
-          </div>
-        </div>
+    <div
+      className="absolute inset-0"
+      style={{
+        zIndex: 40,
+      }}
+    >
+      <svg
+        className="absolute inset-0 w-full h-full"
+        viewBox={`0 0 ${NAV_CANVAS} ${NAV_CANVAS}`}
+        style={{ pointerEvents: "none" }}
+      >
+        <defs>
+          <filter id="navGlass" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+            <feColorMatrix
+              in="blur"
+              type="matrix"
+              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.4 0"
+              result="glow"
+            />
+            <feBlend in="SourceGraphic" in2="glow" mode="screen" />
+          </filter>
+        </defs>
 
-        <nav className="flex-1 px-6 space-y-3">
-          <NavItem icon={LayoutDashboard} label="Dashboard" active />
-          <NavItem icon={Users} label="Audience" />
-          <NavItem icon={TrendingUp} label="Analytics" />
-          <NavItem icon={Settings} label="Settings" />
-        </nav>
-
-        <div className="p-6 border-t border-white/5">
-          <div className="bg-white/5 p-5 rounded-3xl mb-6 flex items-center gap-4 border border-white/5">
-            <div className="w-12 h-12 rounded-full bg-white/10 p-1 border border-white/10 overflow-hidden shadow-sm">
-              <img 
-                src={user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`} 
-                alt="Avatar" 
-                className="w-full h-full object-cover rounded-full"
-              />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="font-bold truncate text-sm text-white">{user.username}</div>
-              <div className="text-xs text-gray-400 capitalize flex items-center gap-1.5 font-medium">
-                {user.platform === 'instagram' ? <Instagram className="w-3.5 h-3.5 text-pink-500" /> : <Facebook className="w-3.5 h-3.5 text-blue-600" />}
-                {user.platform}
-              </div>
-            </div>
-          </div>
-          <Button variant="ghost" className="w-full justify-start text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-2xl h-12 font-bold">
-            <LogOut className="w-5 h-5 mr-3" /> Logout
-          </Button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 md:ml-72 p-6 md:p-12 lg:p-16">
-        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-16">
-          <div>
-            <h1 className="text-4xl font-display font-black text-white tracking-tight">Overview</h1>
-            <p className="text-gray-400 mt-2 font-medium">Monitoring your social growth and audience health.</p>
-          </div>
-          <div className="flex gap-4 w-full sm:w-auto">
-            <Button variant="outline" className="rounded-2xl h-12 px-6 font-bold border-white/10 hover:border-white/20 bg-white/5 text-white w-full sm:w-auto">
-              Download CSV
-            </Button>
-            <Button className="rounded-2xl h-12 px-6 font-bold shadow-lg shadow-primary/25 w-full sm:w-auto">
-              Refresh Data
-            </Button>
-          </div>
-        </header>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <StatsCard 
-            title="Total Unfollowers" 
-            value={stats.totalUnfollowers} 
-            icon={UserMinus} 
-            colorClass="text-red-500"
-            delay={0.1}
+        {segmentEntries.map(([section, segment]) => (
+          <path
+            key={`hit-${section}`}
+            d={describeArc(segment.start, segment.end, centerRadius)}
+            fill="none"
+            stroke="transparent"
+            strokeWidth={NAV_STROKE_WIDTH}
+            strokeLinecap="round"
+            pointerEvents="stroke"
+            style={{ cursor: "pointer" }}
+            onClick={() => onSelect(section)}
           />
-          <StatsCard 
-            title="Recent Unfollowers (7d)" 
-            value={stats.recentUnfollowers.length} 
-            icon={Users} 
-            colorClass="text-blue-500"
-            trend="+12%"
-            trendUp={false}
-            delay={0.2}
-          />
-          <StatsCard 
-            title="Growth Rate" 
-            value={`${stats.growthRate}%`} 
-            icon={TrendingUp} 
-            colorClass="text-green-500"
-            trend="+2.4%"
-            trendUp={true}
-            delay={0.3}
-          />
-        </div>
+        ))}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Chart Section */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="lg:col-span-2 glass-card p-8"
+        <path
+          d={basePath}
+          fill="none"
+          stroke="rgba(47, 43, 43, 0.77)"
+          strokeWidth={NAV_STROKE_WIDTH}
+          strokeLinecap="round"
+          filter="url(#navGlass)"
+        />
+
+        {SEPARATOR_ANGLES.map((angle) => {
+          const inner = polarToCartesian(ARC_CENTER.x, ARC_CENTER.y, NAV_INNER_BOUNDARY + 4, angle);
+          const outer = polarToCartesian(ARC_CENTER.x, ARC_CENTER.y, NAV_OUTER_BOUNDARY - 4, angle);
+          return (
+            <line
+              key={angle}
+              x1={inner.x}
+              y1={inner.y}
+              x2={outer.x}
+              y2={outer.y}
+              stroke="rgba(255,255,255,0.3)"
+              strokeWidth={2}
+              filter="url(#navGlass)"
+              strokeLinecap="round"
+            />
+          );
+        })}
+
+        <path
+          d={indicatorPath}
+          fill="none"
+          stroke="rgba(255, 254, 254, 0.4)"
+          strokeWidth="4"
+          strokeLinecap="round"
+          filter="url(#navGlass)"
+        />
+      </svg>
+
+      {segmentEntries.map(([section, config]) => {
+        const midAngle = (config.start + config.end) / 2;
+        const iconRadius = NAV_BASE_RADIUS;
+        const pos = polarToCartesian(ARC_CENTER.x, ARC_CENTER.y, iconRadius, midAngle);
+        const isActive = activeSection === section;
+        return (
+          <button
+            key={section}
+            onClick={() => onSelect(section)}
+            className="absolute transition-all"
+            style={{
+              left: pos.x - 24,
+              top: pos.y - 24,
+              pointerEvents: "auto",
+              zIndex: 60,
+            }}
           >
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-lg">Activity Overview</h3>
-              <SelectTimeRange />
-            </div>
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData}>
-                  <defs>
-                    <linearGradient id="colorUnfollowers" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8'}} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8'}} />
-                  <Tooltip 
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
+            <div className="w-12 h-12 flex items-center justify-center">
+              {section === "blockers" ? (
+                <svg width="26" height="26" viewBox="0 0 22 22" fill="none">
+                  <circle
+                    cx="11"
+                    cy="7"
+                    r="4.3"
+                    stroke={isActive ? "#000" : "#fff"}
+                    strokeWidth="2"
+                    strokeDasharray="3.5 2"
+                    opacity={isActive ? 1 : 0.7}
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="unfollowers" 
-                    stroke="#ef4444" 
-                    strokeWidth={3}
-                    fillOpacity={1} 
-                    fill="url(#colorUnfollowers)" 
+                  <path
+                    d="M4 20c0-4.3 3.6-7 7-7s7 2.7 7 7"
+                    stroke={isActive ? "#000" : "#fff"}
+                    strokeWidth="2"
+                    strokeDasharray="5 3"
+                    strokeLinecap="round"
+                    opacity={isActive ? 1 : 0.7}
+                    fill="none"
                   />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </motion.div>
-
-          {/* Recent Unfollowers List */}
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
-            className="glass-card p-8"
-          >
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-lg">Recent Unfollowers</h3>
-              <Button variant="ghost" size="sm">View All</Button>
-            </div>
-            
-            <div className="space-y-6">
-              {stats.recentUnfollowers.length === 0 ? (
-                <div className="text-center text-muted-foreground py-10">
-                  No recent unfollowers! 🎉
-                </div>
+                </svg>
               ) : (
-                stats.recentUnfollowers.map((unfollower) => (
-                  <div key={unfollower.id} className="flex items-center justify-between group">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold">
-                        {unfollower.username.substring(0,2).toUpperCase()}
-                      </div>
-                      <div>
-                        <div className="font-semibold text-sm">{unfollower.username}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {format(new Date(unfollower.detectedAt || new Date()), 'MMM d, h:mm a')}
-                        </div>
-                      </div>
-                    </div>
-                    <Button size="icon" variant="ghost" className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <MoreHorizontal className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ))
+                <svg width="26" height="26" viewBox="0 0 22 22" fill="none">
+                  <path
+                    d="M11 11a4 4 0 100-8 4 4 0 000 8zM11 13.5c-4.3 0-7.5 2.6-7.5 5.2V20h15v-1.3c0-2.6-3.2-5.2-7.5-5.2z"
+                    fill={isActive ? "#000" : "#fff"}
+                    opacity={isActive ? 1 : 0.7}
+                  />
+                  {section === "unfollowers" && (
+                    <line
+                      x1="2"
+                      y1="20"
+                      x2="20"
+                      y2="2"
+                      stroke={isActive ? "#000" : "#fff"}
+                      strokeWidth="3.2"
+                      opacity={isActive ? 1 : 0.5}
+                      transform="rotate(10 11 11)"
+                    />
+                  )}
+                </svg>
               )}
             </div>
-          </motion.div>
-        </div>
-      </main>
+          </button>
+        );
+      })}
     </div>
   );
 }
 
-function NavItem({ icon: Icon, label, active = false }: { icon: any, label: string, active?: boolean }) {
-  return (
-    <button className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-      active 
-        ? "bg-primary text-white shadow-lg shadow-primary/25 font-medium" 
-        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-    }`}>
-      <Icon className="w-5 h-5" />
-      {label}
-    </button>
-  );
-}
+export default function Dashboard() {
+  const [, params] = useRoute("/dashboard/:userId");
+  const [, navigate] = useLocation();
+  const { user: authUser, isLoading: authLoading, logout } = useAuth();
+  const disableAnimation = useAnimationPreference();
+  const userId = params ? parseInt(params.userId) : null;
 
-function SelectTimeRange() {
+  // Debug authentication state
+  useEffect(() => {
+    console.log('🔍 Dashboard Auth Debug:', {
+      authLoading,
+      authUser,
+      userId,
+      hasAuthUser: !!authUser,
+      authUserId: authUser?.id
+    });
+  }, [authLoading, authUser, userId]);
+
+  // Redirect if not authenticated or accessing wrong user
+  useEffect(() => {
+    if (!authLoading && !authUser) {
+      console.log('❌ Not authenticated, redirecting to home');
+      navigate("/");
+    } else if (authUser && userId && authUser.id !== userId) {
+      console.log('⚠️ Wrong user ID, redirecting to correct dashboard');
+      navigate(`/dashboard/${authUser.id}`);
+    }
+  }, [authUser, authLoading, userId, navigate]);
+
+  // Use authenticated user's ID
+  const currentUserId = authUser?.id || null;
+  const { data: user, isLoading: userLoading, error: userError } = useUser(currentUserId);
+  const { data: stats, isLoading: statsLoading, error: statsError } = useStats(currentUserId);
+  const { isPro, tier, isLoading: subLoading } = useSubscription();
+  
+  // Debug data loading state
+  useEffect(() => {
+    console.log('📊 Dashboard Data Debug:', {
+      currentUserId,
+      userLoading,
+      statsLoading,
+      hasUser: !!user,
+      hasStats: !!stats,
+      userError: userError?.message,
+      statsError: statsError?.message
+    });
+  }, [currentUserId, userLoading, statsLoading, user, stats, userError, statsError]);
+
+  const [mode, setMode] = useState<'personal' | 'professional'>('personal');
+  const [activeSection, setActiveSection] = useState<Section>("unfollowers");
+  
+  // Allow switching to professional mode even for non-Pro users (will show upgrade overlay)
+  const [platform, setPlatform] = useState<Platform>("instagram");
+  const [period, setPeriod] = useState<Period>("month");
+  const [monthIndex, setMonthIndex] = useState(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [showMonthPicker, setShowMonthPicker] = useState(false);
+  const [showYearPicker, setShowYearPicker] = useState(false);
+  const [clickedDay, setClickedDay] = useState<number | null>(null);
+  const [showAccountsList, setShowAccountsList] = useState(false);
+  const [showRevealGate, setShowRevealGate] = useState(false);
+  const [whiteArcTooltip, setWhiteArcTooltip] = useState({ visible: false, x: 0, y: 0 });
+  const sphereRef = useRef<HTMLDivElement>(null);
+  
+  // Onboarding state
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [needsAgentApproval, setNeedsAgentApproval] = useState(false);
+  const [isPrivateAccount, setIsPrivateAccount] = useState(false);
+  const [hideAgentBanner, setHideAgentBanner] = useState(false);
+  
+  // Unfollower modal state
+  const [selectedUnfollower, setSelectedUnfollower] = useState<any | null>(null);
+  
+  // Settings modal state
+  const [showSettings, setShowSettings] = useState(false);
+  
+  // Check if user needs onboarding (first login or not connected)
+  useEffect(() => {
+    if (!user || !currentUserId) return;
+    
+    const hasSeenOnboarding = localStorage.getItem(`onboarding_seen_${currentUserId}`);
+    const userIsConnected = 'isConnected' in user && user.isConnected;
+    
+    // Show onboarding if:
+    // 1. User hasn't seen it before AND
+    // 2. User is not connected
+    if (!hasSeenOnboarding && !userIsConnected) {
+      setShowOnboarding(true);
+      // Assume private if not connected (will be updated by API)
+      setIsPrivateAccount(!userIsConnected);
+    }
+  }, [currentUserId, user]);
+
+  // Generate chart data for selected month and year (must be before any conditional returns)
+  const filteredChartData = useMemo(() => {
+    if (!stats) return [];
+    
+    if (period === "year") {
+      // Yearly view: aggregate by month
+      return Array.from({ length: 12 }, (_, monthIdx) => {
+        const monthFollowers = stats.recentFollowers.filter(f => {
+          const d = new Date(f.detectedAt || new Date());
+          return d.getMonth() === monthIdx && d.getFullYear() === selectedYear;
+        }).length;
+        
+        const monthUnfollowers = stats.recentUnfollowers.filter(u => {
+          const d = new Date(u.detectedAt || new Date());
+          return d.getMonth() === monthIdx && d.getFullYear() === selectedYear;
+        }).length;
+        
+        const monthBlockers = stats.recentBlockers.filter(b => {
+          const d = new Date(b.detectedAt || new Date());
+          return d.getMonth() === monthIdx && d.getFullYear() === selectedYear;
+        }).length;
+        
+        return {
+          day: monthIdx + 1,
+          month: MONTHS[monthIdx].slice(0, 3),
+          followers: monthFollowers,
+          unfollowers: monthUnfollowers,
+          blockers: monthBlockers
+        };
+      });
+    } else {
+      // Monthly view: show days
+      const daysInMonth = new Date(selectedYear, monthIndex + 1, 0).getDate();
+      return Array.from({ length: daysInMonth }, (_, i) => {
+        const day = i + 1;
+        
+        const dayFollowers = stats.recentFollowers.filter(f => {
+          const d = new Date(f.detectedAt || new Date());
+          return d.getDate() === day && d.getMonth() === monthIndex && d.getFullYear() === selectedYear;
+        }).length;
+        
+        const dayUnfollowers = stats.recentUnfollowers.filter(u => {
+          const d = new Date(u.detectedAt || new Date());
+          return d.getDate() === day && d.getMonth() === monthIndex && d.getFullYear() === selectedYear;
+        }).length;
+        
+        const dayBlockers = stats.recentBlockers.filter(b => {
+          const d = new Date(b.detectedAt || new Date());
+          return d.getDate() === day && d.getMonth() === monthIndex && d.getFullYear() === selectedYear;
+        }).length;
+        
+        return { 
+          day, 
+          followers: dayFollowers,
+          unfollowers: dayUnfollowers,
+          blockers: dayBlockers
+        };
+      });
+    }
+  }, [stats, monthIndex, selectedYear, period]);
+
+  // Show loading state
+  if (userLoading || statsLoading) return <DashboardLoading />;
+  
+  // Show error state
+  if (!user || !stats) return <div className="text-white p-8">Error loading dashboard</div>;
+  
+  // Get user registration date (fallback to 1 year ago if not available)
+  const userRegistrationDate = 'createdAt' in user && user.createdAt 
+    ? new Date(user.createdAt) 
+    : new Date(new Date().setFullYear(new Date().getFullYear() - 1));
+  const registrationYear = userRegistrationDate.getFullYear();
+  const registrationMonth = userRegistrationDate.getMonth();
+  
+  console.log("Dashboard Debug:", { isPro, tier, mode, userRegistrationDate, registrationYear, registrationMonth });
+  
+  // Redirect non-Pro users to pricing page when they try to access professional mode
+  if (mode === 'professional' && !isPro) {
+    // Redirect Premium users to upgrade page, others to plan comparison
+    if (tier === 'premium') {
+      navigate('/upgrade-to-pro');
+    } else {
+      navigate('/plan-comparison');
+    }
+    // Return to personal mode to avoid showing blurred content
+    setMode('personal');
+    return null;
+  }
+
+  // Show Pro Dashboard if in professional mode (only for Pro users)
+  if (mode === 'professional') {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] font-body text-white relative overflow-hidden">
+        {!disableAnimation && <RadarBackground />}
+        
+        {/* Pro Dashboard Content (blurred for non-Pro) */}
+        <div className={!isPro ? 'filter blur-sm pointer-events-none' : ''}>
+          {/* Navbar */}
+          <nav className="fixed w-full top-0 z-50">
+          <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <button onClick={() => navigate("/")} style={{ position: 'absolute', left: '15px', top: '15px' }}>
+              <GlassText text="WALER" fontSize={32} />
+            </button>
+            
+            {/* Center: Mode Switcher */}
+            <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-black/50 backdrop-blur-xl border border-white/10 rounded-full p-1">
+              <button
+                onClick={() => setMode('personal')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                  mode === 'personal'
+                    ? 'bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)]'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <User className="w-4 h-4" />
+                Personal
+              </button>
+              <button
+                onClick={() => setMode('professional')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                  mode === 'professional'
+                    ? 'bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)]'
+                    : 'text-gray-400 hover:text-white cursor-pointer'
+                }`}
+              >
+                <Briefcase className="w-4 h-4" />
+                Professional
+                {!isPro && <Crown className="w-3 h-3 text-amber-400" />}
+              </button>
+            </div>
+            
+            {/* Right: Logout + Pro Badge */}
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-2">
+              <button
+                onClick={() => logout()}
+                className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold text-gray-400 hover:text-white transition-colors border border-white/10 hover:border-white/20"
+              >
+                <LogOut className="w-4 h-4" /> Logout
+              </button>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 text-green-300">
+                <Crown className="w-4 h-4" />
+                Pro
+              </div>
+            </div>
+          </div>
+        </nav>
+        
+        <div className="pt-20">
+          <ProDashboard />
+        </div>
+        </div> {/* Close blur wrapper */}
+      </div>
+    );
+  }
+
+  const totalCount =
+    activeSection === "followers"   ? stats.totalFollowers :
+    activeSection === "unfollowers" ? stats.totalUnfollowers :
+    stats.totalBlockers;
+
+  const maxCount = Math.max(stats.totalFollowers, stats.totalUnfollowers, stats.totalBlockers, 1);
+  const arcPercent = Math.min(totalCount / maxCount, 1);
+  const { arcColor } = SECTION_CONFIG[activeSection];
+
+  const sectionAccounts =
+    activeSection === "followers"   ? stats.recentFollowers :
+    activeSection === "unfollowers" ? stats.recentUnfollowers :
+    stats.recentBlockers;
+
+  const dayAccounts = clickedDay !== null
+    ? stats.recentUnfollowers.filter(u => {
+        const d = new Date(u.detectedAt || new Date());
+        return d.getDate() === clickedDay && d.getMonth() === monthIndex;
+      })
+    : [];
+
+  // White arc gauge: growth percentage (0-75% of circle max)
+  const currentFollowers = filteredChartData[filteredChartData.length - 1]?.followers || 0;
+  const startFollowers = filteredChartData[0]?.followers || 1;
+  const computedGrowthPercent = ((currentFollowers - startFollowers) / startFollowers) * 100;
+  const growthValue = Number.isFinite(stats.growthRate)
+    ? stats.growthRate
+    : Number.isFinite(computedGrowthPercent)
+      ? computedGrowthPercent
+      : 0;
+  const followerRatio = Math.min(Math.max(growthValue / 100, 0), 0.75);
+  const growthDisplay = `${growthValue >= 0 ? "+" : ""}${growthValue.toFixed(1)}%`;
+
+  const handleWhiteArcHover = (event: React.MouseEvent<SVGCircleElement, MouseEvent>) => {
+    if (!sphereRef.current) return;
+    const rect = sphereRef.current.getBoundingClientRect();
+    setWhiteArcTooltip({
+      visible: true,
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top - 12,
+    });
+  };
+
+  const hideWhiteArcTooltip = () => setWhiteArcTooltip((prev) => ({ ...prev, visible: false }));
+
+  const handleMarkAsBlocker = async (unfollowerId: number) => {
+    try {
+      const response = await fetch(`/api/unfollowers/${unfollowerId}/mark-as-blocker`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to mark as blocker');
+      }
+      
+      // Refresh stats to update the UI
+      window.location.reload();
+    } catch (error) {
+      console.error('Error marking as blocker:', error);
+      throw error;
+    }
+  };
+
   return (
-    <select className="text-sm border-none bg-gray-50 rounded-lg px-3 py-1 font-medium text-gray-600 focus:ring-0 cursor-pointer">
-      <option>Last 7 Days</option>
-      <option>Last 30 Days</option>
-    </select>
+    <div className="min-h-screen bg-[#0a0a0a] font-body text-white relative overflow-hidden">
+      {!disableAnimation && <RadarBackground />}
+
+      {/* Navbar */}
+      <nav className="fixed w-full top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <button onClick={() => navigate("/")} style={{ position: 'absolute', left: '15px', top: '15px' }}>
+            <GlassText text="WALER" fontSize={32} />
+          </button>
+          
+          {/* Center: Mode Switcher */}
+          <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-black/50 backdrop-blur-xl border border-white/10 rounded-full p-1">
+            <button
+              onClick={() => setMode('personal')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                mode === 'personal'
+                  ? 'bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)]'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <User className="w-4 h-4" />
+              Personal
+            </button>
+            <button
+              onClick={() => setMode('professional')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                mode === 'professional'
+                  ? 'bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)]'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <Briefcase className="w-4 h-4" />
+              Professional
+              {!isPro && <Crown className="w-3 h-3 text-amber-400" />}
+            </button>
+          </div>
+          
+          {/* Right: Logout + Pro Badge */}
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-2">
+            <button
+              onClick={() => logout()}
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold text-gray-400 hover:text-white transition-colors border border-white/10 hover:border-white/20"
+            >
+              <LogOut className="w-4 h-4" /> Logout
+            </button>
+            {tier && (
+              <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold ${
+                tier === 'pro'
+                  ? 'bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 text-green-300'
+                  : 'bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 text-green-300'
+              }`}>
+                <Crown className="w-4 h-4" />
+                {tier === 'pro' ? 'Pro' : 'Premium'}
+              </div>
+            )}
+          </div>
+        </div>
+      </nav>
+      
+      {/* Banner for users who need to approve agents */}
+      {!hideAgentBanner && !('isConnected' in user && user.isConnected) && (
+        <div className="fixed top-20 left-0 right-0 z-40 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-b border-green-500/30 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="w-5 h-5 text-green-400" />
+                </div>
+                <div>
+                  <p className="font-bold text-green-100 text-sm">
+                    Action required: Accept Waler agents
+                  </p>
+                  <p className="text-xs text-green-200/80">
+                    Your account is private. Accept the 2 follow requests to activate Waler.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowOnboarding(true)}
+                  className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-bold transition-colors whitespace-nowrap"
+                >
+                  View instructions
+                </button>
+                <button
+                  onClick={() => setHideAgentBanner(true)}
+                  className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                  aria-label="Close banner"
+                >
+                  <X className="w-4 h-4 text-white" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Instagram Stats Banner */}
+      {stats.instagramFollowers > 0 && (
+        <div className="fixed top-20 left-0 right-0 z-30 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-b border-green-500/20 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-6 py-3">
+            <div className="flex items-center justify-center gap-8 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400">Instagram:</span>
+                <span className="font-bold text-white">{stats.instagramFollowers.toLocaleString()}</span>
+                <span className="text-gray-500">followers</span>
+              </div>
+              <div className="w-px h-4 bg-white/10"></div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-white">{stats.instagramFollowing.toLocaleString()}</span>
+                <span className="text-gray-500">following</span>
+              </div>
+              {stats.analysisStatus === 'completed' && stats.lastAnalyzedAt && (
+                <>
+                  <div className="w-px h-4 bg-white/10"></div>
+                  <div className="flex items-center gap-2 text-xs text-gray-400">
+                    <span>Updated {new Date(stats.lastAnalyzedAt).toLocaleDateString()}</span>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main layout */}
+      <div className="relative z-10 flex items-center justify-center min-h-screen pt-20 px-6 gap-6 lg:gap-8 flex-wrap lg:flex-nowrap" style={{ paddingTop: stats.instagramFollowers > 0 ? '140px' : '80px' }}>
+
+        {/* LEFT — Sphere */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col items-center gap-6 mt-8"
+        >
+          <div ref={sphereRef} className="relative" style={{ width: NAV_CANVAS, height: NAV_CANVAS }}>
+            <SectionArcNav activeSection={activeSection} onSelect={setActiveSection} />
+
+            <div
+              className="absolute"
+              style={{
+                top: SPHERE_OFFSET,
+                left: SPHERE_OFFSET,
+                width: SPHERE_SIZE,
+                height: SPHERE_SIZE,
+              }}
+            >
+              {/* LAYER 0 — Outer green radial circle (background) */}
+              <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }} viewBox="0 0 352 352">
+              <defs>
+                <radialGradient id="bgRadial" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%"   stopColor="#075625" stopOpacity="1" />
+                  <stop offset="75%"  stopColor="#0B893B" stopOpacity="1" />
+                  <stop offset="100%" stopColor="#0FBC51" stopOpacity="0" />
+                </radialGradient>
+              </defs>
+              <circle cx="176" cy="176" r="174" fill="url(#bgRadial)" fillOpacity="0.42" />
+              </svg>
+
+              {/* LAYER 1 — White arc gauge (wraps glass circle, shows current followers) */}
+              <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 15 }} viewBox="0 0 352 352">
+              <defs>
+                <filter id="glassArc" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
+                  <feColorMatrix
+                    in="blur"
+                    type="matrix"
+                    values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.4 0"
+                    result="softGlow"
+                  />
+                  <feBlend in="SourceGraphic" in2="softGlow" mode="screen" />
+                </filter>
+              </defs>
+              <circle
+                cx="176" cy="176" r="148"
+                fill="none"
+                stroke="rgba(255,255,255,0.25)"
+                strokeWidth="14"
+                strokeLinecap="round"
+                strokeDasharray={`${followerRatio * 930} 930`}
+                strokeDashoffset="0"
+                transform="translate(176,176) scale(-1,1) translate(-176,-176) rotate(-90 176 176)"
+                filter="url(#glassArc)"
+                style={{ transition: "stroke-dasharray 0.6s ease" }}
+                onMouseEnter={handleWhiteArcHover}
+                onMouseMove={handleWhiteArcHover}
+                onMouseLeave={hideWhiteArcTooltip}
+              />
+              </svg>
+
+              {/* LAYER 2 — Colored arc (red/green/white based on section) */}
+              <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 25 }} viewBox="0 0 352 352">
+              <defs>
+                <filter id="arcShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#F95858" floodOpacity="0.25" />
+                </filter>
+                <linearGradient id="arcFade" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%"   stopColor={arcColor} stopOpacity="0" />
+                  <stop offset="12%"  stopColor={arcColor} stopOpacity="1" />
+                  <stop offset="88%"  stopColor={arcColor} stopOpacity="1" />
+                  <stop offset="100%" stopColor={arcColor} stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <circle
+                cx="176" cy="176" r="168"
+                fill="none"
+                stroke={arcColor}
+                strokeWidth="14"
+                strokeLinecap="round"
+                strokeDasharray={`${arcPercent * 0.22 * 1055} 1055`}
+                strokeDashoffset="0"
+                transform="rotate(-90 176 176)"
+                filter="url(#arcShadow)"
+                style={{ transition: "stroke-dasharray 0.6s ease, stroke 0.4s ease" }}
+              />
+            </svg>
+
+            {whiteArcTooltip.visible && (
+              <div
+                className="absolute px-3 py-1 rounded-full bg-white text-black text-xs font-semibold pointer-events-none shadow-lg"
+                style={{
+                  left: whiteArcTooltip.x,
+                  top: whiteArcTooltip.y,
+                  transform: "translate(-50%, -100%)",
+                  zIndex: 80,
+                }}
+              >
+                Your community grew by {growthDisplay}
+              </div>
+            )}
+
+            {/* LAYER 3 — Glass inner circle (foreground), 360x360 centered in 440x440 */}
+            <div
+              className="absolute rounded-full flex flex-col items-center justify-center"
+              style={{
+                width: 288,
+                height: 288,
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                zIndex: 20,
+                background: "rgba(217, 217, 217, 0.16)",
+                backdropFilter: "blur(20px) brightness(0.55) saturate(1.5)",
+                WebkitBackdropFilter: "blur(20px) brightness(0.55) saturate(1.5)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                boxShadow: "inset 0 0 60px rgba(255,255,255,0.04), 0 8px 32px rgba(0,0,0,0.4)",
+              }}
+            >
+              <div className="font-doppio text-white uppercase leading-none text-center" style={{ fontSize: "30px" }}>TOTAL</div>
+              <div className="font-doppio text-white leading-none text-center" style={{ fontSize: "112px", lineHeight: 1 }}>{totalCount}</div>
+              <div className={`font-doppio mt-1 text-center ${SECTION_CONFIG[activeSection].textColor}`} style={{ fontSize: "30px", lineHeight: 1 }}>
+                {SECTION_CONFIG[activeSection].label}
+              </div>
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={() => {
+              if (activeSection === 'unfollowers' || activeSection === 'blockers') {
+                setShowRevealGate(true);
+              } else {
+                setShowAccountsList(true);
+              }
+            }}
+            className="flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 border border-white/20 text-sm font-bold hover:bg-white/15 transition-all relative"
+            style={{ marginTop: "-72px", zIndex: 50 }}
+          >
+            <List className="w-4 h-4" /> Your Circle
+          </button>
+        </motion.div>
+
+        {/* RIGHT — Chart */}
+        <motion.div
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="flex-1 max-w-2xl rounded-3xl overflow-hidden border border-white/10"
+          style={{
+            background: platform === "instagram"
+              ? "linear-gradient(135deg, rgba(131,58,180,0.5) 0%, rgba(253,29,29,0.4) 50%, rgba(252,176,69,0.4) 100%)"
+              : "linear-gradient(135deg, rgba(24,119,242,0.5) 0%, rgba(66,103,178,0.4) 100%)",
+          }}
+        >
+          {/* Platform tabs */}
+          <div className="flex gap-6 px-6 pt-5 pb-2">
+            <button
+              onClick={() => setPlatform("instagram")}
+              className={`flex items-center gap-2 text-sm font-bold pb-2 border-b-2 transition-all ${
+                platform === "instagram" ? "border-orange-400 text-orange-400" : "border-transparent text-gray-500"
+              }`}
+            >
+              <Instagram className="w-4 h-4" /> Instagram
+            </button>
+          </div>
+
+          {/* Period tabs + month nav */}
+          <div className="flex items-center justify-between px-6 py-3">
+            <div className="flex gap-4">
+              {(["month", "year"] as Period[]).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPeriod(p)}
+                  className={`text-sm font-black uppercase tracking-wider pb-1 border-b-2 transition-all ${
+                    period === p ? "border-white text-white" : "border-transparent text-gray-500"
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              {period === "month" && (
+                <button 
+                  onClick={() => setShowMonthPicker(true)}
+                  className="text-xs font-bold bg-white/10 px-3 py-1 rounded-full border border-white/20 hover:bg-white/20 transition-colors cursor-pointer"
+                >
+                  {MONTHS[monthIndex]}
+                </button>
+              )}
+              <button 
+                onClick={() => setShowYearPicker(true)}
+                className="text-xs font-bold bg-white/10 px-3 py-1 rounded-full border border-white/20 hover:bg-white/20 transition-colors cursor-pointer"
+              >
+                {selectedYear}
+              </button>
+            </div>
+          </div>
+
+          {/* Bar chart */}
+          <div className="px-4 pb-4 h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={filteredChartData}
+                barSize={14}
+                onClick={(data) => {
+                  if (data && data.activePayload) {
+                    const day = data.activePayload[0]?.payload?.day;
+                    setClickedDay(day === clickedDay ? null : day);
+                  }
+                }}
+              >
+                <XAxis
+                  dataKey={period === "year" ? "month" : "day"}
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 10 }}
+                  label={{ value: period === "year" ? "MONTH" : "DAY", position: "insideBottomRight", offset: -5, fill: "rgba(255,255,255,0.3)", fontSize: 10 }}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 10 }}
+                  label={{ 
+                    value: activeSection === "followers" ? "FOLLOWERS" : activeSection === "unfollowers" ? "UNFOLLOWERS" : "BLOCKERS", 
+                    angle: -90, 
+                    position: "insideLeft", 
+                    fill: "rgba(255,255,255,0.3)", 
+                    fontSize: 10 
+                  }}
+                />
+                <Tooltip
+                  cursor={{ fill: "rgba(255,255,255,0.05)" }}
+                  contentStyle={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, color: "#fff", fontSize: 12 }}
+                  formatter={(value: any, name: string) => [
+                    value, 
+                    activeSection === "followers" ? "Followers" : activeSection === "unfollowers" ? "Unfollowers" : "Blockers"
+                  ]}
+                  labelFormatter={(label) => period === "year" ? label : `Day ${label}`}
+                />
+                <Bar 
+                  dataKey={activeSection === "followers" ? "followers" : activeSection === "unfollowers" ? "unfollowers" : "blockers"} 
+                  radius={[3, 3, 0, 0]}
+                >
+                  {filteredChartData.map((entry, index) => {
+                    const value = activeSection === "followers" ? entry.followers : activeSection === "unfollowers" ? entry.unfollowers : entry.blockers || 0;
+                    const barColor = 
+                      activeSection === "followers" ? "rgba(34,197,94,0.6)" : 
+                      activeSection === "unfollowers" ? "rgba(239,68,68,0.6)" : 
+                      "rgba(168,85,247,0.6)";
+                    
+                    return (
+                      <Cell
+                        key={index}
+                        fill={barColor}
+                        opacity={clickedDay === entry.day ? 1 : 0.8}
+                      />
+                    );
+                  })}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Clicked day detail */}
+          <AnimatePresence>
+            {clickedDay !== null && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="px-6 pb-4 border-t border-white/10"
+              >
+                <div className="pt-3">
+                  <div className="text-xs font-bold text-gray-400 mb-2">
+                    {activeSection === "followers" ? "Followers" : activeSection === "unfollowers" ? "Unfollowers" : "Blockers"} on day {clickedDay}
+                  </div>
+                  {dayAccounts.length === 0 ? (
+                    <div className="text-xs text-gray-500">
+                      No {activeSection === "followers" ? "followers" : activeSection === "unfollowers" ? "unfollowers" : "blockers"} this day
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {dayAccounts.map((acc) => (
+                        <div key={acc.id} className="flex items-center gap-2 bg-white/5 rounded-full px-3 py-1">
+                          <img
+                            src={acc.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${acc.username}`}
+                            className="w-5 h-5 rounded-full"
+                            alt={acc.username}
+                          />
+                          <span className="text-xs font-medium">@{acc.username}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </div>
+
+      {/* Accounts List Modal */}
+      <AnimatePresence>
+        {showAccountsList && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setShowAccountsList(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-[#0f0f0f] border border-white/10 rounded-3xl w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col"
+            >
+              <div className="flex items-center justify-between p-6 border-b border-white/10">
+                <h2 className="text-lg font-black">
+                  {SECTION_CONFIG[activeSection].label} — {period === "month" ? MONTHS[monthIndex] : "Year"}
+                </h2>
+                <button onClick={() => setShowAccountsList(false)} className="text-gray-400 hover:text-white">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="overflow-y-auto flex-1 p-4 space-y-3">
+                {sectionAccounts.length === 0 ? (
+                  <div className="text-center text-gray-500 py-10">No accounts found</div>
+                ) : (
+                  sectionAccounts.map((acc) => (
+                    <div 
+                      key={acc.id} 
+                      onClick={() => {
+                        if (activeSection === 'unfollowers') {
+                          setSelectedUnfollower(acc);
+                          setShowAccountsList(false);
+                        }
+                      }}
+                      className={`flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all ${
+                        activeSection === 'unfollowers' ? 'cursor-pointer' : ''
+                      }`}
+                    >
+                      <img
+                        src={acc.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${acc.username}`}
+                        alt={acc.username}
+                        className="w-10 h-10 rounded-full border border-white/10 object-cover"
+                      />
+                      <div>
+                        <div className="font-bold text-sm">@{acc.username}</div>
+                        <div className="text-xs text-gray-500">
+                          {new Date(acc.detectedAt || new Date()).toLocaleDateString("fr-FR")}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Reveal Gate Modal */}
+      {showRevealGate && (
+        <RevealGate
+          onReveal={() => {
+            setShowRevealGate(false);
+            setShowAccountsList(true);
+          }}
+          onClose={() => setShowRevealGate(false)}
+        />
+      )}
+
+      {/* Month Picker Modal */}
+      <AnimatePresence>
+        {showMonthPicker && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowMonthPicker(false)}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-[#0f0f0f] border border-white/10 rounded-3xl p-6 w-full max-w-md"
+            >
+              <h3 className="text-xl font-bold text-white mb-4">Select Month</h3>
+              <div className="grid grid-cols-3 gap-3">
+                {MONTHS.map((month, index) => {
+                  const currentYear = new Date().getFullYear();
+                  const currentMonth = new Date().getMonth();
+                  const isFuture = selectedYear > currentYear || (selectedYear === currentYear && index > currentMonth);
+                  const isBeforeRegistration = selectedYear < registrationYear || (selectedYear === registrationYear && index < registrationMonth);
+                  const isDisabled = isFuture || isBeforeRegistration;
+                  
+                  return (
+                    <button
+                      key={month}
+                      onClick={() => {
+                        if (!isDisabled) {
+                          setMonthIndex(index);
+                          setShowMonthPicker(false);
+                        }
+                      }}
+                      disabled={isDisabled}
+                      className={`px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                        monthIndex === index
+                          ? 'bg-green-500 text-white'
+                          : isDisabled
+                          ? 'bg-white/5 text-gray-600 cursor-not-allowed opacity-50'
+                          : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+                      }`}
+                    >
+                      {month.slice(0, 3)}
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Year Picker Modal */}
+      <AnimatePresence>
+        {showYearPicker && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowYearPicker(false)}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-[#0f0f0f] border border-white/10 rounded-3xl p-6 w-full max-w-md"
+            >
+              <h3 className="text-xl font-bold text-white mb-4">Select Year</h3>
+              <div className="grid grid-cols-4 gap-3 max-h-96 overflow-y-auto">
+                {Array.from(
+                  { length: new Date().getFullYear() - registrationYear + 1 }, 
+                  (_, i) => registrationYear + i
+                ).map((year) => {
+                  const currentYear = new Date().getFullYear();
+                  const isFuture = year > currentYear;
+                  const isBeforeRegistration = year < registrationYear;
+                  const isDisabled = isFuture || isBeforeRegistration;
+                  
+                  return (
+                    <button
+                      key={year}
+                      onClick={() => {
+                        if (!isDisabled) {
+                          setSelectedYear(year);
+                          setShowYearPicker(false);
+                        }
+                      }}
+                      disabled={isDisabled}
+                      className={`px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                        selectedYear === year
+                          ? 'bg-green-500 text-white'
+                          : isDisabled
+                          ? 'bg-white/5 text-gray-600 cursor-not-allowed opacity-50'
+                          : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+                      }`}
+                    >
+                      {year}
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Onboarding Modal */}
+      {showOnboarding && (
+        <Onboarding
+          isPrivateAccount={isPrivateAccount}
+          needsApproval={needsAgentApproval}
+          onComplete={() => {
+            setShowOnboarding(false);
+            if (currentUserId) localStorage.setItem(`onboarding_seen_${currentUserId}`, 'true');
+          }}
+          onSkip={() => {
+            setShowOnboarding(false);
+            if (currentUserId) localStorage.setItem(`onboarding_seen_${currentUserId}`, 'true');
+          }}
+        />
+      )}
+      
+      {/* Unfollower Modal */}
+      {selectedUnfollower && (
+        <UnfollowerModal
+          unfollower={selectedUnfollower}
+          onClose={() => setSelectedUnfollower(null)}
+          onMarkAsBlocker={handleMarkAsBlocker}
+        />
+      )}
+      
+      {/* Floating Settings Button */}
+      <button
+        onClick={() => setShowSettings(true)}
+        className="fixed bottom-6 left-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 shadow-lg hover:shadow-xl transition-all flex items-center justify-center group"
+        aria-label="Settings"
+      >
+        <Settings className="w-6 h-6 text-white group-hover:rotate-90 transition-transform duration-300" />
+      </button>
+      
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        onLogout={logout}
+        user={{
+          username: authUser?.username,
+          email: authUser?.email,
+        }}
+      />
+    </div>
   );
 }
 
 function DashboardLoading() {
   return (
-    <div className="min-h-screen bg-gray-50 p-8 flex flex-col gap-8">
-      <div className="flex gap-4">
-        <Skeleton className="h-12 w-48 rounded-xl" />
+    <div className="min-h-screen bg-[#0a0a0a] p-8 flex flex-col items-center justify-center gap-8">
+      <Skeleton className="h-72 w-72 rounded-full" />
+      <div className="flex gap-3">
+        <Skeleton className="h-8 w-24 rounded-full" />
+        <Skeleton className="h-8 w-24 rounded-full" />
+        <Skeleton className="h-8 w-24 rounded-full" />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-40 rounded-3xl" />
-        ))}
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <Skeleton className="h-[400px] lg:col-span-2 rounded-3xl" />
-        <Skeleton className="h-[400px] rounded-3xl" />
-      </div>
+      <Skeleton className="h-72 w-full max-w-2xl rounded-3xl" />
     </div>
   );
 }

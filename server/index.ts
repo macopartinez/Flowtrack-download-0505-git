@@ -1,7 +1,18 @@
+import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
+import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
+import pg from "pg";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
+import { startWalerBotPlaywright } from "./waler-bot-playwright";
+
+declare module "express-session" {
+  interface SessionData {
+    userId: number;
+  }
+}
 
 const app = express();
 const httpServer = createServer(app);
@@ -21,6 +32,31 @@ app.use(
 );
 
 app.use(express.urlencoded({ extended: false }));
+
+// PostgreSQL session store for persistent sessions
+const PgStore = connectPgSimple(session);
+const pgPool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "dev-secret-change-in-production",
+    resave: false,
+    saveUninitialized: false,
+    store: new PgStore({
+      pool: pgPool,
+      tableName: 'session', // Table will be auto-created
+      createTableIfMissing: true,
+    }),
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      sameSite: "lax",
+    },
+  })
+);
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -90,14 +126,8 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || "5000", 10);
-  httpServer.listen(
-    {
-      port,
-      host: "0.0.0.0",
-      reusePort: true,
-    },
-    () => {
-      log(`serving on port ${port}`);
-    },
-  );
+  httpServer.listen(port, () => {
+    log(`serving on port ${port}`);
+    log(`💡 To start Waler bot: POST http://localhost:${port}/api/admin/waler-bot/start`);
+  });
 })();

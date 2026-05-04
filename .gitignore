@@ -1,6 +1,10 @@
 node_modules
 dist
-.DS_Store
+.env
+cookies-*.json
+!cookies-clara.json
+!cookies-nathan.json
+!cookies-waler.json
 server/public
 vite.config.ts.*
 *.tar.gz

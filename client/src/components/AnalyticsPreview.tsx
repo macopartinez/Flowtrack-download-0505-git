@@ -32,7 +32,7 @@ const slides = [
 
 export function AnalyticsPreview() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [selectedPlatform, setSelectedPlatform] = useState<'instagram' | 'facebook'>('instagram');
+  const [selectedPlatform, setSelectedPlatform] = useState<'instagram'>('instagram');
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -53,8 +53,8 @@ export function AnalyticsPreview() {
         animate={{ opacity: 1, scale: 1 }}
         className="relative w-[300px] h-[380px] rounded-[40px] flex flex-col items-center justify-center shadow-2xl overflow-hidden"
         style={{
-          background: `linear-gradient(135deg, ${current.color}15, ${current.color}25)`,
-          border: `2px solid ${current.color}30`,
+          background: `linear-gradient(135deg, ${current.color}25, ${current.color}40)`,
+          border: `2px solid ${current.color}50`,
         }}
       >
         {/* Cercle de progression */}
@@ -129,16 +129,6 @@ export function AnalyticsPreview() {
               }`}
             >
               Instagram
-            </button>
-            <button
-              onClick={() => setSelectedPlatform('facebook')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                selectedPlatform === 'facebook'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white/5 text-gray-400 hover:bg-white/10'
-              }`}
-            >
-              Facebook
             </button>
           </div>
         </div>

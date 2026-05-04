@@ -71,7 +71,7 @@ export function GlassText({ text, className = '', fontSize = 36 }: GlassTextProp
     <div
       ref={containerRef}
       className={`relative inline-block ${className}`}
-      data-testid="text-flowtrack-logo"
+      data-testid="text-waler-logo"
     >
       <span
         ref={textRef}

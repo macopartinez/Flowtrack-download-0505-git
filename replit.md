@@ -1,8 +1,8 @@
-# Flowtrack
+# Waler
 
 ## Overview
 
-Flowtrack is a social media unfollower tracking application. Users connect their Instagram or Facebook accounts, and the app tracks who unfollows them, displaying analytics on a dashboard with charts and stats. The app uses a monorepo structure with a React frontend, Express backend, and PostgreSQL database.
+Waler is a social media unfollower tracking application. Users connect their Instagram or Facebook accounts, and the app tracks who unfollows them, displaying analytics on a dashboard with charts and stats. The app uses a monorepo structure with a React frontend, Express backend, and PostgreSQL database.
 
 ## User Preferences
 
@@ -34,11 +34,11 @@ Key pages:
 The landing page uses a layered animation system with wave-reactive text:
 
 - **RadarBackground** (`client/src/components/RadarBackground.tsx`): Canvas-based radar wave animation (green waves from top-left corner on #0a0a0a dark background). Exports wave position data via `waveData.ts`.
-- **BackgroundFlowtrack** (`client/src/components/BackgroundFlowtrack.tsx`): Large centered "FLOWTRACK" text rendered on canvas. Only outlines/contours are visible, and they glow electric green when radar waves pass through them.
-- **GlassText** (`client/src/components/GlassText.tsx`): Navbar "FLOWTRACK" logo using Lalezar font with CSS `backdrop-filter` glass effect (blur, low brightness, low saturation). Gets frosted with electric green color when waves pass.
+- **BackgroundWaler** (`client/src/components/BackgroundWaler.tsx`): Large centered "WALER" text rendered on canvas. Only outlines/contours are visible, and they glow electric green when radar waves pass through them.
+- **GlassText** (`client/src/components/GlassText.tsx`): Navbar "WALER" logo using Lalezar font with CSS `backdrop-filter` glass effect (blur, low brightness, low saturation). Gets frosted with electric green color when waves pass.
 - **Wave Data** (`client/src/lib/waveData.ts`): Shared module that stores wave positions. `RadarBackground` writes to it each frame, both text components read from it via `getWaveIntensityAtPoint()` to calculate wave intersection intensity.
-- **Scroll Snap & Blur**: Landing page uses `snap-y snap-mandatory`. Section 3 (Features) applies a progressive `backdrop-filter` blur (12px) over the background (including the large BackgroundFlowtrack text) for better focus. The features are presented via a nested vertical snap: 1. Real-time Alerts (with phone animation), 2. Deep Analytics, 3. Account Safety.
-- **Fonts**: Lalezar (Google Font) for FLOWTRACK branding, Outfit for display headings, Plus Jakarta Sans for body text.
+- **Scroll Snap & Blur**: Landing page uses `snap-y snap-mandatory`. Section 3 (Features) applies a progressive `backdrop-filter` blur (12px) over the background (including the large BackgroundWaler text) for better focus. The features are presented via a nested vertical snap: 1. Real-time Alerts (with phone animation), 2. Deep Analytics, 3. Account Safety.
+- **Fonts**: Lalezar (Google Font) for WALER branding, Outfit for display headings, Plus Jakarta Sans for body text.
 - **Theme**: Dark mode only (#0a0a0a background, green electric accents rgba(0,255,100), purple primary for UI elements).
 
 ### Backend

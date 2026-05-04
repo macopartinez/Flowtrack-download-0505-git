@@ -32,7 +32,7 @@ export function RadarBackground() {
         waveSpeed: isMobile ? 60 : 80,
         waveSpacing: isMobile ? 120 : 180,
         maxWaveWidth: isMobile ? 15 : 22.5,
-        shadowBlur: 20
+        shadowBlur: 10
       };
     };
 
@@ -106,7 +106,7 @@ export function RadarBackground() {
       ctx.shadowColor = 'rgba(0, 255, 100, 0.8)';
       ctx.beginPath();
       ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(200, 255, 200, 1)';
+      ctx.fillStyle = 'rgba(200, 255, 200, 0)';
       ctx.fill();
       ctx.restore();
       animationId = requestAnimationFrame(animate);
@@ -139,7 +139,8 @@ export function RadarBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 w-full h-full -z-10 pointer-events-none"
+      className="fixed inset-0 w-full h-full z-0 pointer-events-none"
+      style={{ willChange: 'contents' }}
     />
   );
 }

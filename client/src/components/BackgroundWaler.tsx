@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { getWaveIntensityAtPoint } from '@/lib/waveData';
 
-export function BackgroundFlowtrack() {
+export function BackgroundWaler() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
 
@@ -11,7 +11,7 @@ export function BackgroundFlowtrack() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const text = 'FLOWTRACK';
+    const text = 'WALER';
     const dpr = window.devicePixelRatio || 1;
 
     const resize = () => {
@@ -110,7 +110,7 @@ export function BackgroundFlowtrack() {
       ref={canvasRef}
       className="fixed inset-0 w-full h-full pointer-events-none"
       style={{ zIndex: 0 }}
-      data-testid="background-flowtrack"
+      data-testid="background-waler"
     />
   );
 }
