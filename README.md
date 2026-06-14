@@ -2,50 +2,63 @@
 
 Waler helps you understand your social connections through introspection, not surveillance. We detect when someone leaves your digital circle and guide you through what it means about you and your relationship.
 
-## 🚀 Quick Start (Windows)
+## �️ Base de Données: Supabase PostgreSQL
 
-**Option 1: Automatic (Recommended)**
+**L'application utilise maintenant Supabase!**
+
+### ⚡ Configuration Rapide (5 minutes)
+
+**Consultez le guide complet:** [DEMARRAGE_RAPIDE_SUPABASE.md](./DEMARRAGE_RAPIDE_SUPABASE.md)
+
+**Résumé:**
+1. Créez un projet sur https://supabase.com (gratuit)
+2. Copiez votre connection string
+3. Exécutez `setup-env.bat` ou créez `.env` manuellement
+4. Créez les tables (SQL fourni dans le guide)
+5. Lancez `npm run dev`
+
+**Documentation complète:** [SUPABASE_SETUP.md](./SUPABASE_SETUP.md)
+
+---
+
+## 🚀 Quick Start
+
+### 1. Configuration Environnement
+
+**Automatique (Recommandé):**
 ```bash
-# Double-click this file:
-start.bat
+# Double-cliquez sur:
+setup-env.bat
 ```
 
-**Option 2: Manual**
-
-1. **Initialize Database**
+**Manuel:**
 ```bash
-cd server
-python init_db.py
+# Copiez le template
+copy .env.template .env
+
+# Éditez .env et ajoutez votre DATABASE_URL Supabase
+notepad .env
 ```
 
-2. **Install Dependencies**
-```bash
-# Python
-cd server
-pip install -r requirements.txt
+### 2. Installer les Dépendances
 
-# Node.js
-cd client
+```bash
 npm install
 ```
 
-3. **Start Servers**
+### 3. Configurer Supabase
 
-Terminal 1 (Backend):
-```bash
-cd server
-python app.py
-```
+Voir [DEMARRAGE_RAPIDE_SUPABASE.md](./DEMARRAGE_RAPIDE_SUPABASE.md)
 
-Terminal 2 (Frontend):
+### 4. Démarrer le Serveur
+
 ```bash
-cd client
 npm run dev
 ```
 
-4. **Open Browser**
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:5000
+### 5. Ouvrir l'Application
+
+**Application:** http://localhost:5000
 
 ## 📋 Features
 

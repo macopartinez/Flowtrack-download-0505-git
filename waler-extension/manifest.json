@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "Waler - Instagram Analytics",
+  "version": "1.0.0",
+  "description": "Track your Instagram followers, unfollowers, and engagement in real-time",
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications",
+    "webRequest"
+  ],
+  "host_permissions": [
+    "https://www.instagram.com/*",
+    "https://instagram.com/*",
+    "https://i.instagram.com/*",
+    "http://localhost:5000/*"
+  ],
+  "background": {
+    "service_worker": "dist/background/service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.instagram.com/*", "https://instagram.com/*"],
+      "js": ["dist/content/instagram-tracker.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["http://localhost:5000/*"],
+      "js": ["dist/content/auth-listener.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "src/popup/index.html"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["injected/page-script.js"],
+      "matches": ["https://www.instagram.com/*", "https://instagram.com/*"]
+    }
+  ],
+  "externally_connectable": {
+    "matches": ["http://localhost:5000/*", "http://localhost:*/*"]
+  }
+}

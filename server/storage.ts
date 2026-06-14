@@ -1,6 +1,6 @@
 import { users, unfollowers, followers, blockers, type User, type InsertUser, type Unfollower, type InsertUnfollower, type Follower, type InsertFollower, type Blocker, type InsertBlocker } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -32,6 +32,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUnfollower(unfollower: InsertUnfollower): Promise<Unfollower> {
+    // Supprimer le follower de la table followers s'il existe
+    await db.delete(followers)
+      .where(
+        and(
+          eq(followers.userId, unfollower.userId),
+          eq(followers.username, unfollower.username)
+        )
+      );
+    
+    // Créer l'unfollower
     const [newUnfollower] = await db.insert(unfollowers).values(unfollower).returning();
     return newUnfollower;
   }

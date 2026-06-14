@@ -2,7 +2,7 @@ import { RadarBackground } from "@/components/RadarBackground";
 import { BackgroundWaler } from "@/components/BackgroundWaler";
 import { GlassText } from "@/components/GlassText";
 import { motion } from "framer-motion";
-import { BarChart3, ShieldCheck, Zap, Eye, Search, Lock, ChevronDown, ArrowRight, Users, Heart, TrendingDown, Shield, Star, User } from "lucide-react";
+import { BarChart3, ShieldCheck, Zap, Eye, Search, Lock, ChevronDown, ArrowRight, Users, Heart, TrendingDown, Shield, Star, User, Crown, Target, TrendingUp, Network, MessageCircle, Activity, Clock, Link } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { AnalyticsPreview } from "@/components/AnalyticsPreview";
@@ -253,6 +253,377 @@ export default function Landing() {
           </motion.div>
         </div>
       </section>
+      {/* Pro Mode Introduction */}
+      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-pro-intro">
+        <div className="max-w-5xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-md border border-green-500/30 rounded-full px-6 py-3 mb-8">
+              <Crown className="w-5 h-5 text-green-400" />
+              <span className="text-green-400 font-bold tracking-wider text-sm">PRO MODE</span>
+            </div>
+            <h2 className="text-5xl md:text-7xl font-display font-black mb-8 text-white tracking-tighter leading-tight">
+              Turn insights into <br />
+              <span className="text-gradient bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">business growth</span>
+            </h2>
+            <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
+              Go beyond personal tracking. Manage clients, analyze their circles, and build deeper professional relationships with advanced CRM features.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+              <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 backdrop-blur-xl border border-green-500/20 rounded-3xl p-6">
+                <div className="text-4xl font-black text-white mb-2">10+</div>
+                <div className="text-gray-400 font-medium">Signal Types</div>
+              </div>
+              <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 backdrop-blur-xl border border-green-500/20 rounded-3xl p-6">
+                <div className="text-4xl font-black text-white mb-2">100%</div>
+                <div className="text-gray-400 font-medium">Automated</div>
+              </div>
+              <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 backdrop-blur-xl border border-green-500/20 rounded-3xl p-6">
+                <div className="text-4xl font-black text-white mb-2">∞</div>
+                <div className="text-gray-400 font-medium">Clients</div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Pro Feature 1: Client Management - Base du système */}
+      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-pro-clients">
+        <div className="max-w-6xl mx-auto w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+          >
+            <div className="order-2 lg:order-1">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.8 }}
+                className="relative"
+              >
+                <div className="absolute inset-0 bg-green-500/20 blur-[100px] rounded-full" />
+                <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-[40px] p-8 shadow-2xl">
+                  <div className="space-y-4">
+                    {[
+                      { name: "Sarah Johnson", followers: "12.5K", score: 92, status: "active" },
+                      { name: "Mike Chen", followers: "8.3K", score: 85, status: "active" },
+                      { name: "Emma Davis", followers: "15.2K", score: 78, status: "pending" }
+                    ].map((client, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ x: -20, opacity: 0 }}
+                        whileInView={{ x: 0, opacity: 1 }}
+                        transition={{ delay: i * 0.1 }}
+                        className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all"
+                      >
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center text-white font-bold">
+                          {client.name.charAt(0)}
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-bold text-white">{client.name}</div>
+                          <div className="text-sm text-gray-400">{client.followers} followers</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-black text-white">{client.score}</div>
+                          <div className="text-xs text-gray-400">Score</div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+            <div className="order-1 lg:order-2 text-center lg:text-left">
+              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center mb-8 mx-auto lg:mx-0">
+                <Users className="w-10 h-10 text-white" />
+              </div>
+              <h2 className="text-5xl md:text-6xl font-display font-black mb-6 text-white tracking-tighter">
+                Manage <span className="text-gradient bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">multiple clients</span>
+              </h2>
+              <p className="text-xl text-gray-300 leading-relaxed mb-6">
+                Track unlimited clients and their Instagram circles from one unified dashboard. Monitor engagement, analyze patterns, and build stronger relationships at scale.
+              </p>
+              <ul className="space-y-3 text-left">
+                {["Unlimited client profiles", "Real-time sync", "Automated tracking", "Custom categories"].map((item, i) => (
+                  <motion.li
+                    key={i}
+                    initial={{ x: -20, opacity: 0 }}
+                    whileInView={{ x: 0, opacity: 1 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="flex items-center gap-3 text-gray-300"
+                  >
+                    <div className="w-2 h-2 rounded-full bg-gradient-to-r from-green-400 to-emerald-400" />
+                    {item}
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Pro Feature 2: Relationship Scoring - Analyser les clients */}
+      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-pro-scoring">
+        <div className="max-w-6xl mx-auto w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+          >
+            <div className="order-2 lg:order-1">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.8 }}
+                className="relative"
+              >
+                <div className="absolute inset-0 bg-green-500/20 blur-[100px] rounded-full" />
+                <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-[40px] p-8 shadow-2xl">
+                  <div className="text-center mb-6">
+                    <div className="text-7xl font-black text-transparent bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text mb-2">
+                      92
+                    </div>
+                    <div className="text-gray-400 font-medium">Relationship Score</div>
+                  </div>
+                  <div className="space-y-4">
+                    {[
+                      { label: "Engagement", value: 30, max: 30, color: "from-green-400 to-emerald-500" },
+                      { label: "Likes Received", value: 18, max: 20, color: "from-green-500 to-emerald-600" },
+                      { label: "Connection Streak", value: 20, max: 20, color: "from-emerald-400 to-green-500" },
+                      { label: "Seniority", value: 12, max: 15, color: "from-green-300 to-emerald-400" },
+                      { label: "Mutual Connections", value: 12, max: 15, color: "from-emerald-500 to-green-600" }
+                    ].map((metric, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ x: -20, opacity: 0 }}
+                        whileInView={{ x: 0, opacity: 1 }}
+                        transition={{ delay: i * 0.1 }}
+                      >
+                        <div className="flex justify-between text-sm mb-2">
+                          <span className="text-gray-300">{metric.label}</span>
+                          <span className="text-white font-bold">{metric.value}/{metric.max}</span>
+                        </div>
+                        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            whileInView={{ width: `${(metric.value / metric.max) * 100}%` }}
+                            transition={{ delay: i * 0.1 + 0.3, duration: 0.8 }}
+                            className={`h-full bg-gradient-to-r ${metric.color} rounded-full`}
+                          />
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+            <div className="order-1 lg:order-2 text-center lg:text-left">
+              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mb-8 mx-auto lg:mx-0">
+                <Target className="w-10 h-10 text-white" />
+              </div>
+              <h2 className="text-5xl md:text-6xl font-display font-black mb-6 text-white tracking-tighter">
+                AI-powered <span className="text-gradient bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">relationship scoring</span>
+              </h2>
+              <p className="text-xl text-gray-300 leading-relaxed mb-6">
+                Get intelligent scores (0-100) for every connection based on engagement patterns, likes, connection duration, and mutual networks. Know exactly who matters most.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: "Engagement", Icon: MessageCircle },
+                  { label: "Consistency", Icon: Activity },
+                  { label: "Seniority", Icon: Clock },
+                  { label: "Network", Icon: Link }
+                ].map((factor, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    whileInView={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400/20 to-emerald-500/20 flex items-center justify-center mx-auto mb-3">
+                      <factor.Icon className="w-5 h-5 text-green-400" />
+                    </div>
+                    <div className="text-sm text-gray-300">{factor.label}</div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Pro Feature 3: Mutual Connections - Découvrir le réseau */}
+      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-pro-connections">
+        <div className="max-w-6xl mx-auto w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+          >
+            <div className="text-center lg:text-left">
+              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center mb-8 mx-auto lg:mx-0">
+                <Network className="w-10 h-10 text-white" />
+              </div>
+              <h2 className="text-5xl md:text-6xl font-display font-black mb-6 text-white tracking-tighter">
+                Discover <span className="text-gradient bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">hidden connections</span>
+              </h2>
+              <p className="text-xl text-gray-300 leading-relaxed mb-6">
+                Automatically detect mutual connections between your clients and their followers. Uncover relationship networks and leverage shared contacts for better engagement.
+              </p>
+              <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 backdrop-blur-xl border border-green-500/20 rounded-3xl p-6 text-left">
+                <div className="text-sm text-green-400 font-bold mb-2">EXAMPLE</div>
+                <div className="text-white font-medium mb-1">Sarah & Mike share 12 mutual followers</div>
+                <div className="text-gray-400 text-sm">Including @john_doe, @emma_wilson, @alex_smith...</div>
+              </div>
+            </div>
+            <div className="order-first lg:order-last">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.8 }}
+                className="relative w-full h-[400px] flex items-center justify-center"
+              >
+                <div className="absolute inset-0 bg-green-500/20 blur-[100px] rounded-full" />
+                {/* Network visualization */}
+                <div className="relative w-full h-full">
+                  {/* Center node */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 border-4 border-white/20 flex items-center justify-center text-white font-bold text-2xl shadow-2xl z-20">
+                    You
+                  </div>
+                  {/* Lignes de connexion statiques */}
+                  {[
+                    { angle: 0, name: "Client A" },
+                    { angle: 120, name: "Client B" },
+                    { angle: 240, name: "Client C" }
+                  ].map((node, i) => {
+                    const radius = 140;
+                    const x = Math.cos((node.angle * Math.PI) / 180) * radius;
+                    const y = Math.sin((node.angle * Math.PI) / 180) * radius;
+                    return (
+                      <div key={i}>
+                        {/* Ligne de connexion */}
+                        <div 
+                          className="absolute top-1/2 left-1/2 w-[140px] h-[2px] bg-gradient-to-r from-green-400/40 to-transparent origin-left z-0"
+                          style={{ transform: `translate(-50%, -50%) rotate(${node.angle}deg)` }}
+                        />
+                        {/* Nœud client */}
+                        <div
+                          className="absolute top-1/2 left-1/2 w-20 h-20 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 border-2 border-white/40 flex items-center justify-center text-white font-semibold text-xs shadow-2xl z-10"
+                          style={{ transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))` }}
+                        >
+                          {node.name}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+
+      {/* Pro Feature 4: Advanced Analytics */}
+      <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-pro-analytics">
+        <div className="max-w-6xl mx-auto w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+          >
+            <div className="text-center lg:text-left">
+              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center mb-8 mx-auto lg:mx-0">
+                <TrendingUp className="w-10 h-10 text-white" />
+              </div>
+              <h2 className="text-5xl md:text-6xl font-display font-black mb-6 text-white tracking-tighter">
+                Advanced <span className="text-gradient bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">analytics</span>
+              </h2>
+              <p className="text-xl text-gray-300 leading-relaxed mb-6">
+                Track like patterns, engagement streaks, and follow/unfollow correlations with precision. Detect 10+ signal types automatically and understand behavioral patterns.
+              </p>
+              <div className="space-y-3">
+                {[
+                  { type: "Follow Then Engage", strength: 100, color: "from-green-400 to-emerald-500" },
+                  { type: "Consistent Liker", strength: 85, color: "from-emerald-400 to-green-500" },
+                  { type: "Stalker Pattern", strength: 78, color: "from-green-500 to-emerald-600" }
+                ].map((signal, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ x: -20, opacity: 0 }}
+                    whileInView={{ x: 0, opacity: 1 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="bg-white/5 border border-white/10 rounded-2xl p-4"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-white font-bold">{signal.type}</span>
+                      <span className="text-sm text-gray-400">{signal.strength}/100</span>
+                    </div>
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${signal.strength}%` }}
+                        transition={{ delay: i * 0.1 + 0.3, duration: 0.8 }}
+                        className={`h-full bg-gradient-to-r ${signal.color} rounded-full`}
+                      />
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+            <div className="order-first lg:order-last">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.8 }}
+                className="relative"
+              >
+                <div className="absolute inset-0 bg-green-500/20 blur-[100px] rounded-full" />
+                <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-[40px] p-8 shadow-2xl">
+                  <div className="text-sm text-green-400 font-bold mb-4">ENGAGEMENT TIMELINE</div>
+                  <div className="space-y-6">
+                    {[
+                      { day: "Day 1", event: "Followed you", icon: "👋", color: "blue" },
+                      { day: "Day 2", event: "Liked 3 posts", icon: "❤️", color: "red" },
+                      { day: "Day 5", event: "Liked 5 posts", icon: "🔥", color: "orange" },
+                      { day: "Day 7", event: "Still engaging", icon: "⭐", color: "yellow" }
+                    ].map((item, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ x: -20, opacity: 0 }}
+                        whileInView={{ x: 0, opacity: 1 }}
+                        transition={{ delay: i * 0.15 }}
+                        className="flex items-center gap-4"
+                      >
+                        <div className="text-3xl">{item.icon}</div>
+                        <div className="flex-1">
+                          <div className="text-white font-bold">{item.event}</div>
+                          <div className="text-sm text-gray-400">{item.day}</div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       <section className="h-screen snap-start snap-always relative overflow-hidden group/features" data-testid="section-features">
                 
         {/* Nested snap container */}

@@ -58,6 +58,53 @@ export const api = {
       },
     },
   },
+  unfollowers: {
+    list: {
+      method: 'GET' as const,
+      path: '/api/unfollowers' as const,
+      responses: {
+        200: z.object({
+          unfollowers: z.array(z.object({
+            id: z.number(),
+            username: z.string(),
+            avatar_url: z.string().nullable(),
+            status: z.string(),
+            detected_at: z.string(),
+            verified_at: z.string().nullable(),
+          })),
+        }),
+      },
+    },
+    ghostFollowers: {
+      method: 'GET' as const,
+      path: '/api/ghost-followers' as const,
+      responses: {
+        200: z.object({
+          ghostFollowers: z.array(z.object({
+            id: z.number(),
+            username: z.string(),
+            avatar_url: z.string().nullable(),
+            status: z.string(), // 'blocked' or 'deleted'
+            detected_at: z.string(),
+            verified_at: z.string().nullable(),
+          })),
+        }),
+      },
+    },
+    stats: {
+      method: 'GET' as const,
+      path: '/api/unfollowers/stats' as const,
+      responses: {
+        200: z.object({
+          unfollowed: z.number(),
+          blocked: z.number(),
+          deleted: z.number(),
+          ghost: z.number(),
+          total: z.number(),
+        }),
+      },
+    },
+  },
 };
 
 export function buildUrl(path: string, params?: Record<string, string | number>): string {

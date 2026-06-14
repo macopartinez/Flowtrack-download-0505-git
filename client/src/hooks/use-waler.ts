@@ -57,14 +57,23 @@ export function useUser(id: number | null) {
 // Hook to fetch stats
 export function useStats(userId: number | null) {
   return useQuery({
-    queryKey: [api.stats.get.path, userId],
+    queryKey: ['stats', userId],
     queryFn: async () => {
       if (!userId) return null;
       const url = buildUrl(api.stats.get.path, { userId });
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        cache: 'no-store', // Désactiver le cache du navigateur
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
       if (!res.ok) throw new Error("Failed to fetch stats");
       return api.stats.get.responses[200].parse(await res.json());
     },
     enabled: !!userId,
+    staleTime: 0, // Les données sont immédiatement considérées comme obsolètes
+    cacheTime: 0, // Ne pas garder en cache
+    refetchOnMount: true, // Recharger à chaque montage du composant
+    refetchOnWindowFocus: true, // Recharger quand la fenêtre reprend le focus
   });
 }

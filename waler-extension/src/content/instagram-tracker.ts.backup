@@ -1,0 +1,905 @@
+// Using Chrome API
+import { DOMObserver } from './dom-observer.js';
+import { DataCollector } from './data-collector.js';
+import { DMInterceptor, type DMMessage } from './dm-interceptor.js';
+import { DMAnalyzer } from './dm-analyzer.js';
+import { ScoringEngine, type Contact } from './scoring-engine.js';
+
+class InstagramTracker {
+  private observer: DOMObserver;
+  private collector: DataCollector;
+  private dmInterceptor: DMInterceptor;
+  private dmAnalyzer: DMAnalyzer;
+  private scoringEngine: ScoringEngine;
+  private currentUsername: string | null = null;
+  private dmSyncInterval: NodeJS.Timeout | null = null;
+  private followersCache: Set<string> = new Set();
+  private isInitialized = false;
+  private lastProfileVisits: Map<string, number> = new Map();
+  private readonly VISIT_DEBOUNCE_MS = 30000; // 30 secondes
+  private followerCountObserver: MutationObserver | null = null;
+  private lastFollowerCount: number = 0;
+  private autoCheckInterval: NodeJS.Timeout | null = null;
+  private lastUserActivity: number = Date.now();
+  private readonly INACTIVITY_THRESHOLD = 2 * 60 * 1000; // 2 minutes
+  private mostRecentFollower: string | null = null;
+  private needsFullScan: boolean = false;
+  private isScanning: boolean = false;
+
+  constructor() {
+    this.observer = new DOMObserver();
+    this.collector = new DataCollector();
+    this.dmInterceptor = new DMInterceptor();
+    this.dmAnalyzer = new DMAnalyzer();
+    this.scoringEngine = new ScoringEngine();
+  }
+
+  async init() {
+    if (this.isInitialized) return;
+
+    console.log('🔍 Waler Instagram Tracker initializing...');
+
+    this.currentUsername = this.extractUsername();
+    if (!this.currentUsername) {
+      console.log('❌ Could not detect Instagram username');
+      return;
+    }
+
+    console.log(`✅ Tracking account: @${this.currentUsername}`);
+
+    await this.loadFollowersCache();
+
+    this.observer.onProfileVisit((username) => {
+      // Ignorer les pages système
+      if (this.isSystemPage()) {
+        console.log(`🚫 Ignoring system page`);
+        return;
+      }
+      
+      // Ignorer les visites de son propre profil
+      if (username === this.currentUsername) {
+        console.log(`🚫 Ignoring self-visit: @${username}`);
+        return;
+      }
+      
+      // Debouncing: ne compter qu'une visite par profil toutes les 30 secondes
+      const now = Date.now();
+      const lastVisit = this.lastProfileVisits.get(username);
+      
+      if (!lastVisit || now - lastVisit > this.VISIT_DEBOUNCE_MS) {
+        this.collector.trackProfileVisit(username);
+        this.lastProfileVisits.set(username, now);
+        console.log(`👤 Profile visit: @${username}`);
+      } else {
+        console.log(`⏭️ Skipping duplicate visit: @${username} (visited ${Math.floor((now - lastVisit) / 1000)}s ago)`);
+      }
+    });
+
+    this.observer.onFollowerDetected((follower) => {
+      this.handleFollowerDetected(follower);
+    });
+
+    this.observer.onUnfollowerDetected((unfollower) => {
+      this.handleUnfollowerDetected(unfollower);
+    });
+
+    this.observer.onEngagement((engagement) => {
+      // Ignorer les engagements sur les pages système ou son propre profil
+      if (this.isSystemPage() || this.isOnOwnProfile()) {
+        console.log(`🚫 Ignoring engagement on system page or own profile`);
+        return;
+      }
+      
+      this.collector.trackEngagement(engagement);
+    });
+
+    // NE PLUS intercepter les API - cause ERR_BLOCKED_BY_CLIENT
+    // this.interceptAPIRequests();
+
+    this.observer.start();
+
+    // Start DM interceptor
+    this.startDMInterceptor();
+
+    // Start DM sync (every 5 minutes)
+    this.dmSyncInterval = setInterval(() => {
+      this.syncDMs();
+    }, 5 * 60 * 1000);
+
+    // Start automatic follower count monitoring
+    this.startFollowerCountMonitoring();
+
+    // Track user activity
+    this.trackUserActivity();
+
+    this.isInitialized = true;
+
+    console.log('✅ Waler Instagram Tracker ready');
+  }
+
+  /**
+   * Start DM interceptor
+   */
+  private startDMInterceptor() {
+    this.dmInterceptor.start({
+      onNewMessage: (message: DMMessage) => {
+        this.handleNewDM(message);
+      },
+      onConversationUpdate: (conversation) => {
+        this.handleConversationUpdate(conversation);
+      }
+    });
+
+    console.log('💬 DM interceptor started');
+  }
+
+  /**
+   * Handle new DM message
+   */
+  private async handleNewDM(message: DMMessage) {
+    console.log(`💬 New DM from @${message.conversationWith}: ${message.text.substring(0, 50)}...`);
+
+    // Analyze message with DMAnalyzer
+    const analysis = this.dmAnalyzer.analyzeMessage(message.text);
+    
+    if (analysis.keywords.length > 0) {
+      console.log(`🔍 Keywords detected: ${analysis.keywords.join(', ')} (${analysis.category})`);
+      
+      // If significant keywords detected, trigger scoring
+      if (analysis.confidence > 0.5) {
+        await this.triggerContactScoring(message.conversationWith);
+      }
+    }
+
+    // Send to background for storage
+    await chrome.runtime.sendMessage({
+      type: 'NEW_DM',
+      message
+    });
+  }
+
+  /**
+   * Handle conversation update
+   */
+  private async handleConversationUpdate(conversation: any) {
+    console.log(`📬 Conversation updated: @${conversation.username} (${conversation.messageCount} messages)`);
+
+    // Calculate DM score
+    const dmScore = this.dmAnalyzer.calculateDMScore(conversation);
+    
+    if (dmScore.total >= 15) {
+      // High DM score, trigger full scoring
+      await this.triggerContactScoring(conversation.username);
+    }
+  }
+
+  /**
+   * Trigger contact scoring and classification
+   */
+  private async triggerContactScoring(username: string) {
+    try {
+      // Get conversation
+      const conversation = this.dmInterceptor.getConversation(username);
+      if (!conversation) return;
+
+      // Build contact data
+      const contact: Contact = {
+        username,
+        conversation,
+        likesGiven: 0, // TODO: Get from collector
+        commentsGiven: 0,
+        storiesViewed: 0,
+        sharesReceived: 0,
+        profileVisits: 0,
+        timeSpentMinutes: 0,
+        linkClicks: 0,
+        firstInteractionDate: Date.now() - (30 * 24 * 60 * 60 * 1000), // Default 30 days ago
+        lastInteractionDate: Date.now(),
+        isFollowingBack: false,
+        mutualEngagementCount: 0,
+        mutualConnectionsCount: 0
+      };
+
+      // Calculate score
+      const scoreBreakdown = this.scoringEngine.calculateTotalScore(contact);
+      
+      console.log(`📊 Score for @${username}: ${scoreBreakdown.total}/100`, scoreBreakdown);
+
+      // Detect transition
+      const transition = this.scoringEngine.detectTransition(contact, scoreBreakdown);
+      
+      if (transition.shouldTransition) {
+        console.log(`💡 Transition detected: @${username} ${transition.from} → ${transition.to}`);
+        
+        // Send to background to create suggestion
+        await chrome.runtime.sendMessage({
+          type: 'CREATE_SUGGESTION',
+          username,
+          transition,
+          scoreBreakdown
+        });
+      }
+
+      // Send score to backend
+      await chrome.runtime.sendMessage({
+        type: 'UPDATE_CONTACT_SCORE',
+        username,
+        scoreBreakdown
+      });
+    } catch (error) {
+      console.error('Error triggering contact scoring:', error);
+    }
+  }
+
+  /**
+   * Sync DMs to backend
+   */
+  private async syncDMs() {
+    try {
+      const conversations = this.dmInterceptor.getConversations();
+      
+      if (conversations.length === 0) {
+        console.log('💬 No DMs to sync');
+        return;
+      }
+
+      // Collect all messages
+      const allMessages: DMMessage[] = [];
+      
+      conversations.forEach(conv => {
+        conv.messages.forEach(msg => {
+          allMessages.push({
+            conversationId: conv.username,
+            conversationWith: conv.username,
+            messageId: `${conv.username}_${msg.timestamp}`,
+            text: msg.text,
+            timestamp: msg.timestamp,
+            isSent: msg.isSent,
+            mediaUrls: [],
+            reactions: [],
+            isRead: true
+          });
+        });
+      });
+
+      // Send to background
+      try {
+        await chrome.runtime.sendMessage({
+          type: 'SYNC_DMS',
+          messages: allMessages,
+          conversations: conversations.map(c => ({
+            username: c.username,
+            messageCount: c.messageCount,
+            lastMessageAt: c.lastMessageAt
+          }))
+        });
+
+        console.log(`💬 Synced ${allMessages.length} DMs from ${conversations.length} conversations`);
+
+        // Save conversations locally
+        await this.dmInterceptor.saveConversations();
+      } catch (msgError: any) {
+        // Extension context invalidated (rechargée)
+        if (msgError.message?.includes('Extension context invalidated')) {
+          console.log('⚠️ Extension reloaded, stopping DM sync');
+          if (this.dmSyncInterval) {
+            clearInterval(this.dmSyncInterval);
+            this.dmSyncInterval = null;
+          }
+        } else {
+          throw msgError;
+        }
+      }
+    } catch (error) {
+      console.error('Error syncing DMs:', error);
+  }
+
+  // Collect all messages
+  const allMessages: DMMessage[] = [];
+  
+  conversations.forEach(conv => {
+    conv.messages.forEach(msg => {
+      allMessages.push({
+        conversationId: conv.username,
+        conversationWith: conv.username,
+        messageId: `${conv.username}_${msg.timestamp}`,
+        text: msg.text,
+        timestamp: msg.timestamp,
+        isSent: msg.isSent,
+        mediaUrls: [],
+        reactions: [],
+        isRead: true
+      });
+    });
+  });
+
+  // Send to background
+  try {
+    await chrome.runtime.sendMessage({
+      type: 'SYNC_DMS',
+      messages: allMessages,
+      conversations: conversations.map(c => ({
+        username: c.username,
+        messageCount: c.messageCount,
+        lastMessageAt: c.lastMessageAt
+      }))
+    });
+
+    console.log(`💬 Synced ${allMessages.length} DMs from ${conversations.length} conversations`);
+
+    // Save conversations locally
+    await this.dmInterceptor.saveConversations();
+  } catch (msgError: any) {
+    // Extension context invalidated (rechargée)
+    if (msgError.message?.includes('Extension context invalidated')) {
+      console.log('⚠️ Extension reloaded, stopping DM sync');
+      if (this.dmSyncInterval) {
+        clearInterval(this.dmSyncInterval);
+        this.dmSyncInterval = null;
+      }
+    } else {
+      throw msgError;
+    }
+  }
+} catch (error) {
+  console.error('Error syncing DMs:', error);
+}
+}
+
+/**
+ * Start automatic follower count monitoring
+ */
+private async startFollowerCountMonitoring() {
+  // Vérifier si on a déjà un cache de followers
+  const stored = await chrome.storage.local.get('followersCache');
+  const hasCache = stored.followersCache && stored.followersCache.length > 0;
+
+  if (!hasCache) {
+    console.log('📊 No follower cache found, full scan required on first visit');
+    this.needsFullScan = true;
+  }
+
+  // Check every 30 seconds for follower count changes
+  this.autoCheckInterval = setInterval(() => {
+    this.checkFollowerCountChange();
+
+    console.log('👥 Automatic follower monitoring started');
+  }
+
+  /**
+   * Check if follower count has changed
+   */
+  private async checkFollowerCountChange() {
+    try {
+      // Only check on own profile
+      const path = window.location.pathname;
+      console.log(`🔍 Checking follower count on path: ${path}, username: ${this.currentUsername}`);
+      
+      if (path !== `/${this.currentUsername}` && path !== `/${this.currentUsername}/`) {
+        console.log(`⏭️ Not on own profile, skipping check`);
+        return;
+      }
+
+      // Find follower count element (multiple selectors for robustness)
+      const followerCountElement = 
+        document.querySelector('a[href*="/followers/"] span') ||
+        document.querySelector('a[href$="/followers/"] span') ||
+        Array.from(document.querySelectorAll('span')).find(el => 
+          el.textContent?.includes('follower')
+        );
+
+      if (!followerCountElement) {
+        console.log('❌ Follower count element not found');
+        return;
+      }
+
+      // Extract count (handle "1.2K", "1M" format)
+      const countText = followerCountElement.textContent?.trim() || '0';
+      console.log(`📊 Found follower count text: "${countText}"`);
+      const count = this.parseFollowerCount(countText);
+      console.log(`📊 Parsed follower count: ${count}`);
+
+      // Load last known count from storage
+      const stored = await chrome.storage.local.get('lastFollowerCount');
+      const lastCount = stored.lastFollowerCount || 0;
+
+      // If count changed, trigger auto-check
+      if (count !== lastCount && lastCount > 0) {
+        const diff = count - lastCount;
+        console.log(`🔔 Follower count changed: ${lastCount} → ${count} (${diff > 0 ? '+' : ''}${diff})`);
+
+        // Save new count
+        await chrome.storage.local.set({ lastFollowerCount: count });
+
+        // Hybrid approach: notify + smart auto-check
+        if (diff > 0) {
+          console.log('✨ New follower(s) detected!');
+          this.handleFollowerChange(diff, 'follower');
+        } else if (diff < 0) {
+          console.log('👋 Unfollower(s) detected!');
+          this.handleFollowerChange(diff, 'unfollower');
+        }
+      } else if (lastCount === 0) {
+        // First time, just save the count
+        await chrome.storage.local.set({ lastFollowerCount: count });
+        console.log(`📊 Initial follower count saved: ${count}`);
+      }
+    } catch (error) {
+      console.error('Error checking follower count:', error);
+    }
+  }
+
+  /**
+   * Parse follower count (handles "1.2K", "1M" format)
+   */
+  private parseFollowerCount(text: string): number {
+    const cleanText = text.replace(/[^0-9.KMk]/g, '');
+    
+    if (cleanText.includes('M') || cleanText.includes('m')) {
+      return parseFloat(cleanText) * 1000000;
+    } else if (cleanText.includes('K') || cleanText.includes('k')) {
+      return parseFloat(cleanText) * 1000;
+    }
+    
+    return parseInt(cleanText) || 0;
+  }
+
+  /**
+   * Track user activity (mouse, keyboard, scroll)
+   */
+  private trackUserActivity() {
+    const updateActivity = () => {
+      this.lastUserActivity = Date.now();
+    };
+
+    document.addEventListener('mousemove', updateActivity, { passive: true });
+    document.addEventListener('keydown', updateActivity, { passive: true });
+    document.addEventListener('scroll', updateActivity, { passive: true });
+    document.addEventListener('click', updateActivity, { passive: true });
+
+    console.log('👁️ User activity tracking enabled');
+  }
+
+  /**
+   * Check if user is currently inactive
+   */
+  private isUserInactive(): boolean {
+    const inactiveTime = Date.now() - this.lastUserActivity;
+    return inactiveTime > this.INACTIVITY_THRESHOLD;
+  }
+
+  /**
+   * Handle follower count change (hybrid approach)
+   */
+  private async handleFollowerChange(diff: number, type: 'follower' | 'unfollower') {
+    const absCount = Math.abs(diff);
+    const action = type === 'follower' ? 'nouveau(x) follower(s)' : 'unfollower(s)';
+    
+    // Send notification to service worker
+    try {
+      await chrome.runtime.sendMessage({
+        type: 'FOLLOWER_CHANGE_DETECTED',
+        count: absCount,
+        changeType: type
+      });
+    } catch (error) {
+      console.error('Error sending notification:', error);
+    }
+
+    // Si c'est un unfollower, on a besoin d'un scan complet
+    if (type === 'unfollower') {
+      console.log('📊 Unfollower detected, full scan required');
+      this.needsFullScan = true;
+    }
+
+    // Smart auto-check: only if user is inactive
+    if (this.isUserInactive()) {
+      console.log(`🤖 User inactive, auto-checking ${action}...`);
+      setTimeout(() => {
+        if (this.needsFullScan) {
+          this.performFullScan();
+        } else {
+          this.autoCheckNewFollowers();
+        }
+      }, 1000); // Petit délai pour plus de naturel
+    } else {
+      console.log(`👤 User active, notification sent. Manual check required.`);
+      // Badge sur l'icône de l'extension
+      try {
+        await chrome.runtime.sendMessage({
+          type: 'UPDATE_BADGE',
+          text: type === 'follower' ? `+${absCount}` : `-${absCount}`
+        });
+      } catch (error) {
+        console.error('Error updating badge:', error);
+      }
+    }
+  }
+
+  /**
+   * Perform full scan of all followers
+   */
+  private async performFullScan() {
+    if (this.isScanning) {
+      console.log('⏳ Scan already in progress');
+      return;
+    }
+
+    this.isScanning = true;
+    console.log('🔍 Starting full follower scan...');
+
+    try {
+      // Ouvrir la page followers
+      const followersLink = document.querySelector(`a[href="/${this.currentUsername}/followers/"]`) as HTMLAnchorElement;
+      
+      if (!followersLink) {
+        console.log('❌ Followers link not found');
+        this.isScanning = false;
+        return;
+      }
+
+      followersLink.click();
+      
+      // Attendre que la modal s'ouvre
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      const modal = document.querySelector('[role="dialog"]');
+      if (!modal) {
+        console.log('❌ Followers modal not found');
+        this.isScanning = false;
+        return;
+      }
+
+      // Scroll pour charger tous les followers
+      const scrollContainer = modal.querySelector('div[style*="overflow"]');
+      if (!scrollContainer) {
+        console.log('❌ Scroll container not found');
+        this.isScanning = false;
+        return;
+      }
+
+      console.log('📜 Scrolling to load all followers...');
+      
+      let previousFollowerCount = 0;
+      let currentFollowersList: Set<string> = new Set();
+      let noChangeCount = 0;
+
+      // Scroll jusqu'à ce qu'on ait tous les followers
+      while (noChangeCount < 3) {
+        // Extraire tous les followers actuellement visibles
+        const links = modal.querySelectorAll('a[href^="/"]');
+        
+        for (const link of Array.from(links)) {
+          const href = link.getAttribute('href');
+          if (href) {
+            const usernameMatch = href.match(/^\/([a-zA-Z0-9._]+)\/?(\?.*)?$/);
+            if (usernameMatch) {
+              const username = usernameMatch[1];
+              const systemPages = ['explore', 'reels', 'direct', 'p', 'stories', 'tv', 'accounts'];
+              if (!systemPages.includes(username)) {
+                currentFollowersList.add(username);
+              }
+            }
+          }
+        }
+
+        // Vérifier si on a chargé de nouveaux followers
+        if (currentFollowersList.size === previousFollowerCount) {
+          noChangeCount++;
+        } else {
+          noChangeCount = 0;
+          previousFollowerCount = currentFollowersList.size;
+        }
+
+        console.log(`📊 Loaded ${currentFollowersList.size} followers so far...`);
+
+        // Scroll vers le bas
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      console.log(`✅ Full scan complete: ${currentFollowersList.size} followers loaded`);
+
+      // Comparer avec le cache pour trouver les unfollowers
+      const oldFollowers = this.followersCache;
+      const unfollowers: string[] = [];
+
+      for (const oldFollower of oldFollowers) {
+        if (!currentFollowersList.has(oldFollower)) {
+          unfollowers.push(oldFollower);
+        }
+      }
+
+      // Trouver les nouveaux followers
+      const newFollowers: string[] = [];
+      for (const currentFollower of currentFollowersList) {
+        if (!oldFollowers.has(currentFollower)) {
+          newFollowers.push(currentFollower);
+        }
+      }
+
+      console.log(`🆕 New followers: ${newFollowers.length}`);
+      console.log(`🚫 Unfollowers: ${unfollowers.length}`);
+
+      // Envoyer les unfollowers au backend
+      for (const unfollower of unfollowers) {
+        console.log(`🚫 Unfollower detected: @${unfollower}`);
+        await chrome.runtime.sendMessage({
+          type: 'TRACK_UNFOLLOWER',
+          data: {
+            username: unfollower,
+            metadata: {
+              detectedAt: new Date().toISOString(),
+            },
+          },
+        });
+      }
+
+      // Envoyer les nouveaux followers au backend
+      for (const newFollower of newFollowers) {
+        console.log(`🆕 New follower detected: @${newFollower}`);
+        await chrome.runtime.sendMessage({
+          type: 'TRACK_FOLLOWER',
+          data: {
+            username: newFollower,
+            metadata: {
+              detectedAt: new Date().toISOString(),
+            },
+          },
+        });
+      }
+
+      // Mettre à jour le cache
+      this.followersCache = currentFollowersList;
+      await this.saveFollowersCache();
+
+      // Mettre à jour le follower le plus récent
+      if (currentFollowersList.size > 0) {
+        const firstFollower = Array.from(currentFollowersList)[0];
+        this.mostRecentFollower = firstFollower;
+        await chrome.storage.local.set({ mostRecentFollower: firstFollower });
+      }
+
+      // Fermer la modal
+      const closeButton = modal.querySelector('button[aria-label="Close"], button[aria-label="Fermer"]');
+      if (closeButton) {
+        (closeButton as HTMLButtonElement).click();
+      }
+
+      this.needsFullScan = false;
+      console.log('✅ Full scan completed successfully');
+
+    } catch (error) {
+      console.error('Error during full scan:', error);
+    } finally {
+      this.isScanning = false;
+    }
+  }
+
+  /**
+   * Auto-check new followers by programmatically opening followers page
+   */
+  private async autoCheckNewFollowers() {
+    try {
+      // Find and click followers link
+      const followersLink = document.querySelector(`a[href="/${this.currentUsername}/followers/"]`) as HTMLAnchorElement;
+      
+      if (followersLink) {
+        console.log('🔄 Auto-opening followers page...');
+        
+        // Simulate click to open followers modal
+        followersLink.click();
+        
+        // Wait for modal to load, then scroll to trigger detection
+        setTimeout(() => {
+          const modal = document.querySelector('[role="dialog"]');
+          if (modal) {
+            console.log('📜 Scrolling followers list to detect changes...');
+            
+            // Scroll the modal to load followers
+            const scrollableDiv = modal.querySelector('div[style*="overflow"]');
+            if (scrollableDiv) {
+              let scrollCount = 0;
+              const scrollInterval = setInterval(() => {
+                scrollableDiv.scrollTop += 300;
+                scrollCount++;
+                
+                // Stop after 10 scrolls (load ~50-100 followers)
+                if (scrollCount >= 10) {
+                  clearInterval(scrollInterval);
+                  console.log('✅ Followers loaded and checked');
+                  
+                  // Close modal after 2 seconds
+                  setTimeout(() => {
+                    const closeButton = modal.querySelector('button[aria-label="Close"]') ||
+                                       modal.querySelector('svg[aria-label="Close"]')?.closest('button');
+                    if (closeButton) {
+                      (closeButton as HTMLElement).click();
+                    }
+                  }, 2000);
+                }
+              }, 500);
+            }
+          }
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('Error auto-checking followers:', error);
+    }
+  }
+
+  private extractUsername(): string | null {
+    const metaTag = document.querySelector('meta[property="og:title"]');
+    if (metaTag) {
+      const content = metaTag.getAttribute('content');
+      const match = content?.match(/@(\w+)/);
+      if (match) return match[1];
+    }
+
+    const pathMatch = window.location.pathname.match(/^\/([^\/]+)/);
+    if (pathMatch && pathMatch[1] !== 'explore' && pathMatch[1] !== 'reels') {
+      return pathMatch[1];
+    }
+
+    return null;
+  }
+
+  private isSystemPage(): boolean {
+    const path = window.location.pathname;
+    
+    // Autoriser les conversations DM individuelles (/direct/t/...)
+    if (path.startsWith('/direct/t/')) {
+      return false;
+    }
+    
+    const systemPages = [
+      '/accounts/',
+      '/settings/',
+      '/saved/',
+      '/archive/',
+      '/your_activity/',
+      '/help/',
+      '/about/',
+      '/terms/',
+      '/privacy/',
+      '/explore/',
+      '/reels/',
+      '/direct/', // Bloque /direct/inbox/ mais pas /direct/t/
+      '/create/',
+      '/notifications/'
+    ];
+    
+    return systemPages.some(page => path.startsWith(page));
+  }
+
+  private isOnOwnProfile(): boolean {
+    const path = window.location.pathname;
+    return path === `/${this.currentUsername}` || path === `/${this.currentUsername}/`;
+  }
+
+  private async loadFollowersCache() {
+    const stored = await chrome.storage.local.get('followersCache');
+    if (stored.followersCache) {
+      this.followersCache = new Set(stored.followersCache as string[]);
+      console.log(`📦 Loaded ${this.followersCache.size} followers from cache`);
+    }
+  }
+
+  private async saveFollowersCache() {
+    await chrome.storage.local.set({
+      followersCache: Array.from(this.followersCache),
+    });
+  }
+
+  private async handleFollowerDetected(follower: { username: string; avatarUrl?: string }) {
+    // Charger le follower le plus récent depuis le storage
+    if (!this.mostRecentFollower) {
+      const stored = await chrome.storage.local.get('mostRecentFollower');
+      this.mostRecentFollower = stored.mostRecentFollower || null;
+    }
+
+    // Si c'est le premier follower détecté, le sauvegarder comme référence
+    if (!this.mostRecentFollower) {
+      this.mostRecentFollower = follower.username;
+      await chrome.storage.local.set({ mostRecentFollower: follower.username });
+      console.log(`📌 Most recent follower set: @${follower.username}`);
+      
+      // Ajouter au cache aussi
+      if (!this.followersCache.has(follower.username)) {
+        this.followersCache.add(follower.username);
+        await this.saveFollowersCache();
+      }
+      return;
+    }
+
+    // Si c'est un follower différent du plus récent = NOUVEAU FOLLOWER
+    if (follower.username !== this.mostRecentFollower) {
+      console.log(`🆕 New follower detected: @${follower.username} (previous: @${this.mostRecentFollower})`);
+      
+      // Mettre à jour le plus récent
+      this.mostRecentFollower = follower.username;
+      await chrome.storage.local.set({ mostRecentFollower: follower.username });
+      
+      // Ajouter au cache
+      this.followersCache.add(follower.username);
+      await this.saveFollowersCache();
+
+      // Envoyer au backend
+      await chrome.runtime.sendMessage({
+        type: 'TRACK_FOLLOWER',
+        data: {
+          username: follower.username,
+          avatarUrl: follower.avatarUrl,
+          metadata: {
+            detectedAt: new Date().toISOString(),
+          },
+        },
+      });
+    } else {
+      // C'est toujours le même follower le plus récent, rien à faire
+      console.log(`✓ Same most recent follower: @${follower.username}`);
+    }
+  }
+
+  private async handleUnfollowerDetected(unfollower: { username: string; avatarUrl?: string }) {
+    if (this.followersCache.has(unfollower.username)) {
+      console.log(`➖ Unfollower detected: @${unfollower.username}`);
+      
+      this.followersCache.delete(unfollower.username);
+      await this.saveFollowersCache();
+
+      await chrome.runtime.sendMessage({
+        type: 'TRACK_UNFOLLOWER',
+        data: {
+          username: unfollower.username,
+          avatarUrl: unfollower.avatarUrl,
+          metadata: {
+            detectedAt: new Date().toISOString(),
+          },
+        },
+      });
+    }
+  }
+
+  private interceptAPIRequests() {
+    // DÉSACTIVÉ : Cause ERR_BLOCKED_BY_CLIENT et violations de sécurité
+    // const originalFetch = window.fetch;
+    // window.fetch = async (...args) => {
+    //   const response = await originalFetch(...args);
+    //   const url = args[0].toString();
+    //   if (url.includes('/graphql') || url.includes('/api/v1/')) {
+    //     const clonedResponse = response.clone();
+    //     try {
+    //       const data = await clonedResponse.json();
+    //       this.processAPIResponse(url, data);
+    //     } catch (e) {
+    //     }
+    //   }
+    //   return response;
+    // };
+    
+    console.log('⚠️ API interception disabled (use DOM observation only)');
+  }
+
+  private processAPIResponse(url: string, data: any) {
+    if (url.includes('followers')) {
+      this.collector.processFollowersData(data);
+    } else if (url.includes('following')) {
+      this.collector.processFollowingData(data);
+    } else if (url.includes('user_info')) {
+      this.collector.processUserInfo(data);
+    }
+  }
+}
+
+const tracker = new InstagramTracker();
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => tracker.init());
+} else {
+  tracker.init();
+}
+
+console.log('📱 Waler content script loaded');
+
+

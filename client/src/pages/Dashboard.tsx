@@ -3,9 +3,12 @@ import { useRoute, useLocation } from "wouter";
 import { useUser, useStats } from "@/hooks/use-waler";
 import { useAuth } from "@/hooks/use-auth";
 import { useAnimationPreference } from "@/hooks/use-animation-preference";
+import { useUnfollowers, useGhostFollowers, useUnfollowerStats } from "@/hooks/use-unfollowers";
+import { useUnlockedUnfollowers, useUnlockUnfollower, useUnlockAllUnfollowers } from "@/hooks/use-unlocked-unfollowers";
+import { useQueryClient } from "@tanstack/react-query";
 import { BarChart, Bar, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell } from "recharts";
 import { motion, AnimatePresence, useSpring } from "framer-motion";
-import { Instagram, LogOut, List, X, ChevronLeft, ChevronRight, Settings, AlertTriangle } from "lucide-react";
+import { Instagram, LogOut, List, X, ChevronLeft, ChevronRight, Settings, AlertTriangle, Lock } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RadarBackground } from "@/components/RadarBackground";
 import { GlassText } from "@/components/GlassText";
@@ -301,6 +304,7 @@ export default function Dashboard() {
   const { user: authUser, isLoading: authLoading, logout } = useAuth();
   const disableAnimation = useAnimationPreference();
   const userId = params ? parseInt(params.userId) : null;
+  const queryClient = useQueryClient();
 
   // Debug authentication state
   useEffect(() => {
@@ -312,6 +316,35 @@ export default function Dashboard() {
       authUserId: authUser?.id
     });
   }, [authLoading, authUser, userId]);
+
+  // Écouter les messages de l'extension Chrome pour rafraîchir automatiquement
+  useEffect(() => {
+    // Vérifier si l'API Chrome est disponible (extension installée)
+    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
+      const messageListener = (message: any, sender: any, sendResponse: any) => {
+        if (message.type === 'REFRESH_DASHBOARD') {
+          console.log('🔄 Received refresh request from extension:', message.data);
+          
+          // Invalider toutes les queries pour forcer un rechargement
+          queryClient.invalidateQueries({ queryKey: ['stats'] });
+          queryClient.invalidateQueries({ queryKey: ['unfollowers'] });
+          queryClient.invalidateQueries({ queryKey: ['ghost-followers'] });
+          queryClient.invalidateQueries({ queryKey: ['unfollower-stats'] });
+          
+          console.log('✅ Dashboard data refreshed');
+          sendResponse({ success: true });
+        }
+        return true; // Keep message channel open for async response
+      };
+
+      chrome.runtime.onMessage.addListener(messageListener);
+
+      // Cleanup
+      return () => {
+        chrome.runtime.onMessage.removeListener(messageListener);
+      };
+    }
+  }, [queryClient]);
 
   // Redirect if not authenticated or accessing wrong user
   useEffect(() => {
@@ -329,6 +362,39 @@ export default function Dashboard() {
   const { data: user, isLoading: userLoading, error: userError } = useUser(currentUserId);
   const { data: stats, isLoading: statsLoading, error: statsError } = useStats(currentUserId);
   const { isPro, tier, isLoading: subLoading } = useSubscription();
+  
+  // Fetch unfollowers data
+  const unfollowersQuery = useUnfollowers();
+  const ghostFollowersQuery = useGhostFollowers();
+  const unfollowerStatsQuery = useUnfollowerStats();
+  
+  const unfollowersData = unfollowersQuery.data;
+  const ghostFollowersData = ghostFollowersQuery.data;
+  const unfollowerStatsData = unfollowerStatsQuery.data;
+  
+  // Debug unfollowers data
+  useEffect(() => {
+    console.log('🔍 Unfollowers Query Status:', {
+      unfollowers: {
+        isLoading: unfollowersQuery.isLoading,
+        isError: unfollowersQuery.isError,
+        error: unfollowersQuery.error,
+        data: unfollowersData
+      },
+      ghost: {
+        isLoading: ghostFollowersQuery.isLoading,
+        isError: ghostFollowersQuery.isError,
+        error: ghostFollowersQuery.error,
+        data: ghostFollowersData
+      },
+      stats: {
+        isLoading: unfollowerStatsQuery.isLoading,
+        isError: unfollowerStatsQuery.isError,
+        error: unfollowerStatsQuery.error,
+        data: unfollowerStatsData
+      }
+    });
+  }, [unfollowersData, ghostFollowersData, unfollowerStatsData, unfollowersQuery, ghostFollowersQuery, unfollowerStatsQuery]);
   
   // Debug data loading state
   useEffect(() => {
@@ -359,6 +425,12 @@ export default function Dashboard() {
   const [whiteArcTooltip, setWhiteArcTooltip] = useState({ visible: false, x: 0, y: 0 });
   const sphereRef = useRef<HTMLDivElement>(null);
   
+  // Unlock system states
+  const [accountToUnlock, setAccountToUnlock] = useState<any>(null);
+  const { data: unlockedIds = [] } = useUnlockedUnfollowers();
+  const unlockMutation = useUnlockUnfollower();
+  const unlockAllMutation = useUnlockAllUnfollowers();
+  
   // Onboarding state
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [needsAgentApproval, setNeedsAgentApproval] = useState(false);
@@ -371,6 +443,26 @@ export default function Dashboard() {
   // Settings modal state
   const [showSettings, setShowSettings] = useState(false);
   
+  // Helper function to check if an account is unlocked
+  const isAccountUnlocked = (accountId: number) => {
+    return unlockedIds.includes(accountId);
+  };
+
+  // Handle reveal gate completion (unlock account)
+  const handleRevealComplete = () => {
+    if (accountToUnlock) {
+      unlockMutation.mutate(accountToUnlock.id);
+      setShowRevealGate(false);
+      setAccountToUnlock(null);
+    }
+  };
+
+  // Handle account unlock request
+  const handleUnlockRequest = (account: any) => {
+    setAccountToUnlock(account);
+    setShowRevealGate(true);
+  };
+
   // Check if user needs onboarding (first login or not connected)
   useEffect(() => {
     if (!user || !currentUserId) return;
@@ -449,6 +541,37 @@ export default function Dashboard() {
     }
   }, [stats, monthIndex, selectedYear, period]);
 
+  // Calculer totalCount pour la section active (MUST BE BEFORE EARLY RETURNS)
+  // Pour les followers: toujours le total global
+  // Pour les unfollowers/blockers: filtrer par période (mois ou année)
+  const totalCount = useMemo(() => {
+    if (!stats) return 0;
+    
+    if (activeSection === "followers") {
+      // Followers: afficher le nombre réel d'Instagram
+      return stats.instagramFollowers || stats.totalFollowers;
+    }
+    
+    // Pour unfollowers et blockers: filtrer par période
+    const accounts = activeSection === "unfollowers" 
+      ? (unfollowersData?.unfollowers || stats.recentUnfollowers)
+      : (ghostFollowersData?.ghostFollowers || stats.recentBlockers);
+    
+    if (period === "month") {
+      // Filtrer par mois sélectionné
+      return accounts.filter((acc: any) => {
+        const d = new Date(acc.detectedAt || acc.detected_at || new Date());
+        return d.getMonth() === monthIndex && d.getFullYear() === selectedYear;
+      }).length;
+    } else {
+      // Filtrer par année sélectionnée
+      return accounts.filter((acc: any) => {
+        const d = new Date(acc.detectedAt || acc.detected_at || new Date());
+        return d.getFullYear() === selectedYear;
+      }).length;
+    }
+  }, [activeSection, period, monthIndex, selectedYear, stats, unfollowersData, ghostFollowersData]);
+
   // Show loading state
   if (userLoading || statsLoading) return <DashboardLoading />;
   
@@ -463,9 +586,17 @@ export default function Dashboard() {
   const registrationMonth = userRegistrationDate.getMonth();
   
   console.log("Dashboard Debug:", { isPro, tier, mode, userRegistrationDate, registrationYear, registrationMonth });
+  console.log("🔍 Pro Mode Check:", { 
+    mode, 
+    isPro, 
+    tier, 
+    subLoading,
+    willRedirect: mode === 'professional' && !isPro 
+  });
   
   // Redirect non-Pro users to pricing page when they try to access professional mode
-  if (mode === 'professional' && !isPro) {
+  if (mode === 'professional' && !isPro && !subLoading) {
+    console.log("⚠️ Redirecting non-Pro user from professional mode");
     // Redirect Premium users to upgrade page, others to plan comparison
     if (tier === 'premium') {
       navigate('/upgrade-to-pro');
@@ -479,87 +610,130 @@ export default function Dashboard() {
 
   // Show Pro Dashboard if in professional mode (only for Pro users)
   if (mode === 'professional') {
-    return (
-      <div className="min-h-screen bg-[#0a0a0a] font-body text-white relative overflow-hidden">
-        {!disableAnimation && <RadarBackground />}
-        
-        {/* Pro Dashboard Content (blurred for non-Pro) */}
-        <div className={!isPro ? 'filter blur-sm pointer-events-none' : ''}>
-          {/* Navbar */}
-          <nav className="fixed w-full top-0 z-50">
-          <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <button onClick={() => navigate("/")} style={{ position: 'absolute', left: '15px', top: '15px' }}>
-              <GlassText text="WALER" fontSize={32} />
-            </button>
-            
-            {/* Center: Mode Switcher */}
-            <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-black/50 backdrop-blur-xl border border-white/10 rounded-full p-1">
-              <button
-                onClick={() => setMode('personal')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${
-                  mode === 'personal'
-                    ? 'bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)]'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                <User className="w-4 h-4" />
-                Personal
+    console.log('✅ Rendering Pro Dashboard');
+    try {
+      return (
+        <div className="min-h-screen bg-[#0a0a0a] font-body text-white relative overflow-hidden">
+          {!disableAnimation && <RadarBackground />}
+          
+          {/* Pro Dashboard Content (blurred for non-Pro) */}
+          <div className={!isPro ? 'filter blur-sm pointer-events-none' : ''}>
+            {/* Navbar */}
+            <nav className="fixed w-full top-0 z-50">
+            <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+              <button onClick={() => navigate("/")} style={{ position: 'absolute', left: '15px', top: '15px' }}>
+                <GlassText text="WALER" fontSize={32} />
               </button>
-              <button
-                onClick={() => setMode('professional')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${
-                  mode === 'professional'
-                    ? 'bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)]'
-                    : 'text-gray-400 hover:text-white cursor-pointer'
-                }`}
-              >
-                <Briefcase className="w-4 h-4" />
-                Professional
-                {!isPro && <Crown className="w-3 h-3 text-amber-400" />}
-              </button>
-            </div>
-            
-            {/* Right: Logout + Pro Badge */}
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-2">
-              <button
-                onClick={() => logout()}
-                className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold text-gray-400 hover:text-white transition-colors border border-white/10 hover:border-white/20"
-              >
-                <LogOut className="w-4 h-4" /> Logout
-              </button>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 text-green-300">
-                <Crown className="w-4 h-4" />
-                Pro
+              
+              {/* Center: Mode Switcher */}
+              <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-black/50 backdrop-blur-xl border border-white/10 rounded-full p-1">
+                <button
+                  onClick={() => setMode('personal')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                    mode === 'personal'
+                      ? 'bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)]'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  <User className="w-4 h-4" />
+                  Personal
+                </button>
+                <button
+                  onClick={() => setMode('professional')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                    mode === 'professional'
+                      ? 'bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)]'
+                      : 'text-gray-400 hover:text-white cursor-pointer'
+                  }`}
+                >
+                  <Briefcase className="w-4 h-4" />
+                  Professional
+                  {!isPro && <Crown className="w-3 h-3 text-amber-400" />}
+                </button>
+              </div>
+              
+              {/* Right: Logout + Pro Badge */}
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-2">
+                <button
+                  onClick={() => logout()}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold text-gray-400 hover:text-white transition-colors border border-white/10 hover:border-white/20"
+                >
+                  <LogOut className="w-4 h-4" /> Logout
+                </button>
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 text-green-300">
+                  <Crown className="w-4 h-4" />
+                  Pro
+                </div>
               </div>
             </div>
+          </nav>
+          
+          <div className="pt-20">
+            <ProDashboard />
           </div>
-        </nav>
-        
-        <div className="pt-20">
-          <ProDashboard />
+          </div> {/* Close blur wrapper */}
         </div>
-        </div> {/* Close blur wrapper */}
-      </div>
-    );
+      );
+    } catch (error) {
+      console.error('❌ Error rendering Pro Dashboard:', error);
+      return (
+        <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center p-8">
+          <div className="max-w-md text-center">
+            <h2 className="text-2xl font-bold mb-4">Erreur de chargement du Mode Pro</h2>
+            <p className="text-gray-400 mb-4">Une erreur s'est produite lors du chargement du tableau de bord professionnel.</p>
+            <pre className="bg-black/50 p-4 rounded text-left text-sm overflow-auto mb-4">
+              {error instanceof Error ? error.message : String(error)}
+            </pre>
+            <button
+              onClick={() => setMode('personal')}
+              className="px-6 py-3 bg-green-500 rounded-lg hover:bg-green-600 transition-colors"
+            >
+              Retour au mode personnel
+            </button>
+          </div>
+        </div>
+      );
+    }
   }
 
-  const totalCount =
-    activeSection === "followers"   ? stats.totalFollowers :
-    activeSection === "unfollowers" ? stats.totalUnfollowers :
-    stats.totalBlockers;
+  // Debug: afficher les données
+  console.log('📊 Section Data:', {
+    activeSection,
+    totalCount,
+    unfollowerStatsData,
+    ghostFollowersData,
+    unfollowersData,
+    'stats.totalBlockers': stats.totalBlockers,
+    'stats.totalUnfollowers': stats.totalUnfollowers,
+  });
+
+  // Calculer le delta (évolution depuis hier ou le jour précédent)
+  const sectionKey = activeSection === "followers" ? "followers" : activeSection === "unfollowers" ? "unfollowers" : "blockers";
+  const todayData = filteredChartData[filteredChartData.length - 1];
+  const yesterdayData = filteredChartData[filteredChartData.length - 2];
+  const todayCount = todayData?.[sectionKey] || 0;
+  const yesterdayCount = yesterdayData?.[sectionKey] || 0;
+  const delta = todayCount - yesterdayCount;
+  const previousTotal = totalCount - todayCount;
 
   const maxCount = Math.max(stats.totalFollowers, stats.totalUnfollowers, stats.totalBlockers, 1);
   const arcPercent = Math.min(totalCount / maxCount, 1);
   const { arcColor } = SECTION_CONFIG[activeSection];
 
+  // Utiliser les nouvelles données unfollowers avec status
   const sectionAccounts =
     activeSection === "followers"   ? stats.recentFollowers :
-    activeSection === "unfollowers" ? stats.recentUnfollowers :
-    stats.recentBlockers;
+    activeSection === "unfollowers" ? (unfollowersData?.unfollowers || stats.recentUnfollowers) :
+    (ghostFollowersData?.ghostFollowers || stats.recentBlockers);
 
   const dayAccounts = clickedDay !== null
-    ? stats.recentUnfollowers.filter(u => {
-        const d = new Date(u.detectedAt || new Date());
+    ? (activeSection === "followers" 
+        ? stats.recentFollowers 
+        : activeSection === "unfollowers" 
+          ? (unfollowersData?.unfollowers || stats.recentUnfollowers)
+          : (ghostFollowersData?.ghostFollowers || stats.recentBlockers)
+      ).filter((acc: any) => {
+        const d = new Date(acc.detectedAt || acc.detected_at || new Date());
         return d.getDate() === clickedDay && d.getMonth() === monthIndex;
       })
     : [];
@@ -858,6 +1032,17 @@ export default function Dashboard() {
             >
               <div className="font-doppio text-white uppercase leading-none text-center" style={{ fontSize: "30px" }}>TOTAL</div>
               <div className="font-doppio text-white leading-none text-center" style={{ fontSize: "112px", lineHeight: 1 }}>{totalCount}</div>
+              {delta !== 0 && (
+                <div className="flex items-center justify-center gap-2 mt-2">
+                  <span className="text-gray-400 text-sm font-mono">{previousTotal}</span>
+                  <span className={`text-2xl ${delta > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {delta > 0 ? '↗' : '↘'}
+                  </span>
+                  <span className={`text-sm font-mono font-bold ${delta > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {delta > 0 ? '+' : ''}{delta}
+                  </span>
+                </div>
+              )}
               <div className={`font-doppio mt-1 text-center ${SECTION_CONFIG[activeSection].textColor}`} style={{ fontSize: "30px", lineHeight: 1 }}>
                 {SECTION_CONFIG[activeSection].label}
               </div>
@@ -961,6 +1146,7 @@ export default function Dashboard() {
                   axisLine={false}
                   tickLine={false}
                   tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 10 }}
+                  allowDecimals={false}
                   label={{ 
                     value: activeSection === "followers" ? "FOLLOWERS" : activeSection === "unfollowers" ? "UNFOLLOWERS" : "BLOCKERS", 
                     angle: -90, 
@@ -972,10 +1158,28 @@ export default function Dashboard() {
                 <Tooltip
                   cursor={{ fill: "rgba(255,255,255,0.05)" }}
                   contentStyle={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, color: "#fff", fontSize: 12 }}
-                  formatter={(value: any, name: string) => [
-                    value, 
-                    activeSection === "followers" ? "Followers" : activeSection === "unfollowers" ? "Unfollowers" : "Blockers"
-                  ]}
+                  formatter={(value: any, name: string, props: any) => {
+                    const sectionKey = activeSection === "followers" ? "followers" : activeSection === "unfollowers" ? "unfollowers" : "blockers";
+                    const currentDayValue = props.payload[sectionKey] || 0;
+                    
+                    // Calculer le total cumulé jusqu'à ce jour
+                    const currentIndex = filteredChartData.findIndex(d => d.day === props.payload.day);
+                    const cumulativeTotal = filteredChartData
+                      .slice(0, currentIndex + 1)
+                      .reduce((sum, d) => sum + (d[sectionKey] || 0), 0);
+                    
+                    const label = activeSection === "followers" ? "Followers" : activeSection === "unfollowers" ? "Unfollowers" : "Blockers";
+                    const sign = currentDayValue > 0 ? "+" : "";
+                    const textColor = activeSection === "followers" ? "text-[#02c950]" : activeSection === "unfollowers" ? "text-amber-500" : "text-gray-300";
+                    
+                    return [
+                      <div key="tooltip-content" className="flex flex-col gap-1">
+                        <div className={`font-bold ${textColor}`}>{sign}{currentDayValue} {label.toLowerCase()}</div>
+                        <div className="text-xs text-gray-400">Total: {cumulativeTotal}</div>
+                      </div>,
+                      ""
+                    ];
+                  }}
                   labelFormatter={(label) => period === "year" ? label : `Day ${label}`}
                 />
                 <Bar 
@@ -987,7 +1191,7 @@ export default function Dashboard() {
                     const barColor = 
                       activeSection === "followers" ? "rgba(34,197,94,0.6)" : 
                       activeSection === "unfollowers" ? "rgba(239,68,68,0.6)" : 
-                      "rgba(168,85,247,0.6)";
+                      "rgba(255,255,255,0.6)";
                     
                     return (
                       <Cell
@@ -1013,24 +1217,43 @@ export default function Dashboard() {
               >
                 <div className="pt-3">
                   <div className="text-xs font-bold text-gray-400 mb-2">
-                    {activeSection === "followers" ? "Followers" : activeSection === "unfollowers" ? "Unfollowers" : "Blockers"} on day {clickedDay}
+                    {activeSection === "followers" ? "Followers" : activeSection === "unfollowers" ? "Unfollowers" : "Blockers"} {period === "year" ? `in ${MONTHS[clickedDay - 1]}` : `on day ${clickedDay}`}
                   </div>
                   {dayAccounts.length === 0 ? (
                     <div className="text-xs text-gray-500">
-                      No {activeSection === "followers" ? "followers" : activeSection === "unfollowers" ? "unfollowers" : "blockers"} this day
+                      No {activeSection === "followers" ? "followers" : activeSection === "unfollowers" ? "unfollowers" : "blockers"} {period === "year" ? "this month" : "this day"}
                     </div>
                   ) : (
                     <div className="flex flex-wrap gap-2">
-                      {dayAccounts.map((acc) => (
-                        <div key={acc.id} className="flex items-center gap-2 bg-white/5 rounded-full px-3 py-1">
-                          <img
-                            src={acc.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${acc.username}`}
-                            className="w-5 h-5 rounded-full"
-                            alt={acc.username}
-                          />
-                          <span className="text-xs font-medium">@{acc.username}</span>
+                      {dayAccounts.slice(0, activeSection === 'followers' ? 5 : dayAccounts.length).map((acc) => {
+                        const isUnlocked = activeSection === 'followers' ? true : isAccountUnlocked(acc.id);
+                        return (
+                          <div 
+                            key={acc.id} 
+                            onClick={() => !isUnlocked && handleUnlockRequest(acc)}
+                            className={`flex items-center gap-2 bg-white/5 rounded-full px-3 py-1 ${!isUnlocked ? 'cursor-pointer hover:bg-white/10 transition-colors' : ''}`}
+                          >
+                            <img
+                              src={isUnlocked ? (acc.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${acc.username}`) : `https://api.dicebear.com/7.x/avataaars/svg?seed=locked`}
+                              className="w-5 h-5 rounded-full"
+                              alt={isUnlocked ? acc.username : "locked"}
+                            />
+                            {isUnlocked ? (
+                              <span className="text-xs font-medium">@{acc.username}</span>
+                            ) : (
+                              <div className="flex items-center gap-1">
+                                <span className="text-xs font-medium text-gray-400">@???</span>
+                                <Lock className="w-3 h-3 text-gray-500" />
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                      {activeSection === 'followers' && dayAccounts.length > 5 && (
+                        <div className="flex items-center gap-2 bg-white/5 rounded-full px-3 py-1 text-xs font-medium text-gray-400">
+                          + {dayAccounts.length - 5} followers
                         </div>
-                      ))}
+                      )}
                     </div>
                   )}
                 </div>
@@ -1059,7 +1282,7 @@ export default function Dashboard() {
             >
               <div className="flex items-center justify-between p-6 border-b border-white/10">
                 <h2 className="text-lg font-black">
-                  {SECTION_CONFIG[activeSection].label} — {period === "month" ? MONTHS[monthIndex] : "Year"}
+                  {SECTION_CONFIG[activeSection].label}
                 </h2>
                 <button onClick={() => setShowAccountsList(false)} className="text-gray-400 hover:text-white">
                   <X className="w-5 h-5" />
@@ -1069,32 +1292,55 @@ export default function Dashboard() {
                 {sectionAccounts.length === 0 ? (
                   <div className="text-center text-gray-500 py-10">No accounts found</div>
                 ) : (
-                  sectionAccounts.map((acc) => (
-                    <div 
-                      key={acc.id} 
-                      onClick={() => {
-                        if (activeSection === 'unfollowers') {
-                          setSelectedUnfollower(acc);
-                          setShowAccountsList(false);
-                        }
-                      }}
-                      className={`flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all ${
-                        activeSection === 'unfollowers' ? 'cursor-pointer' : ''
-                      }`}
-                    >
-                      <img
-                        src={acc.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${acc.username}`}
-                        alt={acc.username}
-                        className="w-10 h-10 rounded-full border border-white/10 object-cover"
-                      />
-                      <div>
-                        <div className="font-bold text-sm">@{acc.username}</div>
-                        <div className="text-xs text-gray-500">
-                          {new Date(acc.detectedAt || new Date()).toLocaleDateString("fr-FR")}
+                  sectionAccounts.map((acc) => {
+                    // Les followers sont toujours débloqués, seuls les unfollowers et blockers peuvent être verrouillés
+                    const isUnlocked = activeSection === 'followers' ? true : isAccountUnlocked(acc.id);
+                    return (
+                      <div 
+                        key={acc.id} 
+                        onClick={() => {
+                          if (!isUnlocked) {
+                            handleUnlockRequest(acc);
+                          } else if (activeSection === 'unfollowers') {
+                            setSelectedUnfollower(acc);
+                            setShowAccountsList(false);
+                          }
+                        }}
+                        className={`flex items-center gap-3 p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-all cursor-pointer`}
+                      >
+                        <img
+                          src={isUnlocked ? (acc.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${acc.username}`) : `https://api.dicebear.com/7.x/avataaars/svg?seed=locked`}
+                          alt={isUnlocked ? acc.username : "locked"}
+                          className="w-10 h-10 rounded-full border border-white/10 object-cover"
+                        />
+                        <div className="flex-1">
+                          {isUnlocked ? (
+                            <>
+                              <div className="font-bold text-sm">@{acc.username}</div>
+                              <div className="text-xs text-gray-500">
+                                {new Date(acc.detectedAt || acc.detected_at || new Date()).toLocaleDateString("fr-FR")}
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="font-bold text-sm flex items-center gap-2">
+                                <span className="text-gray-400">@???</span>
+                                <Lock className="w-4 h-4 text-gray-500" />
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                Cliquez pour révéler
+                              </div>
+                            </>
+                          )}
                         </div>
+                        {isUnlocked && activeSection === 'blockers' && acc.status && (
+                          <div className="text-xs px-2 py-1 rounded-full bg-white/10">
+                            {acc.status === 'blocked' ? '🚫 Bloqué' : '❌ Supprimé'}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
             </motion.div>
@@ -1106,10 +1352,20 @@ export default function Dashboard() {
       {showRevealGate && (
         <RevealGate
           onReveal={() => {
-            setShowRevealGate(false);
-            setShowAccountsList(true);
+            if (accountToUnlock) {
+              // Débloquer le compte spécifique
+              handleRevealComplete();
+            } else {
+              // Débloquer TOUS les comptes après le questionnaire "Your Circle"
+              unlockAllMutation.mutate();
+              setShowRevealGate(false);
+              setShowAccountsList(true);
+            }
           }}
-          onClose={() => setShowRevealGate(false)}
+          onClose={() => {
+            setShowRevealGate(false);
+            setAccountToUnlock(null);
+          }}
         />
       )}
 

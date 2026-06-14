@@ -35,7 +35,9 @@ export const unfollowers = pgTable("unfollowers", {
   userId: integer("user_id").notNull(),
   username: text("username").notNull(),
   avatarUrl: text("avatar_url"),
+  status: text("status").notNull().default("unfollowed"), // unfollowed, blocked, deleted
   detectedAt: timestamp("detected_at").defaultNow(),
+  verifiedAt: timestamp("verified_at"),
 });
 
 export const followers = pgTable("followers", {

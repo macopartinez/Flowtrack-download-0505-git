@@ -41,21 +41,66 @@ def get_conn():
     return psycopg2.connect(DATABASE_URL)
 
 
-def get_pending_check_b_events(conn):
-    """Récupère les Events avec needsCheckB=true et status='pending'."""
-    with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-        cur.execute("""
-            SELECT e.id AS event_id,
-                   e."clientId" AS client_id,
-                   c."instagramUsername" AS client_username
-            FROM "Event" e
-            JOIN "Client" c ON c.id = e."clientId"
-            WHERE e."needsCheckB" = true
-              AND e.status = 'pending'
-            ORDER BY e."createdAt" ASC
-            LIMIT 5
-        """)
-        return cur.fetchall()
+def get_queue_files():
+    """Récupère les fichiers de queue JSON."""
+    queue_files = list(Path('.').glob('agent-b-queue-*.json'))
+    log.info(f"Trouvé {len(queue_files)} fichier(s) de queue")
+    return queue_files
+
+
+def load_queue_file(queue_file):
+    """Charge un fichier de queue JSON."""
+    try:
+        with open(queue_file, 'r') as f:
+            data = json.load(f)
+        log.info(f"Queue chargée depuis {queue_file}")
+        return data
+    except Exception as e:
+        log.error(f"Erreur lors du chargement de {queue_file}: {e}")
+        return None
+
+
+def delete_queue_file(queue_file):
+    """Supprime un fichier de queue après traitement."""
+    try:
+        queue_file.unlink()
+        log.info(f"Queue supprimée: {queue_file}")
+    except Exception as e:
+        log.error(f"Erreur lors de la suppression de {queue_file}: {e}")
+
+
+def save_unfollower_result(conn, user_id: int, username: str, status: str):
+    """Sauvegarde le résultat de vérification dans la table unfollowers."""
+    try:
+        with conn.cursor() as cur:
+            # Vérifier si l'unfollower existe déjà
+            cur.execute("""
+                SELECT id FROM unfollowers 
+                WHERE user_id = %s AND username = %s
+            """, (user_id, username))
+            
+            existing = cur.fetchone()
+            
+            if not existing:
+                # Insérer avec le status
+                cur.execute("""
+                    INSERT INTO unfollowers (user_id, username, status, detected_at, verified_at)
+                    VALUES (%s, %s, %s, NOW(), NOW())
+                """, (user_id, username, status))
+                log.info(f"✅ Unfollower créé: @{username} → {status}")
+            else:
+                # Mettre à jour le status et verified_at
+                cur.execute("""
+                    UPDATE unfollowers 
+                    SET status = %s, verified_at = NOW()
+                    WHERE user_id = %s AND username = %s
+                """, (status, user_id, username))
+                log.info(f"✅ Unfollower mis à jour: @{username} → {status}")
+        
+        conn.commit()
+    except Exception as e:
+        log.error(f"❌ Erreur lors de la sauvegarde de @{username}: {e}")
+        conn.rollback()
 
 
 def get_missing_followers(conn, client_id: str):
@@ -151,6 +196,35 @@ async def human_break(duration_min=2, duration_max=5):
     await asyncio.sleep(delay)
 
 
+async def search_username_on_google(page, username: str) -> bool:
+    """
+    Recherche un username sur Google avec site:instagram.com
+    Retourne True si trouvé, False sinon
+    """
+    try:
+        await human_delay(2, 4)
+        
+        search_query = f"site:instagram.com {username}"
+        log.info(f"Recherche Google: {search_query}")
+        
+        await page.goto(f"https://www.google.com/search?q={search_query}", wait_until="domcontentloaded")
+        await human_delay(2, 4)
+        
+        content = await page.content()
+        
+        # Vérifier si des résultats Instagram sont présents
+        if f"instagram.com/{username}" in content.lower():
+            log.info(f"@{username} trouvé sur Google (compte existe)")
+            return True
+        else:
+            log.info(f"@{username} non trouvé sur Google (compte supprimé)")
+            return False
+    
+    except Exception as e:
+        log.error(f"Erreur lors de la recherche Google de @{username}: {e}")
+        return False
+
+
 async def detect_unfollow_type(page, username: str) -> str:
     """
     Vérifie le profil Instagram et détermine le type d'unfollow.
@@ -164,24 +238,46 @@ async def detect_unfollow_type(page, username: str) -> str:
         await human_delay(3, 6)
         
         content = await page.content()
+        page_html = await page.inner_html('body')
         
         # Détecter le type
-        if "Vous ne pouvez pas accéder" in content or "You can't access" in content:
-            log.info(f"@{username} : Compte bloqué")
+        # Si l'Agent B est appelé, c'est que l'extension n'a PAS trouvé le profil (not found)
+        # Donc si l'Agent B trouve le profil → l'utilisateur est BLOQUÉ
+        
+        if "Vous ne pouvez pas accéder" in content or "You can't access" in content or "This Account is Private" in content:
+            log.info(f"@{username} : Compte bloqué (message explicite)")
             return 'blocked'
-        elif "Utilisateur introuvable" in content or "Sorry, this page" in content or "Page not found" in content:
-            log.info(f"@{username} : Compte supprimé")
+        elif ("Utilisateur introuvable" in content or 
+              "Sorry, this page" in content or 
+              "isn't available" in content or
+              "Page not found" in content or
+              "Page Not Found" in page_html):
+            log.info(f"@{username} : Compte supprimé (page introuvable)")
             return 'deleted'
-        elif username.lower() in content.lower():
-            log.info(f"@{username} : Unfollow simple (profil existe)")
-            return 'unfollow'
         else:
-            log.warning(f"@{username} : Type inconnu, considéré comme unfollow")
-            return 'unfollow'
+            # L'extension n'a pas trouvé le profil, mais l'Agent B le trouve
+            # → L'utilisateur est BLOQUÉ par le compte principal
+            log.info(f"@{username} : Bloqué (profil existe pour Agent B mais pas pour l'utilisateur)")
+            return 'blocked'
     
     except Exception as e:
         log.error(f"Erreur lors de la vérification de @{username}: {e}")
         return 'unfollow'  # Par défaut
+
+
+async def verify_missing_via_google(page, username: str) -> str:
+    """
+    Vérifie un username non trouvé sur Instagram via recherche Google.
+    Retourne: 'blocked' si trouvé sur Google, 'deleted' sinon
+    """
+    found_on_google = await search_username_on_google(page, username)
+    
+    if found_on_google:
+        log.info(f"@{username} : Bloqué (trouvé sur Google mais pas sur Instagram)")
+        return 'blocked'
+    else:
+        log.info(f"@{username} : Compte supprimé (non trouvé nulle part)")
+        return 'deleted'
 
 
 async def run_check_async():
@@ -192,14 +288,14 @@ async def run_check_async():
     try:
         update_agent_heartbeat(conn)
         
-        # Récupérer les Events en attente
-        events = get_pending_check_b_events(conn)
+        # Récupérer les fichiers de queue
+        queue_files = get_queue_files()
         
-        if not events:
-            log.info("Aucun Event à traiter")
+        if not queue_files:
+            log.info("Aucune queue à traiter")
             return
         
-        log.info(f"{len(events)} Event(s) à traiter")
+        log.info(f"{len(queue_files)} queue(s) à traiter")
 
         async with async_playwright() as p:
             # Lancer le navigateur (toujours visible)
@@ -241,55 +337,52 @@ async def run_check_async():
                 # Sauvegarder les cookies après connexion
                 await save_session_cookies(context)
             
-            # Traiter chaque Event
-            for event in events:
-                event_id = event['event_id']
-                client_id = event['client_id']
+            # Traiter chaque fichier de queue
+            for queue_file in queue_files:
+                queue_data = load_queue_file(queue_file)
                 
-                log.info(f"Traitement de l'Event {event_id} pour client {client_id}")
-                
-                # Récupérer les followers manquants
-                missing_followers = get_missing_followers(conn, client_id)
-                
-                if not missing_followers:
-                    log.warning(f"Aucun follower manquant trouvé pour l'Event {event_id}")
-                    update_event_status(conn, event_id, 'processed')
+                if not queue_data:
                     continue
                 
-                log.info(f"{len(missing_followers)} follower(s) manquant(s) à vérifier")
+                user_id = queue_data.get('userId')
+                missing_usernames = queue_data.get('missingUsernames', [])
                 
-                # Limiter le nombre de vérifications par session
-                followers_to_check = missing_followers[:MAX_CHECKS_PER_SESSION]
-                if len(missing_followers) > MAX_CHECKS_PER_SESSION:
-                    log.warning(f"Limitation à {MAX_CHECKS_PER_SESSION} vérifications (sur {len(missing_followers)} total)")
+                log.info(f"Traitement de la queue pour user {user_id}")
+                log.info(f"{len(missing_usernames)} username(s) à vérifier")
                 
-                # Vérifier chaque follower manquant
-                for idx, follower in enumerate(followers_to_check, 1):
-                    username = follower['followerUsername']
-                    user_id = follower.get('followerUserId')
-                    
+                if not missing_usernames:
+                    log.warning(f"Aucun username à vérifier dans {queue_file}")
+                    delete_queue_file(queue_file)
+                    continue
+                
+                # Limiter le nombre de vérifications
+                usernames_to_check = missing_usernames[:MAX_CHECKS_PER_SESSION]
+                if len(missing_usernames) > MAX_CHECKS_PER_SESSION:
+                    log.warning(f"Limitation à {MAX_CHECKS_PER_SESSION} vérifications (sur {len(missing_usernames)} total)")
+                
+                # Vérifier chaque username via navigation directe Instagram
+                for idx, username in enumerate(usernames_to_check, 1):
                     # Délai humain entre chaque vérification
                     if idx > 1:
-                        await human_delay(8, 20)
+                        await human_delay(5, 10)
                     
-                    log.info(f"Vérification {idx}/{len(followers_to_check)}: @{username}")
+                    log.info(f"Vérification Instagram {idx}/{len(usernames_to_check)}: @{username}")
                     
-                    # Détecter le type d'unfollow
+                    # Navigation directe vers le profil pour déterminer blocked/deleted/unfollowed
                     unfollow_type = await detect_unfollow_type(page, username)
                     
-                    # Sauvegarder dans UnfollowList
-                    save_unfollow(conn, client_id, username, user_id, unfollow_type, event_id)
+                    log.info(f"@{username} : {unfollow_type}")
                     
-                    # Mettre à jour le FollowerSnapshot
-                    update_follower_status(conn, client_id, username, unfollow_type)
+                    # Sauvegarder dans la base de données
+                    save_unfollower_result(conn, user_id, username, unfollow_type)
                     
-                    # Pause tous les 3-5 comptes
-                    if idx % random.randint(3, 5) == 0 and idx < len(followers_to_check):
-                        await human_break(duration_min=1, duration_max=3)
+                    # Pause tous les 5 comptes
+                    if idx % 5 == 0 and idx < len(usernames_to_check):
+                        await human_break(duration_min=1, duration_max=2)
                 
-                # Marquer l'Event comme traité
-                update_event_status(conn, event_id, 'processed')
-                log.info(f"Event {event_id} traité avec succès")
+                # Supprimer le fichier de queue après traitement
+                delete_queue_file(queue_file)
+                log.info(f"Queue {queue_file} traitée avec succès")
             
             # Sauvegarder les cookies avant de fermer
             await save_session_cookies(context)

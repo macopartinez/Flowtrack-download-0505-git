@@ -271,58 +271,6 @@ export function ProDashboard() {
     setSelectedPerson(null);
   };
 
-  // Filter people by active filter
-  const filteredPeople = people.filter(person => {
-    // Apply tag filter
-    if (activeFilter !== 'all' && !person.tags.includes(activeFilter)) {
-      return false;
-    }
-
-    // Apply search
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return (
-        person.displayName.toLowerCase().includes(query) ||
-        person.instagramUsername.toLowerCase().includes(query) ||
-        (person.sector && person.sector.toLowerCase().includes(query))
-      );
-    }
-
-    return true;
-  });
-
-  // People stats (dynamic based on filter)
-  const getFilteredStats = () => {
-    const filtered = activeFilter === 'all' ? people : people.filter(p => p.tags.includes(activeFilter));
-    
-    const totalPeople = filtered.length;
-    const prospects = filtered.filter(p => p.tags.includes('prospect'));
-    const vipPeople = filtered.filter(p => p.tags.includes('vip'));
-    const mutualPeople = filtered.filter(p => p.followsYou && p.youFollow);
-    const convertedPeople = filtered.filter(p => p.converted);
-    
-    const avgScore = prospects.length > 0
-      ? Math.round(prospects.reduce((sum, p) => sum + (p.score || 0), 0) / prospects.length)
-      : 0;
-    
-    const avgHealthScore = filtered.filter(p => p.healthScore !== undefined).length > 0
-      ? Math.round(filtered.reduce((sum, p) => sum + (p.healthScore || 0), 0) / filtered.filter(p => p.healthScore !== undefined).length)
-      : 0;
-
-    return {
-      totalPeople,
-      prospects: prospects.length,
-      vipPeople: vipPeople.length,
-      mutualPeople: mutualPeople.length,
-      convertedPeople: convertedPeople.length,
-      conversionRate: prospects.length > 0 ? Math.round((convertedPeople.length / prospects.length) * 100) : 0,
-      avgScore,
-      avgHealthScore
-    };
-  };
-
-  const stats = getFilteredStats();
-
   // Client handlers
   const handleAddClient = async (newClient: NewClientData) => {
     try {
@@ -394,6 +342,69 @@ export function ProDashboard() {
     setClients(clients.filter(c => c.id !== client.id));
   };
 
+  const handleUpdateClient = (updatedClient: Client) => {
+    setClients(clients.map(c => c.id === updatedClient.id ? updatedClient : c));
+    setSelectedClient(null);
+  };
+
+  const handleDeleteClient = (clientId: string) => {
+    setClients(clients.filter(c => c.id !== clientId));
+    setSelectedClient(null);
+  };
+
+  // Filter people by active filter (MUST BE BEFORE EARLY RETURNS)
+  const filteredPeople = people.filter(person => {
+    // Apply tag filter
+    if (activeFilter !== 'all' && !person.tags.includes(activeFilter)) {
+      return false;
+    }
+
+    // Apply search
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return (
+        person.displayName.toLowerCase().includes(query) ||
+        person.instagramUsername.toLowerCase().includes(query) ||
+        (person.sector && person.sector.toLowerCase().includes(query))
+      );
+    }
+
+    return true;
+  });
+
+  // People stats (dynamic based on filter) - MUST BE BEFORE EARLY RETURNS
+  const getFilteredStats = () => {
+    const filtered = activeFilter === 'all' ? people : people.filter(p => p.tags.includes(activeFilter));
+    
+    const totalPeople = filtered.length;
+    const prospects = filtered.filter(p => p.tags.includes('prospect'));
+    const vipPeople = filtered.filter(p => p.tags.includes('vip'));
+    const mutualPeople = filtered.filter(p => p.followsYou && p.youFollow);
+    const convertedPeople = filtered.filter(p => p.converted);
+    
+    const avgScore = prospects.length > 0
+      ? Math.round(prospects.reduce((sum, p) => sum + (p.score || 0), 0) / prospects.length)
+      : 0;
+    
+    const avgHealthScore = filtered.filter(p => p.healthScore !== undefined).length > 0
+      ? Math.round(filtered.reduce((sum, p) => sum + (p.healthScore || 0), 0) / filtered.filter(p => p.healthScore !== undefined).length)
+      : 0;
+
+    return {
+      totalPeople,
+      prospects: prospects.length,
+      vipPeople: vipPeople.length,
+      mutualPeople: mutualPeople.length,
+      convertedPeople: convertedPeople.length,
+      conversionRate: prospects.length > 0 ? Math.round((convertedPeople.length / prospects.length) * 100) : 0,
+      avgScore,
+      avgHealthScore
+    };
+  };
+
+  const stats = getFilteredStats();
+
+  // Client filtering - MUST BE BEFORE EARLY RETURNS
   const filteredClients = clients.filter(client =>
     client.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     client.instagramUsername.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -406,17 +417,9 @@ export function ProDashboard() {
     ? Math.round(clients.reduce((sum, c) => sum + c.currentFollowers, 0) / totalClients)
     : 0;
 
-  const handleUpdateClient = (updatedClient: Client) => {
-    setClients(clients.map(c => c.id === updatedClient.id ? updatedClient : c));
-    setSelectedClient(null);
-  };
+  // NOW we can do early returns - ALL HOOKS HAVE BEEN CALLED
+  console.log('🔍 ProDashboard render - selectedPerson:', selectedPerson ? selectedPerson.displayName : 'null');
 
-  const handleDeleteClient = (clientId: string) => {
-    setClients(clients.filter(c => c.id !== clientId));
-    setSelectedClient(null);
-  };
-
-  // Show detail views
   if (selectedClient) {
     console.log('📋 Rendering ClientDetailView for:', selectedClient.displayName);
     return (
@@ -428,8 +431,6 @@ export function ProDashboard() {
       />
     );
   }
-
-  console.log('🔍 ProDashboard render - selectedPerson:', selectedPerson ? selectedPerson.displayName : 'null');
 
   if (selectedPerson) {
     console.log('👤 EARLY RETURN - Rendering PersonDetailView for:', selectedPerson.displayName, selectedPerson);
@@ -745,7 +746,7 @@ export function ProDashboard() {
                 {!searchQuery && activeFilter === 'all' && (
                   <button
                     onClick={() => setShowAddPerson(true)}
-                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold hover:shadow-[0_0_30px_rgba(147,51,234,0.5)] transition-all"
+                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] transition-all"
                   >
                     Add Your First Person
                   </button>

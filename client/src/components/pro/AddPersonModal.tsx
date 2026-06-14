@@ -92,9 +92,9 @@ export function AddPersonModal({ isOpen, onClose, onAdd }: AddPersonModalProps) 
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             className="fixed inset-0 z-[200] flex items-center justify-center p-4 pointer-events-none"
           >
-            <div className="bg-black border border-white/10 rounded-3xl max-w-lg w-full pointer-events-auto shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="bg-black/80 backdrop-blur-sm border border-white/10 rounded-3xl max-w-lg w-full pointer-events-auto shadow-2xl max-h-[90vh] overflow-y-auto">
               {/* Header */}
-              <div className="border-b border-white/10 p-4 sticky top-0 bg-black z-10">
+              <div className="border-b border-white/10 p-4 sticky top-0 bg-black/80 backdrop-blur-sm z-10">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center">
                     <UserPlus className="w-5 h-5 text-green-400" />
@@ -120,7 +120,7 @@ export function AddPersonModal({ isOpen, onClose, onAdd }: AddPersonModalProps) 
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder="username"
-                      className="w-full pl-12 pr-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-gray-500 focus:outline-none focus:border-green-500 transition-colors text-sm"
+                      className="w-full pl-12 pr-4 py-2 rounded-xl bg-black/80 backdrop-blur-sm border border-white/10 text-white placeholder:text-gray-500 focus:outline-none focus:border-green-500 transition-colors text-sm"
                     />
                   </div>
                 </div>
@@ -149,13 +149,13 @@ export function AddPersonModal({ isOpen, onClose, onAdd }: AddPersonModalProps) 
                     value={sector}
                     onChange={(e) => setSector(e.target.value)}
                     placeholder="e.g., coaching, e-commerce, tech..."
-                    className="w-full px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-gray-500 focus:outline-none focus:border-green-500 transition-colors text-sm"
+                    className="w-full px-4 py-2 rounded-xl bg-black/80 backdrop-blur-sm border border-white/10 text-white placeholder:text-gray-500 focus:outline-none focus:border-green-500 transition-colors text-sm"
                   />
                 </div>
 
                 {/* Follow Status */}
                 <div className="grid grid-cols-2 gap-3">
-                  <label className="flex items-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 cursor-pointer hover:bg-white/10 transition-colors">
+                  <label className="flex items-center gap-2 px-4 py-3 rounded-xl bg-black/80 backdrop-blur-sm border border-white/10 cursor-pointer hover:bg-white/10 transition-colors">
                     <input
                       type="checkbox"
                       checked={followsYou}
@@ -164,7 +164,7 @@ export function AddPersonModal({ isOpen, onClose, onAdd }: AddPersonModalProps) 
                     />
                     <span className="text-sm text-white">Te suit</span>
                   </label>
-                  <label className="flex items-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 cursor-pointer hover:bg-white/10 transition-colors">
+                  <label className="flex items-center gap-2 px-4 py-3 rounded-xl bg-black/80 backdrop-blur-sm border border-white/10 cursor-pointer hover:bg-white/10 transition-colors">
                     <input
                       type="checkbox"
                       checked={youFollow}
@@ -176,7 +176,7 @@ export function AddPersonModal({ isOpen, onClose, onAdd }: AddPersonModalProps) 
                 </div>
 
                 {/* Help Text */}
-                <div className="flex items-start gap-2 px-4 py-3 rounded-xl bg-green-500/10 border border-green-500/20">
+                <div className="flex items-start gap-2 px-4 py-3 rounded-xl bg-black/80 backdrop-blur-sm border border-green-500/20">
                   <Lightbulb className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-green-200">
                     <strong>Astuce :</strong> Coche "Prospect" si tu veux convertir cette personne, 
@@ -208,7 +208,7 @@ export function AddPersonModal({ isOpen, onClose, onAdd }: AddPersonModalProps) 
                       <select
                         value={prospectStatus}
                         onChange={(e) => setProspectStatus(e.target.value as ProspectStatus)}
-                        className="w-full px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-green-500 transition-colors text-sm [&>option]:bg-black [&>option]:text-white"
+                        className="w-full px-4 py-2 rounded-xl bg-black/80 backdrop-blur-sm border border-white/10 text-white focus:outline-none focus:border-green-500 transition-colors text-sm [&>option]:bg-black [&>option]:text-white"
                       >
                         <option value="cold">Froid</option>
                         <option value="warm">Tiède</option>
@@ -254,10 +254,10 @@ export function AddPersonModal({ isOpen, onClose, onAdd }: AddPersonModalProps) 
               </div>
 
               {/* Footer */}
-              <div className="border-t border-white/10 p-4 flex gap-3 sticky bottom-0 bg-black">
+              <div className="border-t border-white/10 p-4 flex gap-3 sticky bottom-0 bg-black/80 backdrop-blur-sm">
                 <button
                   onClick={onClose}
-                  className="flex-1 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium transition-colors text-sm"
+                  className="flex-1 px-4 py-2 rounded-xl bg-black/80 backdrop-blur-sm hover:bg-white/10 text-white font-medium transition-colors text-sm"
                 >
                   Annuler
                 </button>

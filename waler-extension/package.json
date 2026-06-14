@@ -1,0 +1,21 @@
+{
+  "name": "waler-extension",
+  "version": "1.0.0",
+  "description": "Waler Instagram Analytics Extension",
+  "type": "module",
+  "scripts": {
+    "dev": "node build.js",
+    "build": "node build.js",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "webextension-polyfill": "^0.12.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.268",
+    "@types/node": "^20.19.27",
+    "@types/webextension-polyfill": "^0.12.1",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.6.3"
+  }
+}

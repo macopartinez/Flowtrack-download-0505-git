@@ -14,6 +14,8 @@ import HowItWorks from "@/pages/HowItWorks";
 import Privacy from "@/pages/Privacy";
 import PlanComparison from "@/pages/PlanComparison";
 import UpgradeToPro from "@/pages/UpgradeToPro";
+import { ClassificationDashboard } from "@/components/classification/ClassificationDashboard";
+import ExtensionAuth from "@/pages/ExtensionAuth";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -29,6 +31,8 @@ function Router() {
       <Route path="/how-it-works" component={HowItWorks} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/dashboard/:userId" component={Dashboard} />
+      <Route path="/classification" component={ClassificationDashboard} />
+      <Route path="/extension-auth" component={ExtensionAuth} />
       <Route component={NotFound} />
     </Switch>
   );

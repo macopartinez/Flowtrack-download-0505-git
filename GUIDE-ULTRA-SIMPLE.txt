@@ -1,0 +1,118 @@
+================================================================================
+                    GUIDE ULTRA SIMPLE - PAS A PAS
+================================================================================
+
+ETAPE 1 : VERIFIER SI LES IDS ONT ETE TROUVES
+==============================================
+
+1. Ouvrez Instagram dans Chrome
+   -> https://www.instagram.com/
+
+2. Appuyez sur F12
+   -> Une fenetre s'ouvre en bas ou a droite
+
+3. Cliquez sur "Console" (en haut de cette fenetre)
+
+4. Ouvrez le fichier CODE-SIMPLE.txt
+   -> Il est dans: C:\Users\Lenovo\Downloads\FlowTrack\FlowTrack\
+
+5. Copiez TOUT le contenu du fichier
+   -> Ctrl + A puis Ctrl + C
+
+6. Collez dans la console Instagram
+   -> Ctrl + V
+
+7. Appuyez sur Entree
+
+8. Lisez les resultats:
+   -> Si vous voyez "ANALYSE TERMINEE!" et 2 usernames
+   -> Alors OUI, les IDs ont ete trouves!
+   -> Passez a l'ETAPE 2
+
+   -> Si vous voyez "Aucun resultat trouve"
+   -> Alors NON, l'analyse n'a pas ete lancee
+   -> Vous devez lancer l'analyse depuis le popup
+
+
+================================================================================
+
+ETAPE 2 : ENVOYER LES RESULTATS AU BACKEND
+===========================================
+
+(Seulement si l'ETAPE 1 a trouve des resultats)
+
+1. Restez sur la meme page Instagram avec la console ouverte
+
+2. Ouvrez le fichier ENVOYER-RESULTATS-SIMPLE.txt
+   -> Il est dans: C:\Users\Lenovo\Downloads\FlowTrack\FlowTrack\
+
+3. Copiez TOUT le contenu du fichier
+   -> Ctrl + A puis Ctrl + C
+
+4. Collez dans la console Instagram
+   -> Ctrl + V
+
+5. Appuyez sur Entree
+
+6. Attendez quelques secondes
+
+7. Vous devriez voir:
+   -> "OK - Resultats envoyes au backend"
+   -> "OK - Stats mises a jour"
+   -> "OK - Notification envoyee"
+   -> "=== TERMINE ==="
+
+8. Verifiez:
+   -> Ouvrez le popup de l'extension
+   -> Vous devriez voir les unfollowers!
+   -> Le dashboard devrait aussi se mettre a jour
+
+
+================================================================================
+
+EN CAS D'ERREUR
+===============
+
+Si vous voyez "SyntaxError" ou une erreur:
+
+1. Verifiez que vous avez bien copie TOUT le code
+   -> Du debut jusqu'a la fin
+   -> Y compris les parentheses
+
+2. Assurez-vous d'etre sur Instagram
+   -> Pas sur chrome://extensions/
+   -> Mais sur https://www.instagram.com/
+
+3. Essayez de fermer et rouvrir la console
+   -> F12 pour fermer
+   -> F12 pour rouvrir
+   -> Reessayez
+
+
+================================================================================
+
+FICHIERS A UTILISER
+===================
+
+ETAPE 1 : CODE-SIMPLE.txt
+          -> Pour verifier si les IDs ont ete trouves
+
+ETAPE 2 : ENVOYER-RESULTATS-SIMPLE.txt
+          -> Pour envoyer les resultats au backend
+
+
+================================================================================
+
+RESUME RAPIDE
+=============
+
+1. Instagram + F12 + Console
+2. Copier CODE-SIMPLE.txt
+3. Coller + Entree
+4. Lire les resultats
+5. Si OK -> Copier ENVOYER-RESULTATS-SIMPLE.txt
+6. Coller + Entree
+7. Verifier le popup
+
+
+================================================================================

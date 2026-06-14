@@ -1,0 +1,108 @@
+// SCRIPT POUR ENVOYER LES RESULTATS AU BACKEND
+// COPIER TOUT CE CODE ET LE COLLER DANS LA CONSOLE INSTAGRAM
+
+(async function() {
+  console.log("Envoi des resultats en attente...");
+  
+  var state = localStorage.getItem("unfollowerCheckState");
+  
+  if (!state) {
+    console.log("Aucun resultat en attente");
+    return;
+  }
+  
+  var parsed = JSON.parse(state);
+  
+  console.log("\nResultats trouves:");
+  console.log("  - Unfollowed:", parsed.results.unfollowed.length);
+  console.log("  - Blocked:", parsed.results.blocked.length);
+  console.log("  - Not found:", parsed.results.notFoundOnInstagram.length);
+  
+  // 1. Envoyer au backend
+  console.log("\nEnvoi au backend...");
+  
+  try {
+    var response = await chrome.runtime.sendMessage({
+      type: "SEND_UNFOLLOWER_RESULTS",
+      data: {
+        unfollowedUsernames: parsed.results.unfollowed,
+        blockedUsernames: parsed.results.blocked,
+        missingUsernames: parsed.results.notFoundOnInstagram
+      }
+    });
+    
+    if (response && response.success) {
+      console.log("OK - Resultats envoyes au backend");
+    } else {
+      console.log("ERREUR - Echec envoi backend:", response);
+    }
+  } catch (error) {
+    console.log("ERREUR:", error);
+  }
+  
+  // 2. Mettre a jour les stats
+  console.log("\nMise a jour des stats...");
+  
+  var totalUnfollowers = parsed.results.unfollowed.length;
+  var totalBlockers = parsed.results.blocked.length + parsed.results.notFoundOnInstagram.length;
+  
+  try {
+    var updateResponse = await chrome.runtime.sendMessage({
+      type: "UPDATE_UNFOLLOWER_STATS",
+      data: {
+        unfollowers: totalUnfollowers,
+        potentialBlockers: totalBlockers
+      }
+    });
+    
+    if (updateResponse && updateResponse.success) {
+      console.log("OK - Stats mises a jour");
+    } else {
+      console.log("ERREUR - Echec mise a jour stats:", updateResponse);
+    }
+  } catch (error) {
+    console.log("ERREUR:", error);
+  }
+  
+  // 3. Notifier la fin d'analyse
+  console.log("\nEnvoi notification...");
+  
+  try {
+    var completedResponse = await chrome.runtime.sendMessage({
+      type: "ANALYSIS_COMPLETED",
+      data: {
+        unfollowers: totalUnfollowers,
+        blocked: parsed.results.blocked.length,
+        notFound: parsed.results.notFoundOnInstagram.length
+      }
+    });
+    
+    if (completedResponse && completedResponse.success) {
+      console.log("OK - Notification envoyee");
+      console.log("   -> Le popup devrait se rafraichir automatiquement");
+      console.log("   -> Le dashboard devrait se rafraichir automatiquement");
+    } else {
+      console.log("ERREUR - Echec notification:", completedResponse);
+    }
+  } catch (error) {
+    console.log("ERREUR:", error);
+  }
+  
+  // 4. Nettoyer
+  console.log("\nNettoyage...");
+  localStorage.removeItem("unfollowerCheckState");
+  await chrome.storage.local.set({ isAnalyzing: false });
+  console.log("OK - Etat nettoye");
+  
+  console.log("\n=== TERMINE ===");
+  console.log("\nVerifiez maintenant:");
+  console.log("1. Ouvrez le popup de l'extension");
+  console.log("   -> Vous devriez voir", totalUnfollowers, "unfollower(s)");
+  console.log("2. Ouvrez le dashboard");
+  console.log("   -> Il devrait afficher les nouvelles stats");
+  
+  return {
+    unfollowers: totalUnfollowers,
+    blockers: totalBlockers
+  };
+})();

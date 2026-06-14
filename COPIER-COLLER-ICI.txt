@@ -1,0 +1,125 @@
+================================================================================
+  VERIFICATION DES IDS DES UNFOLLOWERS
+================================================================================
+
+ETAPE 1 : Ouvrir Instagram
+---------------------------
+1. Allez sur https://www.instagram.com/
+2. Connectez-vous si necessaire
+
+ETAPE 2 : Ouvrir la console
+----------------------------
+1. Appuyez sur F12 (ou clic droit > Inspecter)
+2. Cliquez sur l'onglet "Console"
+
+ETAPE 3 : Copier-coller ce code
+--------------------------------
+Selectionnez TOUT le code ci-dessous (de la ligne "(" jusqu'a ");")
+puis copiez (Ctrl+C) et collez dans la console (Ctrl+V)
+
+
+(function checkUnfollowerIds() {
+  console.log('Verification des IDs des unfollowers...\n');
+
+  const state = localStorage.getItem('unfollowerCheckState');
+  
+  if (!state) {
+    console.log('Aucun resultat trouve dans localStorage');
+    console.log('L analyse n a peut-etre pas ete lancee ou a ete nettoyee');
+    return null;
+  }
+
+  const parsed = JSON.parse(state);
+  
+  console.log('ETAT DE L ANALYSE:');
+  console.log('  - Username:', parsed.myUsername);
+  console.log('  - Progression:', parsed.currentIndex + '/' + (parsed.missingFollowers?.length || 0));
+  console.log('  - Followers manquants:', parsed.missingFollowers);
+  
+  console.log('\nRESULTATS:');
+  console.log('  - Unfollowed:', parsed.results.unfollowed.length);
+  console.log('  - Blocked:', parsed.results.blocked.length);
+  console.log('  - Not found:', parsed.results.notFoundOnInstagram.length);
+  
+  console.log('\n' + '='.repeat(60));
+  console.log('DETAILS DES UNFOLLOWERS:');
+  console.log('='.repeat(60));
+  
+  if (parsed.results.unfollowed.length > 0) {
+    console.log('\nUNFOLLOWED (IDs trouves):');
+    parsed.results.unfollowed.forEach(function(username, index) {
+      console.log('   ' + (index + 1) + '. @' + username);
+    });
+    console.log('\n   Ces comptes existent toujours sur Instagram');
+    console.log('   Ils vous ont simplement unfollow');
+  }
+  
+  if (parsed.results.blocked.length > 0) {
+    console.log('\nBLOCKED (IDs trouves mais compte prive/bloque):');
+    parsed.results.blocked.forEach(function(username, index) {
+      console.log('   ' + (index + 1) + '. @' + username);
+    });
+    console.log('\n   Ces comptes existent mais vous ne pouvez pas y acceder');
+  }
+  
+  if (parsed.results.notFoundOnInstagram.length > 0) {
+    console.log('\nNOT FOUND (IDs non trouves):');
+    parsed.results.notFoundOnInstagram.forEach(function(username, index) {
+      console.log('   ' + (index + 1) + '. @' + username);
+    });
+    console.log('\n   Ces comptes n existent plus sur Instagram');
+  }
+  
+  const total = parsed.results.unfollowed.length + 
+                parsed.results.blocked.length + 
+                parsed.results.notFoundOnInstagram.length;
+  
+  console.log('\n' + '='.repeat(60));
+  console.log('RESUME:');
+  console.log('='.repeat(60));
+  console.log('\nTotal d unfollowers detectes: ' + total);
+  console.log('   - Unfollowed: ' + parsed.results.unfollowed.length);
+  console.log('   - Blocked: ' + parsed.results.blocked.length);
+  console.log('   - Not found: ' + parsed.results.notFoundOnInstagram.length);
+  
+  if (parsed.currentIndex >= parsed.missingFollowers.length) {
+    console.log('\nANALYSE TERMINEE');
+    console.log('Tous les unfollowers ont ete verifies');
+    
+    if (total === 2) {
+      console.log('\nPARFAIT! Les 2 unfollowers manquants ont ete identifies:');
+      const allUnfollowers = [].concat(
+        parsed.results.unfollowed,
+        parsed.results.blocked,
+        parsed.results.notFoundOnInstagram
+      );
+      allUnfollowers.forEach(function(username, index) {
+        console.log('   ' + (index + 1) + '. @' + username);
+      });
+    }
+    
+    console.log('\nPROCHAINES ETAPES:');
+    console.log('   1. Les IDs ont ete trouves');
+    console.log('   2. MAIS les resultats n ont pas ete envoyes au backend');
+    console.log('   3. Consultez le fichier: send-pending-results.js');
+  } else {
+    console.log('\nANALYSE INCOMPLETE');
+    console.log('Progression: ' + parsed.currentIndex + '/' + parsed.missingFollowers.length);
+  }
+  
+  return parsed;
+})();
+
+
+ETAPE 4 : Appuyer sur Entree
+-----------------------------
+Le script va s'executer et afficher les resultats
+
+ETAPE 5 : Lire les resultats
+-----------------------------
+La console va vous montrer:
+  - Si les IDs ont ete trouves
+  - Quels sont les unfollowers
+  - Si l'analyse est terminee
+
+================================================================================
