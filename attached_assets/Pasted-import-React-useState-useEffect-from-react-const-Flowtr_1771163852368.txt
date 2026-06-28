@@ -1,0 +1,350 @@
+import React, { useState, useEffect } from 'react';
+
+const FlowtrackDashboard = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [viewMode, setViewMode] = useState('month');
+  const [selectedPlatform, setSelectedPlatform] = useState('instagram');
+  const [animatedBars, setAnimatedBars] = useState([]);
+
+  // Données du graphique (31 jours pour février)
+  const monthData = [
+    320, 350, 340, 360, 355, 370, 365, 380, 375, 390, 
+    385, 400, 395, 410, 405, 420, 415, 400, 390, 410,
+    420, 410, 390, 380, 370, 390, 400, 410, 420, 415, 410
+  ];
+
+  const slides = [
+    { 
+      total: 66, 
+      label: 'Unfollowers',
+      color: '#1DB954',
+      gradient: 'from-green-600 to-green-400'
+    },
+    { 
+      total: 66, 
+      label: 'Unfollowers',
+      color: '#EF4444',
+      gradient: 'from-red-600 to-red-400'
+    },
+    { 
+      total: 32, 
+      label: 'Blocked',
+      color: '#6B7280',
+      gradient: 'from-gray-600 to-gray-400'
+    }
+  ];
+
+  // Animation automatique des slides
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Animation des barres
+  useEffect(() => {
+    setAnimatedBars([]);
+    const timeout = setTimeout(() => {
+      setAnimatedBars(monthData);
+    }, 200);
+    return () => clearTimeout(timeout);
+  }, [currentSlide]);
+
+  const current = slides[currentSlide];
+  const maxValue = Math.max(...monthData);
+
+  return (
+    <div className="w-full h-screen bg-black flex items-center justify-center p-8 overflow-hidden relative">
+      <style jsx>{`
+        @keyframes wave {
+          0%, 100% { transform: translateX(0) translateY(0); }
+          25% { transform: translateX(-5%) translateY(-2%); }
+          50% { transform: translateX(-10%) translateY(-4%); }
+          75% { transform: translateX(-5%) translateY(-2%); }
+        }
+        @keyframes barGrow {
+          from { 
+            transform: scaleY(0);
+            opacity: 0;
+          }
+          to { 
+            transform: scaleY(1);
+            opacity: 1;
+          }
+        }
+        @keyframes slideIn {
+          from { 
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to { 
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        @keyframes rotateCircle {
+          from { stroke-dashoffset: 691; }
+          to { stroke-dashoffset: ${691 - (current.total / 100) * 691}; }
+        }
+      `}</style>
+
+      {/* Vagues vertes animées en arrière-plan */}
+      <div className="absolute inset-0 overflow-hidden opacity-20">
+        <svg className="absolute w-[120%] h-full" style={{ animation: 'wave 15s ease-in-out infinite' }}>
+          <path
+            d="M 0,100 Q 250,80 500,100 T 1000,100 T 1500,100 T 2000,100 V 400 H 0 Z"
+            fill="url(#wave1)"
+            opacity="0.3"
+          />
+          <path
+            d="M 0,150 Q 200,120 400,150 T 800,150 T 1200,150 T 1600,150 V 400 H 0 Z"
+            fill="url(#wave2)"
+            opacity="0.2"
+          />
+          <path
+            d="M 0,200 Q 300,170 600,200 T 1200,200 T 1800,200 V 400 H 0 Z"
+            fill="url(#wave3)"
+            opacity="0.1"
+          />
+          <defs>
+            <linearGradient id="wave1" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#10B981" />
+              <stop offset="100%" stopColor="#059669" />
+            </linearGradient>
+            <linearGradient id="wave2" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#34D399" />
+              <stop offset="100%" stopColor="#10B981" />
+            </linearGradient>
+            <linearGradient id="wave3" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#6EE7B7" />
+              <stop offset="100%" stopColor="#34D399" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <div className="relative z-10 flex gap-8 max-w-7xl w-full">
+        {/* Partie gauche - Cercle avec total */}
+        <div 
+          className="relative w-[400px] h-[500px] rounded-[50px] flex flex-col items-center justify-center shadow-2xl"
+          style={{
+            background: `linear-gradient(135deg, ${current.color}20, ${current.color}40)`,
+            border: `3px solid ${current.color}30`,
+            animation: 'slideIn 0.5s ease-out'
+          }}
+        >
+          {/* Cercle de progression */}
+          <div className="relative mb-8">
+            <svg width="280" height="280" className="transform -rotate-90">
+              {/* Cercle de fond */}
+              <circle
+                cx="140"
+                cy="140"
+                r="110"
+                fill="none"
+                stroke={`${current.color}20`}
+                strokeWidth="20"
+              />
+              {/* Cercle de progression avec animation */}
+              <circle
+                cx="140"
+                cy="140"
+                r="110"
+                fill="none"
+                stroke={current.color}
+                strokeWidth="20"
+                strokeLinecap="round"
+                strokeDasharray="691"
+                strokeDashoffset={691 - (current.total / 100) * 691}
+                style={{
+                  transition: 'stroke-dashoffset 1.5s ease-out',
+                  filter: `drop-shadow(0 0 10px ${current.color})`
+                }}
+              />
+            </svg>
+
+            {/* Texte au centre du cercle */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <div className="text-white/60 text-sm font-medium tracking-wider mb-2">
+                TOTAL
+              </div>
+              <div 
+                className="text-[100px] font-black leading-none mb-2"
+                style={{ 
+                  color: current.color,
+                  textShadow: `0 0 30px ${current.color}50`
+                }}
+              >
+                {current.total}
+              </div>
+              <div className="text-white text-xl font-medium">
+                {current.label}
+              </div>
+            </div>
+          </div>
+
+          {/* Bouton Accounts list */}
+          <button 
+            className="px-8 py-3 rounded-2xl font-medium text-white transition-all hover:scale-105"
+            style={{
+              background: `${current.color}30`,
+              border: `2px solid ${current.color}`,
+              boxShadow: `0 0 20px ${current.color}30`
+            }}
+          >
+            📋 Accounts list
+          </button>
+        </div>
+
+        {/* Partie droite - Graphique */}
+        <div 
+          className="flex-1 rounded-[50px] p-8 shadow-2xl relative overflow-hidden"
+          style={{
+            background: 'linear-gradient(135deg, #1F2937, #111827)',
+            border: '2px solid #374151'
+          }}
+        >
+          {/* Header avec sélection Instagram/Facebook */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex gap-3">
+              <button
+                onClick={() => setSelectedPlatform('instagram')}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold transition-all ${
+                  selectedPlatform === 'instagram'
+                    ? 'bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white'
+                    : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'
+                }`}
+              >
+                <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500" />
+                Instagram
+              </button>
+              <button
+                onClick={() => setSelectedPlatform('facebook')}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold transition-all ${
+                  selectedPlatform === 'facebook'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50'
+                }`}
+              >
+                <div className="w-6 h-6 rounded-lg bg-blue-600" />
+                Facebook
+              </button>
+            </div>
+
+            {/* Switch MONTH/YEAR */}
+            <div className="flex gap-1 bg-gray-800 rounded-xl p-1">
+              <button
+                onClick={() => setViewMode('month')}
+                className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${
+                  viewMode === 'month'
+                    ? 'bg-white text-gray-900'
+                    : 'text-gray-500 hover:text-gray-300'
+                }`}
+              >
+                MONTH
+              </button>
+              <button
+                onClick={() => setViewMode('year')}
+                className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${
+                  viewMode === 'year'
+                    ? 'bg-white text-gray-900'
+                    : 'text-gray-500 hover:text-gray-300'
+                }`}
+              >
+                YEAR
+              </button>
+            </div>
+          </div>
+
+          {/* Label FOLLOWERS et FEBRUARY */}
+          <div className="flex items-baseline gap-4 mb-8">
+            <div className="text-white/50 text-sm font-bold tracking-wider">FOLLOWERS</div>
+            <div className="text-gray-500 text-xs font-medium">FEBRUARY</div>
+          </div>
+
+          {/* Zone du graphique */}
+          <div className="relative h-[320px]">
+            {/* Lignes de grille */}
+            <div className="absolute inset-0 flex flex-col justify-between py-4">
+              {[300, 200, 100].map((val) => (
+                <div key={val} className="flex items-center gap-3">
+                  <span className="text-white/30 text-xs font-medium w-8 text-right">{val}</span>
+                  <div className="flex-1 h-px bg-white/5" />
+                </div>
+              ))}
+            </div>
+
+            {/* Barres du graphique */}
+            <div className="absolute inset-0 flex items-end gap-[3px] pt-4 pl-14 pr-4 pb-8">
+              {animatedBars.map((value, index) => {
+                const height = (value / maxValue) * 100;
+                const isInstagram = selectedPlatform === 'instagram';
+                
+                return (
+                  <div
+                    key={index}
+                    className="flex-1 rounded-t-[3px] relative group cursor-pointer"
+                    style={{
+                      height: `${height}%`,
+                      background: isInstagram
+                        ? 'linear-gradient(180deg, #E1306C 0%, #F77737 50%, #FCAF45 100%)'
+                        : 'linear-gradient(180deg, #1877F2 0%, #0A66C2 100%)',
+                      opacity: 0.85,
+                      animation: `barGrow 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) ${index * 0.02}s backwards`,
+                      transformOrigin: 'bottom',
+                      boxShadow: isInstagram
+                        ? '0 0 15px rgba(225, 48, 108, 0.3)'
+                        : '0 0 15px rgba(24, 119, 242, 0.3)'
+                    }}
+                  >
+                    {/* Tooltip */}
+                    <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-black/90 text-white px-3 py-1.5 rounded-lg text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                      +{Math.round(value)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Axe des jours */}
+            <div className="absolute bottom-0 left-14 right-4 flex justify-between text-white/30 text-[10px] font-medium">
+              <span>1</span>
+              <span>4</span>
+              <span>7</span>
+              <span>10</span>
+              <span>13</span>
+              <span>16</span>
+              <span>19</span>
+              <span>22</span>
+              <span>25</span>
+              <span>28</span>
+              <span>31</span>
+              <span className="text-white/50">DAY</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Indicateurs de slides en bas */}
+      <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex gap-3">
+        {slides.map((slide, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentSlide(index)}
+            className="transition-all"
+            style={{
+              width: currentSlide === index ? '48px' : '12px',
+              height: '12px',
+              borderRadius: '6px',
+              background: currentSlide === index ? slide.color : '#374151',
+              boxShadow: currentSlide === index ? `0 0 20px ${slide.color}` : 'none'
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default FlowtrackDashboard;

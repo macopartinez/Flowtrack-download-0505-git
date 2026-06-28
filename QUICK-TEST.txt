@@ -1,0 +1,86 @@
+================================================================================
+  TEST RAPIDE - SIMULATION DE 2 UNFOLLOWERS
+================================================================================
+
+SITUATION:
+  - DB extension: 213 followers
+  - Instagram actuel: 211 followers
+  - Difference: 2 unfollowers non detectes
+
+ETAPES:
+  1. Ouvrez Chrome et allez sur: chrome://extensions/
+  2. Activez le "Mode developpeur"
+  3. Trouvez "Waler" et cliquez sur "Service worker"
+  4. Copiez-collez le code ci-dessous dans la console
+  5. Ouvrez le popup pour voir +2 unfollowers
+
+================================================================================
+CODE A COPIER-COLLER:
+================================================================================
+
+(async function simulate2Unfollowers() {
+  console.log('Simulation de 2 unfollowers...\n');
+
+  const stored = await chrome.storage.local.get(['sessionStats', 'followerDatabase']);
+  const currentStats = stored.sessionStats || {
+    followers: 0,
+    unfollowers: 0,
+    potentialBlockers: 0,
+    engagements: 0,
+  };
+
+  console.log('Stats AVANT:', currentStats);
+
+  const newStats = {
+    ...currentStats,
+    unfollowers: currentStats.unfollowers + 2,
+  };
+
+  await chrome.storage.local.set({ sessionStats: newStats });
+
+  if (stored.followerDatabase) {
+    const db = stored.followerDatabase;
+    db.totalCount = 211;
+    await chrome.storage.local.set({ 
+      followerDatabase: db,
+      lastFollowerCount: 211
+    });
+  }
+
+  await chrome.storage.local.set({
+    unfollowerDetected: true,
+    unfollowerCount: 2
+  });
+
+  console.log('Stats APRES:', newStats);
+
+  const tabs = await chrome.tabs.query({});
+  for (const tab of tabs) {
+    if (tab.url?.includes('localhost:5000/dashboard')) {
+      try {
+        await chrome.tabs.sendMessage(tab.id, {
+          type: 'REFRESH_DASHBOARD',
+          data: { unfollowers: 2, blocked: 0, notFound: 0 }
+        });
+        console.log('Dashboard notifie');
+      } catch (e) {}
+    }
+  }
+
+  console.log('\nTERMINE! Ouvrez le popup pour voir +2 unfollowers');
+})();
+
+================================================================================
+VERIFICATION:
+================================================================================
+
+Apres avoir execute le code:
+  1. Ouvrez le popup de l'extension
+     -> Vous devriez voir +2 unfollowers
+  
+  2. Si vous avez un dashboard ouvert
+     -> Il devrait se rafraichir automatiquement
+  
+  3. Pas besoin de recharger quoi que ce soit!
+
+================================================================================

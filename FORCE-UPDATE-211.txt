@@ -1,0 +1,23 @@
+// À exécuter dans la console Instagram (F12 → Console)
+// Assurez-vous d'être sur Instagram, pas sur le dashboard !
+
+chrome.runtime.sendMessage({
+  type: 'UPDATE_USER_INFO',
+  data: {
+    username: 'VOTRE_USERNAME', // ⚠️ REMPLACEZ PAR VOTRE USERNAME
+    followersCount: 211,
+    followingCount: 0, // Mettez le bon nombre si vous le connaissez
+    postsCount: 0,
+    bio: '',
+    isPrivate: false,
+  }
+}, (response) => {
+  if (chrome.runtime.lastError) {
+    console.error('❌ Erreur:', chrome.runtime.lastError);
+  } else if (response && response.success) {
+    console.log('✅ Mise à jour réussie !', response);
+    console.log('🔄 Rechargez le dashboard maintenant');
+  } else {
+    console.error('❌ Échec:', response);
+  }
+});

@@ -1,0 +1,257 @@
+@import url('https://fonts.googleapis.com/css2?family=Doppio+One&family=Lalezar&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: 'Outfit', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-doppio: 'Doppio One', sans-serif;
+
+  /* Dark theme colors from Figma */
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+
+  --primary: 142 70% 50.4%; /* Figma Green */
+  --primary-foreground: 210 40% 98%;
+
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 142 70% 50.4%;
+
+  --radius: 0.75rem;
+
+  /* Paper grain texture (SVG fractal noise) */
+  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+/* Scrollbar utilities */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased font-body;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
+  }
+}
+
+/* Custom Gradients & Utilities */
+.bg-mesh {
+  background-color: hsla(0, 0%, 100%, 1);
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(253,16%,7%,0.05) 0px, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(339,49%,30%,0.05) 0px, transparent 50%);
+}
+
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 1)) drop-shadow(0 0 16px rgba(2, 201, 80, 0.8)) drop-shadow(0 0 32px rgba(2, 201, 80, 0.6));
+  padding-right: 0.1em;
+  margin-right: -0.1em;
+}
+
+/* Floating text legibility — adds a soft dark halo so text placed directly over
+   the animated radar/WALER canvas stays readable when a bright green wave passes
+   behind it, without needing an opaque background box (which would hide the
+   animation). Apply to titles/labels/hints that sit on z-10 with no card behind. */
+.text-readable {
+  text-shadow:
+    0 0 4px rgba(0, 0, 0, 0.9),
+    0 1px 14px rgba(0, 0, 0, 0.85),
+    0 0 28px rgba(0, 0, 0, 0.7);
+}
+
+/* OLED surface — clean dark panel with a neon-green hairline + soft glow.
+   Mirrors the login modal (bg-black, #02c950/30 border, green glow). Use this
+   instead of flat bg-white/5 glass to give surfaces depth without looking busy. */
+.oled-card {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, rgba(255, 255, 255, 0) 100%),
+    rgba(6, 6, 6, 0.72);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid rgba(2, 201, 80, 0.14);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.04),
+    0 24px 60px -24px rgba(0, 0, 0, 0.85),
+    0 0 50px -16px rgba(2, 201, 80, 0.16);
+  transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease;
+}
+.oled-card:hover {
+  border-color: rgba(2, 201, 80, 0.32);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
+    0 28px 70px -24px rgba(0, 0, 0, 0.9),
+    0 0 70px -14px rgba(2, 201, 80, 0.26);
+}
+
+/* Thin neon hairline used as a section accent / underline. */
+.neon-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(2, 201, 80, 0.6), transparent);
+}
+
+/* Glassmorphism */
+.glass {
+  @apply bg-white/70 backdrop-blur-lg border border-white/20 shadow-xl;
+}
+
+.glass-card {
+  @apply bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/50 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300;
+}
+
+.glass-text-container {
+  position: relative;
+  display: inline-block;
+}
+
+.glass-text-container .glass-text-backdrop {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(18px) brightness(0.2) saturate(0.3);
+  -webkit-backdrop-filter: blur(18px) brightness(0.2) saturate(0.3);
+  mask-image: var(--glass-text-mask);
+  -webkit-mask-image: var(--glass-text-mask);
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.glass-text-container .glass-text-visible {
+  font-family: 'Lalezar', cursive;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.08);
+  position: relative;
+}
+
+@keyframes notifAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(200px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes notifDisappear {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(200px);
+  }
+}
+
+.browser-notif {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 230px;
+  background: rgba(20, 20, 20, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 12px 14px;
+  opacity: 0;
+  z-index: 3;
+  pointer-events: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  animation: notifAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+             notifDisappear 0.6s ease-in 2.0s forwards;
+}
+
+/* Full-screen subtle paper grain overlay (sits above the animated background, behind content) */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--paper-grain);
+  background-size: 200px 200px;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  filter: blur(0.5px);
+}
+
+/*
+ * Blurry paper-grain backdrop placed BEHIND a text block to keep it legible
+ * over the busy animated background. Add `text-paper` to a text container.
+ * - ::before = soft, blurred dark halo for contrast
+ * - ::after  = grain texture, edge-masked so no hard rectangle shows
+ */
+.text-paper {
+  position: relative;
+  isolation: isolate;
+}
+.text-paper::before,
+.text-paper::after {
+  content: "";
+  position: absolute;
+  inset: -1.5rem -2.75rem;
+  z-index: -1;
+  pointer-events: none;
+}
+.text-paper::before {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(8, 8, 8, 0.82) 0%,
+    rgba(8, 8, 8, 0.55) 45%,
+    rgba(8, 8, 8, 0) 72%
+  );
+  filter: blur(12px);
+}
+.text-paper::after {
+  background-image: var(--paper-grain);
+  background-size: 160px 160px;
+  opacity: 0.16;
+  mix-blend-mode: overlay;
+  filter: blur(0.6px);
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 48%, transparent 75%);
+  mask-image: radial-gradient(ellipse at center, #000 48%, transparent 75%);
+}
+
+/* Animation delays for blob */
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}

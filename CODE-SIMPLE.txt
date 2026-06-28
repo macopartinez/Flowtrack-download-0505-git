@@ -1,0 +1,77 @@
+// COPIER TOUT CE CODE ET LE COLLER DANS LA CONSOLE INSTAGRAM
+
+(function() {
+  console.log("Verification des IDs des unfollowers...");
+  
+  var state = localStorage.getItem("unfollowerCheckState");
+  
+  if (!state) {
+    console.log("Aucun resultat trouve");
+    console.log("L'analyse n'a peut-etre pas ete lancee");
+    return null;
+  }
+  
+  var parsed = JSON.parse(state);
+  
+  console.log("\n=== ETAT DE L'ANALYSE ===");
+  console.log("Username:", parsed.myUsername);
+  console.log("Progression:", parsed.currentIndex, "/", parsed.missingFollowers.length);
+  
+  console.log("\n=== RESULTATS ===");
+  console.log("Unfollowed:", parsed.results.unfollowed.length);
+  console.log("Blocked:", parsed.results.blocked.length);
+  console.log("Not found:", parsed.results.notFoundOnInstagram.length);
+  
+  if (parsed.results.unfollowed.length > 0) {
+    console.log("\n=== UNFOLLOWED (IDs trouves) ===");
+    for (var i = 0; i < parsed.results.unfollowed.length; i++) {
+      console.log((i + 1) + ". @" + parsed.results.unfollowed[i]);
+    }
+  }
+  
+  if (parsed.results.blocked.length > 0) {
+    console.log("\n=== BLOCKED (IDs trouves) ===");
+    for (var i = 0; i < parsed.results.blocked.length; i++) {
+      console.log((i + 1) + ". @" + parsed.results.blocked[i]);
+    }
+  }
+  
+  if (parsed.results.notFoundOnInstagram.length > 0) {
+    console.log("\n=== NOT FOUND (comptes supprimes) ===");
+    for (var i = 0; i < parsed.results.notFoundOnInstagram.length; i++) {
+      console.log((i + 1) + ". @" + parsed.results.notFoundOnInstagram[i]);
+    }
+  }
+  
+  var total = parsed.results.unfollowed.length + 
+              parsed.results.blocked.length + 
+              parsed.results.notFoundOnInstagram.length;
+  
+  console.log("\n=== RESUME ===");
+  console.log("Total unfollowers detectes:", total);
+  
+  if (parsed.currentIndex >= parsed.missingFollowers.length) {
+    console.log("\nANALYSE TERMINEE!");
+    
+    if (total === 2) {
+      console.log("\nPARFAIT! Les 2 unfollowers ont ete identifies:");
+      var all = parsed.results.unfollowed.concat(
+        parsed.results.blocked,
+        parsed.results.notFoundOnInstagram
+      );
+      for (var i = 0; i < all.length; i++) {
+        console.log((i + 1) + ". @" + all[i]);
+      }
+    }
+    
+    console.log("\nPROCHAINES ETAPES:");
+    console.log("1. Les IDs ont ete trouves");
+    console.log("2. MAIS pas envoyes au backend");
+    console.log("3. Utilisez le script d'envoi pour corriger");
+  } else {
+    console.log("\nANALYSE INCOMPLETE");
+    console.log("Progression:", parsed.currentIndex, "/", parsed.missingFollowers.length);
+  }
+  
+  return parsed;
+})();

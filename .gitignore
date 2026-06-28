@@ -1,0 +1,30 @@
+node_modules
+dist
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Secrets / sessions Instagram — NE JAMAIS committer
+cookies-*.json
+session-agent-*.json
+follower-database-export.json
+
+# Bases de données locales
+*.db
+*.db-shm
+*.db-wal
+
+server/public
+vite.config.ts.*
+*.tar.gz
+
+# État interne Replit + Playwright
+.local/
+waler-extension/waler-recording-*.json
+
+# Fichiers sensibles / temporaires
+instagram-login.png
+context.md
+tmp/
+attached_assets/

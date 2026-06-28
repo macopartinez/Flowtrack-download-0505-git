@@ -1,0 +1,87 @@
+// SCRIPT CORRIGE POUR METTRE A JOUR LES STATS
+// A EXECUTER DANS LA CONSOLE DU SERVICE WORKER
+
+(async function() {
+  console.log("Mise a jour des stats...");
+  
+  try {
+    // 1. Recuperer les stats actuelles
+    const stored = await chrome.storage.local.get(["sessionStats", "followerDatabase"]);
+    const currentStats = stored.sessionStats || {
+      followers: 0,
+      unfollowers: 0,
+      potentialBlockers: 0,
+      engagements: 0
+    };
+    
+    console.log("Stats AVANT:", currentStats);
+    
+    // 2. Ajouter les 2 nouveaux unfollowers
+    const newStats = {
+      followers: currentStats.followers,
+      unfollowers: currentStats.unfollowers + 2,
+      potentialBlockers: currentStats.potentialBlockers,
+      engagements: currentStats.engagements
+    };
+    
+    await chrome.storage.local.set({ sessionStats: newStats });
+    
+    // 3. Mettre a jour le compteur de followers
+    if (stored.followerDatabase) {
+      const db = stored.followerDatabase;
+      db.totalCount = 211;
+      await chrome.storage.local.set({ 
+        followerDatabase: db,
+        lastFollowerCount: 211
+      });
+    }
+    
+    // 4. Marquer les unfollowers comme detectes
+    await chrome.storage.local.set({
+      unfollowerDetected: true,
+      unfollowerCount: 2
+    });
+    
+    console.log("Stats APRES:", newStats);
+    
+    // 5. Notifier les dashboards
+    console.log("\nNotification des dashboards...");
+    const tabs = await chrome.tabs.query({});
+    let notified = 0;
+    
+    for (const tab of tabs) {
+      if (tab.url && tab.url.includes("localhost:5000/dashboard")) {
+        try {
+          await chrome.tabs.sendMessage(tab.id, {
+            type: "REFRESH_DASHBOARD",
+            data: { unfollowers: 2, blocked: 0, notFound: 0 }
+          });
+          console.log("Dashboard tab", tab.id, "notifie");
+          notified++;
+        } catch (e) {
+          console.log("Tab", tab.id, ":", e.message);
+        }
+      }
+    }
+    
+    if (notified === 0) {
+      console.log("Aucun dashboard ouvert");
+    }
+    
+    console.log("\n=== TERMINE ===");
+    console.log("\nLes 2 unfollowers identifies:");
+    console.log("1. @emmaa.roussel");
+    console.log("2. @t0m.pei");
+    console.log("\nVerifiez maintenant:");
+    console.log("1. Ouvrez le popup de l'extension");
+    console.log("   -> Vous devriez voir 2 unfollowers");
+    console.log("2. Si un dashboard est ouvert:");
+    console.log("   -> Il devrait se rafraichir automatiquement");
+    
+    return newStats;
+    
+  } catch (error) {
+    console.error("Erreur:", error);
+    console.error("Details:", error.message);
+  }
+})();

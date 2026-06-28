@@ -1,0 +1,90 @@
+================================================================================
+  TEST DE MISE A JOUR AUTOMATIQUE DES STATS D'UNFOLLOWERS
+================================================================================
+
+ETAPE 1 : Ouvrir la console de l'extension
+-------------------------------------------
+1. Ouvrez Chrome
+2. Allez sur : chrome://extensions/
+3. Activez le "Mode developpeur" (en haut a droite)
+4. Trouvez l'extension "Waler"
+5. Cliquez sur "Service worker" (lien bleu)
+6. Une console DevTools va s'ouvrir
+
+ETAPE 2 : Copier-coller ce code dans la console
+------------------------------------------------
+
+(async function testUnfollowerUpdate() {
+  console.log('Test de mise a jour automatique\n');
+  
+  const stored = await chrome.storage.local.get('sessionStats');
+  const currentStats = stored.sessionStats || {
+    followers: 0,
+    unfollowers: 0,
+    potentialBlockers: 0,
+    engagements: 0,
+  };
+  
+  console.log('Stats avant:', currentStats);
+  
+  const newStats = {
+    ...currentStats,
+    unfollowers: currentStats.unfollowers + 2,
+  };
+  
+  await chrome.storage.local.set({ sessionStats: newStats });
+  console.log('Stats apres:', newStats);
+  
+  const tabs = await chrome.tabs.query({});
+  for (const tab of tabs) {
+    if (tab.url?.includes('localhost:5000/dashboard')) {
+      try {
+        await chrome.tabs.sendMessage(tab.id, {
+          type: 'REFRESH_DASHBOARD',
+          data: { unfollowers: 2, blocked: 0, notFound: 0 }
+        });
+        console.log('Dashboard tab ' + tab.id + ' notifie');
+      } catch (e) {
+        console.log('Tab ' + tab.id + ': ' + e.message);
+      }
+    }
+  }
+  
+  console.log('\nTest termine!');
+  console.log('Ouvrez le popup pour voir +2 unfollowers');
+})();
+
+ETAPE 3 : Verifier les resultats
+---------------------------------
+1. Cliquez sur l'icone de l'extension (popup)
+2. Verifiez que les unfollowers ont augmente de 2
+3. Si vous avez un onglet dashboard ouvert, il devrait se rafraichir automatiquement
+
+================================================================================
+
+AUTRES COMMANDES UTILES
+-----------------------
+
+Pour verifier les stats actuelles :
+------------------------------------
+(async function() {
+  const stored = await chrome.storage.local.get('sessionStats');
+  console.log('Stats actuelles:', stored.sessionStats);
+})();
+
+
+Pour reinitialiser les stats a zero :
+--------------------------------------
+(async function() {
+  await chrome.storage.local.set({
+    sessionStats: {
+      followers: 0,
+      unfollowers: 0,
+      potentialBlockers: 0,
+      engagements: 0,
+    }
+  });
+  console.log('Stats reinitialisees');
+})();
+
+================================================================================

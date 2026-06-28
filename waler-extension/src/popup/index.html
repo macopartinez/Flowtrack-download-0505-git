@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Waler - Instagram Analytics</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lalezar&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 380px;
+      min-height: 500px;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #000000;
+      color: hsl(0, 0%, 98%);
+    }
+
+    .container {
+      padding: 24px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      position: relative;
+    }
+
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(2, 201, 80, 0.55), transparent);
+    }
+
+    .logo {
+      font-family: 'Lalezar', cursive;
+      font-size: 30px;
+      font-weight: 400;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+      color: rgba(255, 255, 255, 0.92);
+      text-shadow:
+        0 0 18px rgba(2, 201, 80, 0.38),
+        0 0 40px rgba(2, 201, 80, 0.16);
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: hsl(240, 5%, 60%);
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0) 100%),
+        rgba(6, 6, 6, 0.82);
+      border: 1px solid rgba(2, 201, 80, 0.14);
+      border-radius: 12px;
+      padding: 18px 14px;
+      text-align: center;
+      transition: all 0.3s ease;
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.04),
+        0 0 40px -16px rgba(2, 201, 80, 0.14);
+    }
+
+    .stat-card:hover {
+      border-color: rgba(2, 201, 80, 0.32);
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
+        0 0 60px -14px rgba(2, 201, 80, 0.28);
+      transform: translateY(-2px);
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: hsl(142, 70%, 50.4%);
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: hsl(240, 5%, 64.9%);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .sync-status {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0) 100%),
+        rgba(6, 6, 6, 0.82);
+      border: 1px solid rgba(2, 201, 80, 0.14);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.04),
+        0 0 40px -16px rgba(2, 201, 80, 0.12);
+    }
+
+    .sync-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .sync-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: hsl(0, 0%, 98%);
+    }
+
+    .sync-badge {
+      background: hsl(142, 70%, 50.4%, 0.15);
+      color: hsl(142, 70%, 50.4%);
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .sync-info {
+      font-size: 12px;
+      color: hsl(240, 5%, 64.9%);
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0) 100%),
+        rgba(6, 6, 6, 0.82);
+      border: 1px solid rgba(2, 201, 80, 0.18);
+      border-radius: 10px;
+      padding: 14px;
+      color: hsl(0, 0%, 98%);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .btn:hover {
+      border-color: rgba(2, 201, 80, 0.36);
+      box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
+        0 0 30px -10px rgba(2, 201, 80, 0.22);
+      transform: translateY(-2px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: #02c950;
+      color: #000;
+      border: 1px solid #02c950;
+      font-weight: 700;
+      box-shadow: 0 0 16px rgba(2, 201, 80, 0.25);
+    }
+
+    .btn-primary:hover {
+      background: #04d958;
+      border-color: #04d958;
+      box-shadow: 0 0 28px rgba(2, 201, 80, 0.42);
+    }
+
+    .not-authenticated {
+      text-align: center;
+      padding: 50px 20px;
+    }
+
+    .not-authenticated h2 {
+      margin-bottom: 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+    }
+
+    .not-authenticated p {
+      color: hsl(240, 5%, 64.9%);
+      margin-bottom: 24px;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .spinner {
+      border: 3px solid hsl(240, 3.7%, 15.9%);
+      border-top: 3px solid hsl(142, 70%, 50.4%);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Icônes line minimalistes (style lucide), teintées vert de marque */
+    .ic {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vertical-align: -2px;
+    }
+    .ic-green { stroke: hsl(142, 70%, 50.4%); }
+    .ic-red { stroke: hsl(0, 70%, 62%); }
+
+    /* Petit spinner inline (feedback de chargement sur boutons / lignes) */
+    .spinner-sm {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid hsl(240, 3.7%, 25%);
+      border-top-color: hsl(142, 70%, 50.4%);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
+    /* Animation radar pulse */
+    .radar-pulse {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: hsl(142, 76%, 46%);
+      margin-right: 8px;
+      position: relative;
+      animation: radar-pulse 2s ease-in-out infinite;
+    }
+
+    .radar-pulse::before,
+    .radar-pulse::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: hsl(142, 76%, 46%);
+      opacity: 0.7;
+      animation: radar-wave 2s ease-in-out infinite;
+    }
+
+    .radar-pulse::after {
+      animation-delay: 1s;
+    }
+
+    @keyframes radar-pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+      }
+    }
+
+    @keyframes radar-wave {
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.7;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(3);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">Waler</div>
+      <div class="subtitle">Instagram Analytics</div>
+    </div>
+
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <div>Loading...</div>
+    </div>
+
+    <div id="not-authenticated" class="not-authenticated" style="display: none;">
+      <h2><span data-icon="lock"></span> Not connected</h2>
+      <p>Connect to Waler to start tracking your Instagram stats</p>
+      <button class="btn btn-primary" id="login-btn">Sign in</button>
+    </div>
+
+    <div id="authenticated" style="display: none;">
+      <!-- Sélecteur de compte Instagram (multi-compte) -->
+      <div id="account-switcher" style="margin-bottom: 14px;">
+        <button id="account-current" style="width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; background: linear-gradient(180deg,rgba(255,255,255,0.025) 0%,rgba(255,255,255,0) 100%), rgba(6,6,6,0.82); border: 1px solid rgba(2,201,80,0.18); border-radius: 10px; color: hsl(0,0%,98%); cursor: pointer; font-family: inherit; box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.04); transition: border-color 0.25s ease;">
+          <span style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+            <img id="account-current-avatar" src="https://api.dicebear.com/7.x/initials/svg?seed=waler&backgroundColor=16a34a,15803d,166534&fontWeight=600" alt="" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; background: hsl(240,3.7%,25%);" />
+            <span id="account-current-name" style="font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@—</span>
+          </span>
+          <span id="account-caret" style="font-size: 11px; color: hsl(240,5%,64.9%);">▼</span>
+        </button>
+        <div id="account-list" style="display: none; margin-top: 6px; background: rgba(4,4,4,0.96); border: 1px solid rgba(2,201,80,0.22); border-radius: 10px; overflow: hidden; box-shadow: 0 8px 32px -8px rgba(0,0,0,0.8), 0 0 40px -16px rgba(2,201,80,0.2);"></div>
+        <button id="account-link-btn" style="display: none; width: 100%; margin-top: 6px; padding: 9px; background: transparent; border: 1px dashed hsl(142, 70%, 50.4%, 0.5); border-radius: 9px; color: hsl(142, 70%, 60%); font-weight: 600; font-size: 12px; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; justify-content: center; gap: 6px;"><span data-icon="plus" data-icon-variant="green"></span> Link an Instagram account</button>
+      </div>
+
+      <!-- Onglets Base / Pro -->
+      <div id="section-tabs" style="display: flex; gap: 6px; margin-bottom: 20px; background: rgba(0,0,0,0.7); border: 1px solid rgba(2,201,80,0.12); padding: 4px; border-radius: 10px; box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.03);">
+        <button id="tab-base" style="flex: 1; padding: 10px; border: 1px solid rgba(2,201,80,0.2); border-radius: 7px; background: rgba(2,201,80,0.08); color: hsl(0,0%,98%); font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit;">Base</button>
+        <button id="tab-pro" style="flex: 1; padding: 10px; border: none; border-radius: 7px; background: transparent; color: hsl(240,5%,64.9%); font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; justify-content: center; gap: 6px;"><span data-icon="sparkles" data-icon-variant="green"></span> Pro</button>
+      </div>
+
+      <div id="base-section">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <div style="font-size: 11px; color: hsl(240, 5%, 64.9%); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;"><span data-icon="chart" data-icon-variant="green"></span> Session stats</div>
+        <button id="reset-stats-btn" style="background: none; border: none; color: hsl(240, 5%, 64.9%); cursor: pointer; font-size: 11px; padding: 4px 8px; border-radius: 6px; transition: all 0.2s;" onmouseover="this.style.background='hsl(240, 3.7%, 15.9%)'" onmouseout="this.style.background='none'"><span data-icon="refresh"></span> Reset</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="followers-count">0</div>
+          <div class="stat-label">New followers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="unfollowers-count">0</div>
+          <div class="stat-label">Unfollowers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="ghost-count">0</div>
+          <div class="stat-label">Ghost</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="pending-count">0</div>
+          <div class="stat-label">Pending</div>
+        </div>
+      </div>
+
+      <!-- Indicateur d'analyse en cours -->
+      <div id="analysis-indicator" class="sync-status" style="display: none; border-color: hsl(142, 76%, 36%, 0.3); background: hsl(142, 76%, 36%, 0.1);">
+        <div class="sync-header">
+          <div class="sync-title" style="color: hsl(142, 76%, 46%);">
+            <span class="radar-pulse"></span>
+            Analyzing
+          </div>
+          <div class="sync-badge" style="background: hsl(142, 76%, 36%, 0.15); color: hsl(142, 76%, 46%);" id="analysis-progress">0%</div>
+        </div>
+        <div class="sync-info" id="analysis-status">Initializing...</div>
+      </div>
+
+      <div class="sync-status">
+        <div class="sync-header">
+          <div class="sync-title">Sync</div>
+          <div class="sync-badge" id="sync-badge">Active</div>
+        </div>
+        <div class="sync-info" id="sync-info">Last sync: Never</div>
+      </div>
+
+      <!-- Alerte unfollowers -->
+      <div id="unfollower-alert" class="sync-status" style="display: none; border-color: hsl(0, 70%, 50.4%, 0.3); background: hsl(0, 70%, 50.4%, 0.1);">
+        <div class="sync-header">
+          <div class="sync-title" style="color: hsl(0, 70%, 60%);"><span data-icon="alert" data-icon-variant="red"></span> Unfollowers detected</div>
+          <div class="sync-badge" style="background: hsl(0, 70%, 50.4%, 0.15); color: hsl(0, 70%, 60%);" id="unfollower-count-badge">0</div>
+        </div>
+        <div class="sync-info">Click "Analyze unfollowers" to identify who unfollowed, blocked, or deleted their account.</div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="initial-scan-btn" style="display: none;"><span data-icon="search"></span> Run initial scan</button>
+        <button class="btn btn-primary" id="unfollower-analysis-btn" title="Open Instagram, then click to scan who unfollowed, blocked, or deleted their account. Keep the Instagram tab in the foreground during the analysis." style="display: none; background: hsl(0, 70%, 50.4%); border-color: hsl(0, 70%, 50.4%);"><span data-icon="search"></span> Analyze unfollowers</button>
+        <button class="btn btn-primary" id="sync-full-btn" title="Pushes your ENTIRE local follower database to the dashboard. Use this after an initial scan, or if the dashboard looks incomplete. Slower than Quick sync." style="background: hsl(142.1, 76.2%, 36.3%); border-color: hsl(142.1, 76.2%, 36.3%);"><span data-icon="upload"></span> Full sync — push all (Base → Dashboard)</button>
+        <button class="btn btn-primary" id="restore-db-btn" title="Rebuilds your local database from the dashboard, without re-scanning Instagram. Use this after reinstalling the extension or switching device." style="background: hsl(210, 76.2%, 42%); border-color: hsl(210, 76.2%, 42%);"><span data-icon="cloud"></span> Restore (Dashboard → Base)</button>
+        <button class="btn btn-primary" id="sync-btn" title="Fast sync: sends only pending changes and refreshes your follower count. Run it regularly. To re-send everything, use “Full sync” above.">Quick sync (new changes)</button>
+        <button class="btn" id="dashboard-btn" title="Opens your dashboard in a new tab.">Open dashboard</button>
+      </div>
+      </div><!-- /#base-section -->
+
+      <!-- ==================== SECTION PRO ==================== -->
+      <div id="pro-section" style="display: none;">
+        <!-- Encart upsell (affiché si non-Pro) -->
+        <div id="pro-upsell" style="display: none; text-align: center; padding: 30px 16px;">
+          <div style="margin-bottom: 12px;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="hsl(142, 70%, 50.4%)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .962 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.582a.5.5 0 0 1 0 .962L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.962 0z"/></svg></div>
+          <h2 style="font-family: 'Outfit', sans-serif; font-size: 18px; margin-bottom: 8px;">Pro feature</h2>
+          <p style="color: hsl(240,5%,64.9%); font-size: 13px; line-height: 1.6; margin-bottom: 20px;">
+            Conversation analysis is reserved for the Pro plan. Upgrade to Pro to analyze your conversation history and track how your relationships evolve.
+          </p>
+          <button class="btn btn-primary" id="upgrade-pro-btn">Upgrade to Pro</button>
+        </div>
+
+        <!-- Contenu Pro (affiché si Pro) -->
+        <div id="pro-content" style="display: none;">
+          <div style="font-size: 11px; color: hsl(240, 5%, 64.9%); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;"><span data-icon="users" data-icon-variant="green"></span> Your contacts (people)</div>
+
+          <!-- Compte Instagram ciblé par la section Pro (repli si l'auto-détection se trompe) -->
+          <label for="pro-account-select" style="display:block; font-size:11px; color:hsl(240,5%,64.9%); margin-bottom:6px;">Analyzed account</label>
+          <select id="pro-account-select" style="width:100%; margin-bottom:12px; padding:10px 12px; font-size:13px; background:rgba(6,6,6,0.9); color:hsl(0,0%,98%); border:1px solid rgba(2,201,80,0.18); border-radius:10px; outline:none;"></select>
+
+          <button class="btn btn-primary" id="pro-engagement-btn" style="width: 100%; margin-bottom: 12px; font-size: 13px;"><span data-icon="search"></span> Analyze engagement (posts)</button>
+
+          <div id="pro-people-loading" style="display:flex; align-items:center; justify-content:center; gap:8px; padding: 20px; color: hsl(240,5%,64.9%); font-size: 13px;"><span class="spinner-sm"></span> Loading…</div>
+
+          <div id="pro-people-empty" style="display:none; text-align:center; padding: 20px; color: hsl(240,5%,64.9%); font-size: 13px; line-height: 1.6;">
+            No contacts yet.<br>Add people in the dashboard (People section).
+          </div>
+
+          <div id="pro-people-list" style="display:none; flex-direction: column; gap: 8px;"></div>
+
+          <button class="btn" id="pro-refresh-btn" style="margin-top: 12px; font-size: 12px;"><span data-icon="refresh"></span> Refresh list</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="popup-chrome.js"></script>
+</body>
+</html>

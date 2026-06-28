@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animation Ondes Radar</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #0a0a0a;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="radarCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('radarCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Configuration du canvas - responsive pour fond de site web
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Point central (10, 10 dans le système de coordonnées de l'animation)
+        const centerX = 10;
+        const centerY = 10;
+
+        // Tableau pour stocker les ondes
+        const waves = [];
+
+        // Configuration des ondes - adaptable selon la taille d'écran
+        const getWaveConfig = () => {
+            const screenWidth = window.innerWidth;
+            const isMobile = screenWidth < 768;
+            
+            return {
+                maxRadius: Math.max(canvas.width, canvas.height),
+                waveSpeed: isMobile ? 60 : 80, // pixels par seconde
+                waveSpacing: isMobile ? 120 : 180,
+                maxWaveWidth: isMobile ? 15 : 22.5,
+                shadowBlur: 20
+            };
+        };
+        
+        let config = getWaveConfig();
+        let waveCounter = 0;
+        
+        // Variables pour le timing précis
+        let lastFrameTime = performance.now();
+        
+        // Mettre à jour la config lors du redimensionnement
+        window.addEventListener('resize', () => {
+            config = getWaveConfig();
+        });
+
+        // Classe pour gérer chaque onde
+        class Wave {
+            constructor(beat) {
+                this.radius = 0;
+                this.opacity = 1;
+                this.beat = beat;
+            }
+
+            update(deltaTime) {
+                // Utiliser deltaTime pour une vitesse constante (pixels par seconde)
+                this.radius += (config.waveSpeed * deltaTime) / 1000;
+                // L'opacité diminue avec la distance
+                this.opacity = Math.max(0, 1 - (this.radius / config.maxRadius));
+            }
+
+            draw() {
+                if (this.opacity <= 0 || this.radius <= 0) return;
+
+                // Effet électrique optimisé
+                ctx.save();
+                
+                // Ombre pour effet néon
+                ctx.shadowBlur = config.shadowBlur;
+                ctx.shadowColor = `rgba(0, 255, 100, ${this.opacity * 0.5})`;
+                
+                // Ligne principale électrique
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, this.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(0, 255, 100, ${this.opacity})`;
+                ctx.lineWidth = config.maxWaveWidth;
+                ctx.stroke();
+                
+                // Ligne interne plus brillante
+                ctx.shadowBlur = 0;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, this.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(150, 255, 200, ${this.opacity * 0.6})`;
+                ctx.lineWidth = config.maxWaveWidth * 0.4;
+                ctx.stroke();
+                
+                ctx.restore();
+            }
+
+            isFinished() {
+                return this.radius > config.maxRadius;
+            }
+        }
+
+        // Créer une nouvelle onde basée sur l'espacement en distance
+        function createWave() {
+            // Créer une nouvelle onde si la dernière onde a parcouru assez de distance
+            if (waves.length === 0 || waves[waves.length - 1].radius >= config.waveSpacing) {
+                waves.push(new Wave(waveCounter));
+                waveCounter++;
+            }
+        }
+
+        // Boucle d'animation optimisée avec timing précis
+        function animate(currentTime) {
+            // Calculer le temps écoulé depuis la dernière frame
+            const deltaTime = currentTime - lastFrameTime;
+            lastFrameTime = currentTime;
+            
+            // Limiter deltaTime pour éviter les sauts après un changement d'onglet
+            const safeDeltaTime = Math.min(deltaTime, 100); // Maximum 100ms par frame
+            
+            // Effacer le canvas
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Créer de nouvelles ondes basées sur la distance
+            createWave();
+
+            // Mettre à jour et dessiner toutes les ondes avec deltaTime
+            for (let i = waves.length - 1; i >= 0; i--) {
+                waves[i].update(safeDeltaTime);
+                waves[i].draw();
+
+                // Supprimer les ondes terminées
+                if (waves[i].isFinished()) {
+                    waves.splice(i, 1);
+                }
+            }
+
+            // Dessiner le point source électrique au centre
+            ctx.save();
+            ctx.shadowBlur = config.shadowBlur;
+            ctx.shadowColor = 'rgba(0, 255, 100, 0.8)';
+            
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(200, 255, 200, 1)';
+            ctx.fill();
+            
+            ctx.restore();
+
+            // Continuer l'animation
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Démarrer l'animation
+        let animationId;
+        function startAnimation() {
+            lastFrameTime = performance.now(); // Réinitialiser le temps pour éviter les sauts
+            animate(lastFrameTime);
+        }
+        
+        // Pause l'animation quand la page n'est pas visible (économie de ressources)
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+            } else {
+                startAnimation();
+            }
+        });
+        
+        startAnimation();
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+{
+  "manifest_version": 3,
+  "name": "Waler - Instagram Analytics",
+  "version": "1.0.0",
+  "description": "Track your Instagram followers, unfollowers, and engagement in real-time",
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications",
+    "webRequest",
+    "cookies",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.instagram.com/*",
+    "https://instagram.com/*",
+    "https://i.instagram.com/*",
+    "https://waler.website/*",
+    "http://localhost:5000/*"
+  ],
+  "background": {
+    "service_worker": "dist/background/service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.instagram.com/*", "https://instagram.com/*"],
+      "js": ["dist/content/instagram-tracker.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://waler.website/*", "http://localhost:5000/*"],
+      "js": ["dist/content/auth-listener.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "assets/icons/icon-16.png",
+    "32": "assets/icons/icon-32.png",
+    "48": "assets/icons/icon-48.png",
+    "128": "assets/icons/icon-128.png"
+  },
+  "action": {
+    "default_popup": "src/popup/index.html",
+    "default_icon": {
+      "16": "assets/icons/icon-16.png",
+      "32": "assets/icons/icon-32.png",
+      "48": "assets/icons/icon-48.png",
+      "128": "assets/icons/icon-128.png"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["injected/page-script.js"],
+      "matches": ["https://www.instagram.com/*", "https://instagram.com/*"]
+    }
+  ],
+  "externally_connectable": {
+    "matches": ["https://waler.website/*", "http://localhost:5000/*"]
+  }
+}
