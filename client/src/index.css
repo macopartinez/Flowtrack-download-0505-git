@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Doppio+One&family=Lalezar&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+/* Fonts are loaded non-blocking from client/index.html (Doppio One, Lalezar, Outfit, Plus Jakarta Sans). */
 
 @tailwind base;
 @tailwind components;

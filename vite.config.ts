@@ -17,6 +17,18 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Cacheable vendor chunks for libs on the eager (landing) path.
+          // recharts is intentionally NOT listed: it's only used by the lazy
+          // Dashboard/classification routes, so Rollup keeps it in an async
+          // chunk that never preloads on the landing page.
+          "react-vendor": ["react", "react-dom", "wouter", "@tanstack/react-query"],
+          motion: ["framer-motion"],
+        },
+      },
+    },
   },
   server: {
     proxy: {
