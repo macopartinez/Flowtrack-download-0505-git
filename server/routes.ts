@@ -1107,8 +1107,19 @@ export async function registerRoutes(
       if (!userId) {
         return res.status(401).json({ message: "Non authentifié" });
       }
-      
+
       const { priceId: directPriceId, billingPeriod, planName } = req.body;
+
+      // DISABLE_STRIPE=true : bypass Stripe, activate subscription directly and
+      // redirect to dashboard. Used during Chrome Web Store review period.
+      if (process.env.DISABLE_STRIPE === 'true') {
+        const tier = planName === 'pro' ? 'pro' : 'premium';
+        await db.update(users)
+          .set({ subscriptionTier: tier, subscriptionStatus: 'active', isVerified: true })
+          .where(eq(users.id, userId));
+        const baseUrl = process.env.CLIENT_URL || 'http://localhost:5000';
+        return res.json({ url: `${baseUrl}/dashboard/${userId}?checkout=success` });
+      }
 
       // Allow lookup by planName + billingPeriod (used during onboarding).
       // 'premium' maps to the 'base' plan; 'pro' maps to 'pro'.
@@ -1124,15 +1135,15 @@ export async function registerRoutes(
       if (!priceId) {
         return res.status(400).json({ message: "priceId requis (ou planName + billingPeriod)" });
       }
-      
+
       const user = await getUserById(userId);
       if (!user) {
         return res.status(404).json({ message: "Utilisateur non trouvé" });
       }
-      
+
       // Récupérer customerId si existe
       const { subscription } = await getUserPlan(userId);
-      
+
       const session = await createCheckoutSession({
         userId,
         userEmail: user.email,
@@ -1141,7 +1152,7 @@ export async function registerRoutes(
         cancelUrl: `${process.env.CLIENT_URL || 'http://localhost:5000'}/pricing?checkout=canceled`,
         customerId: subscription?.stripeCustomerId || undefined,
       });
-      
+
       res.json({ sessionId: session.id, url: session.url });
     } catch (err) {
       console.error("Checkout error:", err);
