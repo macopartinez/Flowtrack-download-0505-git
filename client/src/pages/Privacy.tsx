@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Shield, Lock, Eye, Database, CheckCircle } from "lucide-react";
+import { Shield, Lock, Eye, Database, CheckCircle, BarChart2 } from "lucide-react";
 
 export default function Privacy() {
   return (
@@ -35,9 +35,30 @@ export default function Privacy() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold mb-3 text-white">Data Collection</h2>
-                  <p className="text-gray-300 leading-relaxed">
-                    Waler only collects the data needed to provide our relationship-tracking service. We use Instagram's official APIs to access your public profile information (followers, following, statistics). We do not collect any private or sensitive data beyond what's necessary to run the service.
+                  <p className="text-gray-300 leading-relaxed mb-4">
+                    Waler collects only the data necessary to provide its follower-tracking and DM analysis service. The browser extension reads data directly from Instagram's web interface (DOM and network responses) while you are logged in. No data is collected when you are not using the extension.
                   </p>
+                  <p className="text-gray-300 leading-relaxed mb-4">
+                    The following data may be collected and stored:
+                  </p>
+                  <ul className="space-y-2 text-gray-400">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                      Your Instagram username and profile information
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                      Your followers and following lists (to detect changes)
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                      DM conversation content (encrypted, for the coach feature)
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                      Instagram session cookies (used solely to authenticate requests)
+                    </li>
+                  </ul>
                 </div>
               </div>
             </motion.div>
@@ -55,12 +76,12 @@ export default function Privacy() {
                 <div>
                   <h2 className="text-2xl font-bold mb-3 text-white">Data Security</h2>
                   <p className="text-gray-300 leading-relaxed mb-4">
-                    The content of your direct messages is encrypted at rest with bank-grade standards (AES-256-GCM). Data in transit is protected by TLS, and we follow industry best practices to safeguard your information.
+                    We apply industry-standard security measures to protect your data at every stage.
                   </p>
                   <ul className="space-y-2 text-gray-400">
                     <li className="flex items-center gap-2">
                       <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      AES-256 encryption of message content at rest
+                      AES-256-GCM encryption of DM content at rest
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
@@ -69,6 +90,10 @@ export default function Privacy() {
                     <li className="flex items-center gap-2">
                       <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
                       Passwords stored as salted bcrypt hashes
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                      Instagram session cookies are never transmitted to third parties
                     </li>
                   </ul>
                 </div>
@@ -93,17 +118,53 @@ export default function Privacy() {
                   <ul className="space-y-2 text-gray-400">
                     <li className="flex items-center gap-2">
                       <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      Detect changes in your following
+                      Detect changes in your followers and following
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      Generate analytics and statistics
+                      Generate analytics and statistics about your account
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                      Power the DM coach feature (conversation analysis)
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
                       Send tracking notifications
                     </li>
                   </ul>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+              className="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 p-8"
+            >
+              <div className="flex items-start gap-4 mb-6">
+                <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                  <BarChart2 className="w-6 h-6 text-green-400" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold mb-3 text-white">Third-Party Analytics</h2>
+                  <p className="text-gray-300 leading-relaxed mb-4">
+                    Our website uses the following third-party analytics tools to improve user experience. These tools may collect anonymized usage data such as page views, clicks, and navigation patterns.
+                  </p>
+                  <ul className="space-y-3 text-gray-400">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                      <span><strong className="text-gray-300">Google Analytics (GA4)</strong> — collects anonymized traffic and behavior data. Governed by <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300 transition-colors">Google's Privacy Policy</a>.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                      <span><strong className="text-gray-300">Microsoft Clarity</strong> — records anonymized session replays and heatmaps to help us understand how users interact with the site. Governed by <a href="https://privacy.microsoft.com/privacystatement" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300 transition-colors">Microsoft's Privacy Statement</a>.</span>
+                    </li>
+                  </ul>
+                  <p className="text-gray-400 leading-relaxed mt-4 text-sm">
+                    These tools do not have access to your Instagram data or your Waler account content.
+                  </p>
                 </div>
               </div>
             </motion.div>
@@ -121,7 +182,7 @@ export default function Privacy() {
                 <div>
                   <h2 className="text-2xl font-bold mb-3 text-white">No-Commercialization Commitment</h2>
                   <p className="text-gray-300 leading-relaxed mb-4">
-                    <strong className="text-green-400">Your data will never be used for commercial purposes or sold to third parties.</strong>
+                    <strong className="text-green-400">Your data will never be sold or transferred to third parties for commercial purposes.</strong>
                   </p>
                   <p className="text-gray-300 leading-relaxed">
                     We never sell, trade, or rent your personal information to any external company. Your data stays strictly confidential and is used solely to operate our service. We only share your data with your explicit consent or when required by law.
