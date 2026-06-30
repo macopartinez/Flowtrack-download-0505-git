@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Heart } from "lucide-react";
-import { useLocation } from "wouter";
 
 interface RevealGateProps {
   onReveal: () => void;
@@ -16,84 +15,136 @@ interface RevealAnswers {
   commitments?: string[];
 }
 
-const QUESTIONS = [
+interface QuestionTheme {
+  id: keyof RevealAnswers;
+  type: 'single' | 'multiple';
+  subtitle?: string;
+  // Plusieurs formulations neutres par thème : on en tire une au hasard à
+  // chaque ouverture pour que le questionnaire ne reste jamais identique,
+  // tout en gardant les `value` (et donc le schéma des réponses) stables.
+  titles: string[];
+  options: { value: string; label: string }[];
+}
+
+// Pool de questions. Les libellés restent introspectifs, doux et ouverts —
+// un signal, pas un verdict (voir la philosophie du tunnel de vente).
+const QUESTION_POOL: QuestionTheme[] = [
   {
     id: 'feeling',
-    title: 'Before we show you who it is — how are you feeling right now?',
     type: 'single',
+    titles: [
+      'Before we show you who it is — how are you feeling right now?',
+      'Take a second before we continue — what\'s present for you right now?',
+      'Before the name appears — where\'s your head at this moment?',
+    ],
     options: [
-      { value: 'anxious', label: 'Anxious, my heart is racing a little' },
+      { value: 'anxious', label: 'A little tense, my mind is moving fast' },
       { value: 'curious', label: 'Curious but calm' },
-      { value: 'suspicion', label: 'Already have a feeling who it might be' },
-      { value: 'mixed', label: 'A mix of things I can\'t quite name' }
-    ]
+      { value: 'suspicion', label: 'I have a quiet sense of who it might be' },
+      { value: 'mixed', label: 'A mix of things I can\'t quite name' },
+    ],
   },
   {
     id: 'recentTension',
-    title: 'In the past few weeks, has anything felt different with the people close to you?',
     type: 'single',
+    titles: [
+      'In the past few weeks, has anything felt different with the people close to you?',
+      'Lately, have your connections felt the way they usually do?',
+      'Looking back over the last month — has anything shifted in how people show up for you?',
+    ],
     options: [
-      { value: 'yes_tension', label: 'Yes — there\'s been some tension I noticed' },
-      { value: 'little_distance', label: 'A little — some distance but nothing specific' },
-      { value: 'normal', label: 'No — everything seemed normal to me' },
-      { value: 'not_paying', label: 'I wasn\'t paying attention, honestly' }
-    ]
+      { value: 'yes_tension', label: 'Yes — I noticed a bit of distance somewhere' },
+      { value: 'little_distance', label: 'A little — nothing I could put my finger on' },
+      { value: 'normal', label: 'No — things felt steady to me' },
+      { value: 'not_paying', label: 'Honestly, I wasn\'t paying close attention' },
+    ],
   },
   {
     id: 'unresolved',
-    title: 'Is there anyone in your life right now with whom you feel there\'s something unresolved?',
     type: 'single',
+    titles: [
+      'Is there anyone in your life right now with whom you feel there\'s something unresolved?',
+      'Is there a relationship right now that still feels like an open question?',
+      'When you think of the people around you, does any connection feel unfinished?',
+    ],
     options: [
-      { value: 'yes_know', label: 'Yes, and I know exactly who' },
-      { value: 'maybe', label: 'Maybe, but I haven\'t faced it yet' },
+      { value: 'yes_know', label: 'Yes, and I have a sense of who' },
+      { value: 'maybe', label: 'Maybe — I haven\'t really sat with it' },
       { value: 'not_aware', label: 'Not that I\'m aware of' },
-      { value: 'few_people', label: 'There are a few people actually' }
-    ]
+      { value: 'few_people', label: 'A few people, actually' },
+    ],
   },
   {
     id: 'firstInstinct',
-    title: 'When you find out who it is — what\'s your first instinct likely to be?',
     type: 'single',
+    titles: [
+      'When you find out who it is — what\'s your first instinct likely to be?',
+      'Once you see the name — what do you imagine yourself doing first?',
+      'When the answer is in front of you — how do you tend to react to news like this?',
+    ],
     options: [
-      { value: 'reach_out', label: 'Reach out immediately and ask why' },
-      { value: 'withdraw', label: 'Withdraw and process alone' },
-      { value: 'hurt', label: 'Feel hurt and look for what I did wrong' },
-      { value: 'angry', label: 'Feel angry and want to confront them' },
-      { value: 'observe', label: 'Observe from a distance before doing anything' }
-    ]
+      { value: 'reach_out', label: 'Reach out and gently ask what happened' },
+      { value: 'withdraw', label: 'Step back and process it on my own' },
+      { value: 'hurt', label: 'Feel it, and wonder what part was mine' },
+      { value: 'angry', label: 'Feel a flash of frustration' },
+      { value: 'observe', label: 'Take some distance before doing anything' },
+    ],
   },
   {
     id: 'commitments',
-    title: 'Before you see the name — what do you commit to?',
-    subtitle: 'You can select multiple',
     type: 'multiple',
+    subtitle: 'You can select multiple',
+    titles: [
+      'Before you see the name — what do you want to commit to?',
+      'Before we reveal anything — what do you want to hold onto?',
+      'Before the name appears — what kind of response do you want to choose?',
+    ],
     options: [
       { value: 'breathe', label: 'To take a breath before reacting' },
       { value: 'self_reflect', label: 'To ask myself first: what was my role in this?' },
-      { value: 'remember_signal', label: 'To remember that a virtual signal reflects a real feeling' },
-      { value: 'be_kind', label: 'To be kind to myself, whatever I discover' }
-    ]
-  }
+      { value: 'remember_signal', label: 'To remember that a signal reflects a feeling, not a verdict' },
+      { value: 'be_kind', label: 'To be kind to myself, whatever I discover' },
+    ],
+  },
 ];
 
+// Tire une variante de titre au hasard pour chaque thème.
+function buildQuestions() {
+  return QUESTION_POOL.map((theme) => ({
+    ...theme,
+    title: theme.titles[Math.floor(Math.random() * theme.titles.length)],
+  }));
+}
+
 export function RevealGate({ onReveal, onClose }: RevealGateProps) {
-  const [, navigate] = useLocation();
+  // Construit le questionnaire une seule fois par montage → la sélection
+  // aléatoire reste stable pendant toute la session du gate.
+  const [questions] = useState(buildQuestions);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<RevealAnswers>({});
   const [showTransition, setShowTransition] = useState(false);
 
-  const question = QUESTIONS[currentQuestion];
-  const isLastQuestion = currentQuestion === QUESTIONS.length - 1;
+  const question = questions[currentQuestion];
+  const isLastQuestion = currentQuestion === questions.length - 1;
   const isMultiple = question.type === 'multiple';
 
-  const currentAnswer = answers[question.id as keyof RevealAnswers];
-  const canProceed = isMultiple 
+  const currentAnswer = answers[question.id];
+  const canProceed = isMultiple
     ? ((currentAnswer as string[] | undefined)?.length ?? 0) > 0
     : !!currentAnswer;
 
+  // Fermeture au clavier (Escape) — accessibilité.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onClose]);
+
   const handleSelect = (value: string) => {
     if (isMultiple) {
-      const current = (answers[question.id as keyof RevealAnswers] as string[]) || [];
+      const current = (answers[question.id] as string[]) || [];
       const updated = current.includes(value)
         ? current.filter(v => v !== value)
         : [...current, value];
@@ -105,7 +156,7 @@ export function RevealGate({ onReveal, onClose }: RevealGateProps) {
 
   const handleNext = () => {
     if (!canProceed) return;
-    
+
     if (isLastQuestion) {
       setShowTransition(true);
     } else {
@@ -126,6 +177,8 @@ export function RevealGate({ onReveal, onClose }: RevealGateProps) {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
+        role="dialog"
+        aria-modal="true"
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
       >
         <motion.div
@@ -174,8 +227,9 @@ export function RevealGate({ onReveal, onClose }: RevealGateProps) {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 1.2 }}
+            autoFocus
             onClick={() => {
-              // Sauvegarder les réponses dans localStorage
+              // Sauvegarder les réponses dans localStorage (analytics tunnel)
               localStorage.setItem('revealGateAnswers', JSON.stringify(answers));
               // Afficher les comptes
               onReveal();
@@ -191,12 +245,16 @@ export function RevealGate({ onReveal, onClose }: RevealGateProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm overflow-y-auto">
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm overflow-y-auto"
+    >
       <div className="max-w-3xl w-full mx-auto px-6 py-12">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-bold text-gray-500">
-              Question {currentQuestion + 1} of {QUESTIONS.length}
+              Question {currentQuestion + 1} of {questions.length}
             </span>
             <button
               onClick={onClose}
@@ -209,7 +267,7 @@ export function RevealGate({ onReveal, onClose }: RevealGateProps) {
             <motion.div
               className="h-full bg-gradient-to-r from-green-500 to-emerald-500"
               initial={{ width: 0 }}
-              animate={{ width: `${((currentQuestion + 1) / QUESTIONS.length) * 100}%` }}
+              animate={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
               transition={{ duration: 0.3 }}
             />
           </div>
@@ -230,7 +288,11 @@ export function RevealGate({ onReveal, onClose }: RevealGateProps) {
               <p className="text-gray-400 mb-8">{question.subtitle}</p>
             )}
 
-            <div className="space-y-3 mb-12">
+            <div
+              role={isMultiple ? 'group' : 'radiogroup'}
+              aria-label={question.title}
+              className="space-y-3 mb-12"
+            >
               {question.options.map((option) => {
                 const isSelected = isMultiple
                   ? (currentAnswer as string[] | undefined)?.includes(option.value)
@@ -240,6 +302,8 @@ export function RevealGate({ onReveal, onClose }: RevealGateProps) {
                   <motion.button
                     key={option.value}
                     onClick={() => handleSelect(option.value)}
+                    role={isMultiple ? 'checkbox' : 'radio'}
+                    aria-checked={isSelected}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                     className={`w-full p-6 rounded-2xl text-left transition-all duration-300 ${
@@ -267,13 +331,15 @@ export function RevealGate({ onReveal, onClose }: RevealGateProps) {
               })}
             </div>
 
-            <div className="flex items-center justify-between">
-              <button
-                onClick={handleBack}
-                className="px-6 py-3 rounded-full text-gray-400 hover:text-white transition-colors font-bold"
-              >
-                {currentQuestion === 0 ? 'Cancel' : 'Back'}
-              </button>
+            <div className={`flex items-center ${currentQuestion === 0 ? 'justify-end' : 'justify-between'}`}>
+              {currentQuestion > 0 && (
+                <button
+                  onClick={handleBack}
+                  className="px-6 py-3 rounded-full text-gray-400 hover:text-white transition-colors font-bold"
+                >
+                  Back
+                </button>
+              )}
               <button
                 onClick={handleNext}
                 disabled={!canProceed}
