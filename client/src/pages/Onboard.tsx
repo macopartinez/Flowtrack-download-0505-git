@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { GlassText } from "@/components/GlassText";
+import { NavBar } from "@/components/NavBar";
 import { RadarBackground } from "@/components/RadarBackground";
 import { BackgroundWaler } from "@/components/BackgroundWaler";
 import { useAuth } from "@/hooks/use-auth";
@@ -297,13 +297,7 @@ export default function Onboard() {
         <RadarBackground />
         <BackgroundWaler />
 
-        <nav className="fixed w-full top-0 z-50 bg-transparent">
-          <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <button onClick={() => setLocation("/")} style={{ position: 'absolute', left: '15px', top: '15px' }} data-testid="link-home">
-              <GlassText text="WALER" fontSize={36} />
-            </button>
-          </div>
-        </nav>
+        <NavBar logoSize={36} />
 
         <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-24">
           <motion.div
@@ -370,13 +364,7 @@ export default function Onboard() {
       <RadarBackground />
       <BackgroundWaler />
 
-      <nav className="fixed w-full top-0 z-50 bg-transparent">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <button onClick={() => setLocation("/")} style={{ position: 'absolute', left: '15px', top: '15px' }} data-testid="link-home">
-            <GlassText text="WALER" fontSize={36} />
-          </button>
-        </div>
-      </nav>
+      <NavBar logoSize={36} />
 
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-32">
         <div className="w-full max-w-3xl my-auto">

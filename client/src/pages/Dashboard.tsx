@@ -12,7 +12,7 @@ import { Instagram, LogOut, List, X, ChevronLeft, ChevronRight, Lock, RotateCcw,
 import { Skeleton } from "@/components/ui/skeleton";
 import { fallbackAvatar } from "@/lib/utils";
 import { RadarBackground } from "@/components/RadarBackground";
-import { GlassText } from "@/components/GlassText";
+import { NavBar } from "@/components/NavBar";
 import { RevealGate } from "@/components/RevealGate";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { ProDashboard } from "@/components/pro/ProDashboard";
@@ -568,54 +568,49 @@ export default function Dashboard() {
           {/* Pro Dashboard Content (blurred for non-Pro) */}
           <div className={!isPro ? 'filter blur-sm pointer-events-none' : ''}>
             {/* Navbar */}
-            <nav className="fixed w-full top-0 z-50">
-            <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-              <button onClick={() => navigate("/")} style={{ position: 'absolute', left: '15px', top: '15px' }}>
-                <GlassText text="WALER" fontSize={32} />
-              </button>
-              
-              {/* Center: Mode Switcher */}
-              <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-black/50 backdrop-blur-xl border border-white/10 rounded-full p-1">
-                <button
-                  onClick={() => setMode('personal')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${
-                    isPersonalMode
-                      ? 'bg-[#02c950] text-black shadow-[0_0_20px_rgba(2,201,80,0.5)]'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  <User className="w-4 h-4" />
-                  Personal
-                </button>
-                <button
-                  onClick={() => setMode('professional')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${
-                    isProfessionalMode
-                      ? 'bg-[#02c950] text-black shadow-[0_0_20px_rgba(2,201,80,0.5)]'
-                      : 'text-gray-400 hover:text-white cursor-pointer'
-                  }`}
-                >
-                  <Briefcase className="w-4 h-4" />
-                  Professional
-                  {!isPro && <Crown className="w-3 h-3 text-amber-400" />}
-                </button>
-              </div>
-              
-              {/* Right: Account switcher + Logout + Pro Badge */}
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                <AccountSwitcher value={currentUserId} onChange={setSelectedAccountId} />
-                <button
-                  onClick={() => logout()}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold text-gray-400 hover:text-white transition-colors border border-white/10 hover:border-white/20"
-                >
-                  <LogOut className="w-4 h-4" /> Logout
-                </button>
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#02c950]/15 border border-[#02c950]/30 text-[#02c950]">
-                  <Crown className="w-4 h-4" />
+            <NavBar
+              center={
+                <div className="flex items-center gap-2 bg-black/50 backdrop-blur-xl border border-white/10 rounded-full p-1">
+                  <button
+                    onClick={() => setMode('personal')}
+                    className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                      isPersonalMode
+                        ? 'bg-[#02c950] text-black shadow-[0_0_20px_rgba(2,201,80,0.5)]'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    <User className="w-4 h-4" />
+                    <span className="hidden sm:inline">Personal</span>
+                  </button>
+                  <button
+                    onClick={() => setMode('professional')}
+                    className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                      isProfessionalMode
+                        ? 'bg-[#02c950] text-black shadow-[0_0_20px_rgba(2,201,80,0.5)]'
+                        : 'text-gray-400 hover:text-white cursor-pointer'
+                    }`}
+                  >
+                    <Briefcase className="w-4 h-4" />
+                    <span className="hidden sm:inline">Professional</span>
+                    {!isPro && <Crown className="w-3 h-3 text-amber-400" />}
+                  </button>
                 </div>
-              </div>
-            </div>
-          </nav>
+              }
+              actions={
+                <>
+                  <AccountSwitcher value={currentUserId} onChange={setSelectedAccountId} />
+                  <button
+                    onClick={() => logout()}
+                    className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full text-sm font-bold text-gray-400 hover:text-white transition-colors border border-white/10 hover:border-white/20"
+                  >
+                    <LogOut className="w-4 h-4" /> <span className="hidden sm:inline">Logout</span>
+                  </button>
+                  <div className="hidden sm:flex items-center justify-center w-10 h-10 rounded-full bg-[#02c950]/15 border border-[#02c950]/30 text-[#02c950]">
+                    <Crown className="w-4 h-4" />
+                  </div>
+                </>
+              }
+            />
           
           <div className="pt-20">
             <ProDashboard
@@ -708,56 +703,51 @@ export default function Dashboard() {
       {!disableAnimation && <RadarBackground />}
 
       {/* Navbar */}
-      <nav className="fixed w-full top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <button onClick={() => navigate("/")} style={{ position: 'absolute', left: '15px', top: '15px' }}>
-            <GlassText text="WALER" fontSize={32} />
-          </button>
-          
-          {/* Center: Mode Switcher */}
-          <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-black/50 backdrop-blur-xl border border-white/10 rounded-full p-1">
+      <NavBar
+        center={
+          <div className="flex items-center gap-2 bg-black/50 backdrop-blur-xl border border-white/10 rounded-full p-1">
             <button
               onClick={() => setMode('personal')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${
+              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full text-sm font-bold transition-all ${
                 isPersonalMode
-                  ? 'bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)]'
+                  ? 'bg-[#02c950] text-black shadow-[0_0_20px_rgba(2,201,80,0.5)]'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
               <User className="w-4 h-4" />
-              Personal
+              <span className="hidden sm:inline">Personal</span>
             </button>
             <button
               onClick={() => setMode('professional')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${
+              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full text-sm font-bold transition-all ${
                 isProfessionalMode
-                  ? 'bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)]'
+                  ? 'bg-[#02c950] text-black shadow-[0_0_20px_rgba(2,201,80,0.5)]'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
               <Briefcase className="w-4 h-4" />
-              Professional
+              <span className="hidden sm:inline">Professional</span>
               {!isPro && <Crown className="w-3 h-3 text-amber-400" />}
             </button>
           </div>
-          
-          {/* Right: Account switcher + Logout + Pro Badge */}
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+        }
+        actions={
+          <>
             <AccountSwitcher value={currentUserId} onChange={setSelectedAccountId} />
             <button
               onClick={() => logout()}
-              className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold text-gray-400 hover:text-white transition-colors border border-white/10 hover:border-white/20"
+              className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full text-sm font-bold text-gray-400 hover:text-white transition-colors border border-white/10 hover:border-white/20"
             >
-              <LogOut className="w-4 h-4" /> Logout
+              <LogOut className="w-4 h-4" /> <span className="hidden sm:inline">Logout</span>
             </button>
             {tier && (
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 text-green-300">
+              <div className="hidden sm:flex items-center justify-center w-10 h-10 rounded-full bg-[#02c950]/15 border border-[#02c950]/30 text-[#02c950]">
                 <Crown className="w-4 h-4" />
               </div>
             )}
-          </div>
-        </div>
-      </nav>
+          </>
+        }
+      />
 
       {/* Main layout */}
       <div className="relative z-10 flex items-center justify-center min-h-screen pt-20 px-6 gap-6 lg:gap-8 flex-wrap lg:flex-nowrap" style={{ paddingTop: '80px' }}>
@@ -922,10 +912,7 @@ export default function Dashboard() {
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="flex-1 max-w-2xl rounded-3xl overflow-hidden border border-white/10"
-          style={{
-            background: "linear-gradient(135deg, rgba(131,58,180,0.92) 0%, rgba(253,29,29,0.88) 50%, rgba(252,176,69,0.88) 100%)",
-          }}
+          className="oled-card flex-1 max-w-2xl rounded-3xl overflow-hidden"
         >
           {/* Platform header */}
           <div className="flex gap-6 px-6 pt-5 pb-2">

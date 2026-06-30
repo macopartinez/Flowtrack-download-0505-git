@@ -1,6 +1,6 @@
 import { RadarBackground } from "@/components/RadarBackground";
 import { BackgroundWaler } from "@/components/BackgroundWaler";
-import { GlassText } from "@/components/GlassText";
+import { NavBar } from "@/components/NavBar";
 import { motion, AnimatePresence } from "framer-motion";
 import { BarChart3, ShieldCheck, Zap, Eye, Search, Lock, ChevronDown, ArrowRight, Users, Heart, TrendingDown, Shield, Star, User, Crown, Target, TrendingUp, Network, MessageCircle, Activity, Clock, Link, UserPlus, Sparkles, Flame, Repeat, Check, UserMinus } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -183,29 +183,27 @@ export default function Landing() {
       <BackgroundWaler />
       <div className="grain-overlay z-0" aria-hidden="true" />
       <ConnectDialog isOpen={isOpen} setIsOpen={setIsOpen} />
-      <nav className="fixed w-full top-0 z-50 bg-transparent">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2" style={{ position: 'absolute', left: '15px', top: '15px' }}>
-            <GlassText text="WALER" fontSize={36} />
-          </div>
-          <div className="flex items-center gap-6" style={{ position: 'absolute', right: '15px', top: '15px' }}>
-            <button 
-              onClick={() => navigate("/onboard")}
-              className="text-base font-bold px-6 py-2.5 rounded-full transition-all duration-300 bg-[#02c950]/20 backdrop-blur-md border border-white/20 hover:shadow-[0_0_20px_rgba(2,201,80,0.4)] hover:bg-[#02c950]/30 text-white" 
-              data-testid="button-start-tracking"
-            >
-              Begin Your Journey
-            </button>
-            <button 
+      <NavBar
+        logoSize={36}
+        actions={
+          <>
+            <button
               onClick={() => setIsOpen(true)}
-              className="text-sm font-bold text-white hover:text-white/80 transition-colors" 
+              className="text-sm font-bold text-white hover:text-white/80 transition-colors order-1 sm:order-none"
               data-testid="button-login"
             >
               Welcome Back
             </button>
-          </div>
-        </div>
-      </nav>
+            <button
+              onClick={() => navigate("/onboard")}
+              className="text-sm sm:text-base font-bold px-4 sm:px-6 py-2.5 rounded-full transition-all duration-300 bg-[#02c950]/20 backdrop-blur-md border border-white/20 hover:shadow-[0_0_20px_rgba(2,201,80,0.4)] hover:bg-[#02c950]/30 text-white whitespace-nowrap"
+              data-testid="button-start-tracking"
+            >
+              Begin Your Journey
+            </button>
+          </>
+        }
+      />
       <section className="h-screen snap-start snap-always flex items-center justify-center relative px-6" data-testid="section-hero">
         <div className="max-w-5xl mx-auto text-center">
           <motion.div

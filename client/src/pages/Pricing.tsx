@@ -4,7 +4,7 @@ import { usePlans, useCreateCheckout, useUserPlan } from "@/hooks/use-subscripti
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { RadarBackground } from "@/components/RadarBackground";
-import { GlassText } from "@/components/GlassText";
+import { NavBar } from "@/components/NavBar";
 import { motion } from "framer-motion";
 import { Check, Zap, Crown, Loader2 } from "lucide-react";
 
@@ -63,9 +63,8 @@ export default function Pricing() {
       <RadarBackground />
 
       {/* Navbar */}
-      <nav className="fixed w-full top-0 z-50 backdrop-blur-xl bg-black/20 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <GlassText text="WALER" fontSize={32} />
+      <NavBar
+        actions={
           <Button
             onClick={() => navigate("/")}
             variant="ghost"
@@ -73,8 +72,8 @@ export default function Pricing() {
           >
             Back
           </Button>
-        </div>
-      </nav>
+        }
+      />
 
       {/* Main Content */}
       <div className="relative z-10 pt-32 pb-20 px-6">
@@ -158,7 +157,7 @@ export default function Pricing() {
                   )}
 
                   {isCurrentPlan && (
-                    <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                    <div className="absolute top-4 right-4 bg-[#02c950] text-black px-3 py-1 rounded-full text-xs font-bold">
                       Current plan
                     </div>
                   )}
