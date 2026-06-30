@@ -396,8 +396,8 @@ export default function Onboard() {
                   className="h-1 rounded-full transition-all duration-500"
                   style={{
                     flex: i === step ? 2 : 1,
-                    backgroundColor: i <= step 
-                      ? (i <= QUESTIONNAIRE_END ? "#3b82f6" : "#02c950")
+                    backgroundColor: i <= step
+                      ? (i <= QUESTIONNAIRE_END ? "rgba(2,201,80,0.5)" : "#02c950")
                       : "rgba(255,255,255,0.1)",
                   }}
                 />

@@ -6,52 +6,15 @@ import { Button } from "@/components/ui/button";
 import { RadarBackground } from "@/components/RadarBackground";
 import { GlassText } from "@/components/GlassText";
 import { motion } from "framer-motion";
-import { Check, Zap, Crown, Loader2, Sparkles } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Check, Zap, Crown, Loader2 } from "lucide-react";
 
 export default function Pricing() {
   const [, navigate] = useLocation();
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
-  const [isSimulating, setIsSimulating] = useState(false);
   const { user } = useAuth();
   const { data: plans, isLoading: plansLoading } = usePlans();
   const { data: userPlan } = useUserPlan();
   const { mutate: createCheckout, isPending: isCheckoutPending } = useCreateCheckout();
-  const { toast } = useToast();
-
-  const handleSimulateSubscription = async () => {
-    if (!user) return;
-    
-    setIsSimulating(true);
-    try {
-      const response = await fetch(`/api/admin/trigger-follow/${user.id}`, {
-        method: 'POST',
-      });
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        toast({
-          title: "Agents enabled!",
-          description: `Agents A and B will now track you (@${data.username})`,
-        });
-      } else {
-        toast({
-          title: "Agents inactive",
-          description: "Start agents A and B manually first",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Couldn't trigger the agents",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSimulating(false);
-    }
-  };
 
   const handleSubscribe = (planName: string, priceId: string | null) => {
     if (!user) {
@@ -243,28 +206,6 @@ export default function Pricing() {
                         "Choose this plan"
                       )}
                     </Button>
-
-                    {/* Bouton de simulation */}
-                    {!isCurrentPlan && (
-                      <Button
-                        onClick={handleSimulateSubscription}
-                        disabled={isSimulating}
-                        variant="outline"
-                        className="w-full h-10 rounded-xl font-medium bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border-purple-500/50"
-                      >
-                        {isSimulating ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Activating...
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles className="w-4 h-4 mr-2" />
-                            Simulate (Test)
-                          </>
-                        )}
-                      </Button>
-                    )}
                   </div>
                 </motion.div>
               );

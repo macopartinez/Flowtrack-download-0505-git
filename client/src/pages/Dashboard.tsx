@@ -8,7 +8,7 @@ import { useUnlockedUnfollowers, useUnlockUnfollower, useUnlockAllUnfollowers } 
 import { useQueryClient } from "@tanstack/react-query";
 import { BarChart, Bar, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell } from "recharts";
 import { motion, AnimatePresence, useSpring } from "framer-motion";
-import { Instagram, LogOut, List, X, ChevronLeft, ChevronRight, Lock } from "lucide-react";
+import { Instagram, LogOut, List, X, ChevronLeft, ChevronRight, Lock, RotateCcw, Ban, UserX } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fallbackAvatar } from "@/lib/utils";
 import { RadarBackground } from "@/components/RadarBackground";
@@ -580,7 +580,7 @@ export default function Dashboard() {
                   onClick={() => setMode('personal')}
                   className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${
                     isPersonalMode
-                      ? 'bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)]'
+                      ? 'bg-[#02c950] text-black shadow-[0_0_20px_rgba(2,201,80,0.5)]'
                       : 'text-gray-400 hover:text-white'
                   }`}
                 >
@@ -591,7 +591,7 @@ export default function Dashboard() {
                   onClick={() => setMode('professional')}
                   className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all ${
                     isProfessionalMode
-                      ? 'bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)]'
+                      ? 'bg-[#02c950] text-black shadow-[0_0_20px_rgba(2,201,80,0.5)]'
                       : 'text-gray-400 hover:text-white cursor-pointer'
                   }`}
                 >
@@ -610,7 +610,7 @@ export default function Dashboard() {
                 >
                   <LogOut className="w-4 h-4" /> Logout
                 </button>
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 text-green-300">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#02c950]/15 border border-[#02c950]/30 text-[#02c950]">
                   <Crown className="w-4 h-4" />
                 </div>
               </div>
@@ -1179,13 +1179,15 @@ export default function Dashboard() {
                           )}
                         </div>
                         {isUnlocked && (acc.recoveredAt || acc.recovered_at) && (
-                          <div className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-300 border border-green-500/30">
-                            ↩️ Refollowed
+                          <div className="text-xs px-2 py-1 rounded-full bg-[#02c950]/15 text-[#02c950] border border-[#02c950]/30 flex items-center gap-1">
+                            <RotateCcw className="w-3 h-3" /> Refollowed
                           </div>
                         )}
                         {isUnlocked && activeSection === 'blockers' && acc.status && (
-                          <div className="text-xs px-2 py-1 rounded-full bg-white/10">
-                            {acc.status === 'blocked' ? '🚫 Blocked' : '❌ Removed'}
+                          <div className="text-xs px-2 py-1 rounded-full bg-white/10 flex items-center gap-1">
+                            {acc.status === 'blocked'
+                              ? <><Ban className="w-3 h-3" /> Blocked</>
+                              : <><UserX className="w-3 h-3" /> Removed</>}
                           </div>
                         )}
                       </div>
@@ -1257,7 +1259,7 @@ export default function Dashboard() {
                       disabled={isDisabled}
                       className={`px-4 py-3 rounded-xl text-sm font-bold transition-all ${
                         monthIndex === index
-                          ? 'bg-green-500 text-white'
+                          ? 'bg-[#02c950] text-black'
                           : isDisabled
                           ? 'bg-white/5 text-gray-600 cursor-not-allowed opacity-50'
                           : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
@@ -1313,7 +1315,7 @@ export default function Dashboard() {
                       disabled={isDisabled}
                       className={`px-4 py-3 rounded-xl text-sm font-bold transition-all ${
                         selectedYear === year
-                          ? 'bg-green-500 text-white'
+                          ? 'bg-[#02c950] text-black'
                           : isDisabled
                           ? 'bg-white/5 text-gray-600 cursor-not-allowed opacity-50'
                           : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
